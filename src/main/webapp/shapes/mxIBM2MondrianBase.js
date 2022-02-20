@@ -33,6 +33,7 @@ mxUtils.extend(mxIBM2MondrianBase, mxShape);
 
 mxIBM2MondrianBase.prototype.cst = {
 	MONDRIAN_BASE : 'mxgraph.ibm2mondrian.base',
+	COLOR_PALETTE : 'IBM',
 
 	SHAPE_TYPE : 'shapeType',
 	SHAPE_TYPE_DEFAULT : 'pn',
@@ -65,57 +66,68 @@ mxIBM2MondrianBase.prototype.cst = {
 	TAG_COLOR_FILL_DEFAULT : 'medium', 
 };
 
-//**********************************************************************************************************************************************************
-// IBM Design Language Color Definitions https://www.ibm.com/design/language/color/#specifications
-//**********************************************************************************************************************************************************
-mxIBM2MondrianBase.prototype.getSelectedColorSpecification = function(colorFamily) {
-	switch(colorFamily) {
-		case 'red':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#fff1f1', swatch_20: '#ffd7d9', swatch_30: '#ffb3b8', swatch_40: '#ff8389', swatch_50: '#fa4d56', swatch_60: '#da1e28', swatch_70: '#a2191f', swatch_80: '#750e13', swatch_90: '#520408', swatch_100: '#2d0709'};
-		case 'magenta':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#fff0f7', swatch_20: '#ffd6e8', swatch_30: '#ffafd2', swatch_40: '#ff7eb6', swatch_50: '#ee5396', swatch_60: '#d02670', swatch_70: '#9f1853', swatch_80: '#740937', swatch_90: '#510224', swatch_100: '#2a0a18'};
-		case 'purple':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#f6f2ff', swatch_20: '#e8daff', swatch_30: '#d4bbff', swatch_40: '#be95ff', swatch_50: '#a56eff', swatch_60: '#8a3ffc', swatch_70: '#6929c4', swatch_80: '#491d8b', swatch_90: '#31135e', swatch_100: '#1c0f30'};
-		case 'cyan':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#e5f6ff', swatch_20: '#bae6ff', swatch_30: '#82cfff', swatch_40: '#33b1ff', swatch_50: '#1192e8', swatch_60: '#0072c3', swatch_70: '#00539a', swatch_80: '#003a6d', swatch_90: '#012749', swatch_100: '#061727'};
-		case 'blue':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#edf5ff', swatch_20: '#d0e2ff', swatch_30: '#a6c8ff', swatch_40: '#78a9ff', swatch_50: '#4589ff', swatch_60: '#0f62fe', swatch_70: '#0043ce', swatch_80: '#002d9c', swatch_90: '#001d6c', swatch_100: '#001141'};
-		case 'teal':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#d9fbfb', swatch_20: '#9ef0f0', swatch_30: '#3ddbd9', swatch_40: '#08bdba', swatch_50: '#009d9a', swatch_60: '#007d79', swatch_70: '#005d5d', swatch_80: '#004144', swatch_90: '#022b30', swatch_100: '#081a1c'};
-		case 'green':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#defbe6', swatch_20: '#a7f0ba', swatch_30: '#6fdc8c', swatch_40: '#42be65', swatch_50: '#24a148', swatch_60: '#198038', swatch_70: '#0e6027', swatch_80: '#044317', swatch_90: '#022d0d', swatch_100: '#071908'};
-		case 'black':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#f2f4f8', swatch_20: '#dde1e6', swatch_30: '#000000', swatch_40: '#000000', swatch_50: '#000000', swatch_60: '#000000', swatch_70: '#000000', swatch_80: '#000000', swatch_90: '#000000', swatch_100: '#000000'};
-		case 'gray':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#f2f4f8', swatch_20: '#dde1e6', swatch_30: '#c1c7cd', swatch_40: '#a2a9b0', swatch_50: '#878d96', swatch_60: '#697077', swatch_70: '#4d5358', swatch_80: '#343a3f', swatch_90: '#21272a', swatch_100: '#121619'};
-		case 'yellow':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#fcf4d6', swatch_20: '#fddc69', swatch_30: '#f1c21b', swatch_40: '#d2a106', swatch_50: '#b28600', swatch_60: '#8e6a00', swatch_70: '#684e00', swatch_80: '#483700', swatch_90: '#302400', swatch_100: '#1c1500'};
-		case 'orange':
-			return {noColor: 'none', white: '#ffffff', swatch_10: '#fff2e8', swatch_20: '#ffd9Be', swatch_30: '#ffb784', swatch_40: '#ff832b', swatch_50: '#eb6200', swatch_60: '#ba4e00', swatch_70: '#8a3800', swatch_80: '#5e2900', swatch_90: '#3e1a00', swatch_100: '#231000'};			
-		case 'white':
-				return {noColor: '#ffffff', white: '#ffffff', swatch_10: '#ffffff', swatch_20: '#ffffff', swatch_30: '#ffffff', swatch_40: '#ffffff', swatch_50: '#ffffff', swatch_60: '#ffffff', swatch_70: '#ffffff', swatch_80: '#ffffff', swatch_90: '#ffffff', swatch_100: '#ffffff'};	
-		case 'noColor':
-				return {noColor: 'none', white: 'none', swatch_10: 'none', swatch_20: 'none', swatch_30: 'none', swatch_40: 'none', swatch_50: 'none', swatch_60: 'none', swatch_70: 'none', swatch_80: 'none', swatch_90: 'none', swatch_100: 'none'};	
-		}
+
+mxIBM2MondrianBase.prototype.getColor = function(colorFamily, colorIntensity) {
+	let colorPalette = mxIBM2MondrianBase.prototype.cst.COLOR_PALETTE;
+
+	switch(colorIntensity) 
+	{
+		case mxIBM2MondrianBase.prototype.colorIntensity.NO_COLOR:
+			return 'none';
+		case mxIBM2MondrianBase.prototype.colorIntensity.WHITE:
+			return '#ffffff';
+		case mxIBM2MondrianBase.prototype.colorIntensity.VERY_LIGHT:
+		case mxIBM2MondrianBase.prototype.colorIntensity.LIGHT:
+			return this.getSelectedColorSpecification(colorFamily, colorPalette)[mxIBM2MondrianBase.prototype.colorIntensity.LIGHT];
+		case mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM:
+			return this.getSelectedColorSpecification(colorFamily, colorPalette)[mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM];
+		case mxIBM2MondrianBase.prototype.colorIntensity.DARK:
+			return this.getSelectedColorSpecification(colorFamily, colorPalette)[mxIBM2MondrianBase.prototype.colorIntensity.DARK];
+	}
 }
 
-// A color swatch of 60 or higher is considered 'dark'
-mxIBM2MondrianBase.prototype.isDarkColor = function(color,colorSwatch)
+//**********************************************************************************************************************************************************
+
+//**********************************************************************************************************************************************************
+mxIBM2MondrianBase.prototype.getSelectedColorSpecification = function(colorFamily, colorPalette) {
+	switch(colorPalette)
+	{
+		case 'IBM': // IBM Design Language Color Definitions https://www.ibm.com/design/language/color/#specifications
+			switch(colorFamily) {
+				case 'red':
+					return {light: '#fff1f1', medium: '#fa4d56', dark: '#750e13'}; //RED: 		swatch_10, swatch_50, swatch_80
+				case 'magenta':
+					return {light: '#fff0f7', medium: '#ee5396', dark: '#9f1853'}; //MAGENTA: 	swatch_10, swatch_50, swatch_70
+				case 'purple':
+					return {light: '#f6f2ff', medium: '#a56eff', dark: '#6929c4'}; //PURPLE: 	swatch_10, swatch_50, swatch_70
+				case 'cyan':
+					return {light: '#e5f6ff', medium: '#1192e8', dark: '#00539a'}; //CYAN:	 	swatch_10, swatch_50, swatch_70
+				case 'blue':
+					return {light: '#edf5ff', medium: '#0f62fe', dark: '#002d9c'}; //BLUE: 		swatch_10, swatch_60, swatch_80
+				case 'teal':
+					return {light: '#d9fbfb', medium: '#009d9a', dark: '#005d5d'}; //TEAL: 		swatch_10, swatch_50, swatch_70
+				case 'green':
+					return {light: '#defbe6', medium: '#24a148', dark: '#0e6027'}; //GREEN: 	swatch_10, swatch_50, swatch_70
+				case 'yellow':
+					return {light: '#fcf4d6', medium: '#b28600', dark: '#684e00'}; //YELLOW: 	swatch_10, swatch_50, swatch_70
+				case 'orange':
+					return {light: '#fff2e8', medium: '#eb6200', dark: '#8a3800'}; //ORANGE: 	swatch_10, swatch_50, swatch_70
+				case 'gray':
+					return {light: '#f2f4f8', medium: '#697077', dark: '#343a3f'}; //GRAY: 		swatch_10, swatch_60, swatch_80
+				case 'black':
+					return {light: '#f2f4f8', medium: '#000000', dark: '#000000'}; //BLACK: 	swatch_10, swatch_50, swatch_70
+				}
+	}
+}
+
+mxIBM2MondrianBase.prototype.isDarkColor = function(color,colorIntensity)
 {
 	if(color === '#000000') // black
 		return true;
 	else if(color === '#ffffff') // white
 		return false;
 	else
-	{
-		var swatch = null; 
-		if(colorSwatch != null)
-			swatch = colorSwatch.split("_")[1];
-		if(swatch != null)
-			return parseInt(swatch) >= 50;
-		else
-			return false;
-	}
+		return (colorIntensity === mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM || colorIntensity === mxIBM2MondrianBase.prototype.colorIntensity.DARK);
 }
 
 mxIBM2MondrianBase.prototype.colorIntensity = {
@@ -127,7 +139,7 @@ mxIBM2MondrianBase.prototype.colorIntensity = {
 	DARK: 'dark'
 }
 
-mxIBM2MondrianBase.prototype.getColorSwatch = function(colorFamily, colorIntensity, shapePart, shapeLayout, shapeType)
+mxIBM2MondrianBase.prototype.getColorIntensity = function(colorIntensity, shapePart, shapeType)
 {
 	if((shapeType === 'pg' || shapeType === 'lg') && shapePart === 'corner')
 	{
@@ -138,39 +150,18 @@ mxIBM2MondrianBase.prototype.getColorSwatch = function(colorFamily, colorIntensi
 		switch(colorIntensity) 
 		{
 			case mxIBM2MondrianBase.prototype.colorIntensity.DARK:
-				if(colorFamily === 'blue' || colorFamily === 'red' || colorFamily === 'gray')
-					return 'swatch_80';
-				else
-					return 'swatch_70';
+				return mxIBM2MondrianBase.prototype.colorIntensity.DARK;
 			default:
-				if(colorFamily === 'blue' || colorFamily === 'gray')
-					return 'swatch_60';
-				else
-					return 'swatch_50';	
-				}
+				return mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM;
+		}
+	}
+	else if(colorIntensity == mxIBM2MondrianBase.prototype.colorIntensity.VERY_LIGHT)
+	{
+		return mxIBM2MondrianBase.prototype.colorIntensity.LIGHT
 	}
 	else
 	{
-		switch(colorIntensity)
-		{
-			case mxIBM2MondrianBase.prototype.colorIntensity.NO_COLOR:
-				return mxIBM2MondrianBase.prototype.colorIntensity.NO_COLOR;
-			case mxIBM2MondrianBase.prototype.colorIntensity.WHITE:
-				return mxIBM2MondrianBase.prototype.colorIntensity.WHITE;
-			case mxIBM2MondrianBase.prototype.colorIntensity.VERY_LIGHT:
-			case mxIBM2MondrianBase.prototype.colorIntensity.LIGHT:
-				return 'swatch_10';
-			case mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM:
-				if(colorFamily === 'blue' || colorFamily === 'gray')
-					return 'swatch_60';
-				else
-					return 'swatch_50';
-			case mxIBM2MondrianBase.prototype.colorIntensity.DARK:
-				if(colorFamily === 'blue' || colorFamily === 'red' || colorFamily === 'gray')
-					return 'swatch_80';
-				else
-					return 'swatch_70';
-		}	
+		return colorIntensity;
 	}
 }
 
@@ -297,16 +288,16 @@ mxIBM2MondrianBase.prototype.getShapeVisualDefinition = function (
 		shape: {visible:false, type: shapeType, layout: shapeLayout, width: null, height: null, radius: null, leftOffSet: null},
 		style: {type: shapeStyle, color: null},
 		multiplicity: {visible: shapeMultiplicity, spacing: null},
-		outerLine: {color: null, colorSwatch: null, dashed: (shapeStyle === 'dashed'), secondLine: (shapeStyle === 'double'), secondLineOffSet: null},
-		bar: {visible: false, color: null, width: null, height: null},
-		corner: {visible: false, color: null, colorSwatch: null, width: null, height: null},
-		icon: {visible: false, color: null, colorSwatch: null, size: null, spacing: null, rotate: 0, flipH: false, flipV: false},
-		titleBar: {visible: false, color: null, colorSwatch: null},
+		outerLine: {color: null, colorIntensity: null, dashed: (shapeStyle === 'dashed'), secondLine: (shapeStyle === 'double'), secondLineOffSet: null},
+		bar: {visible: false, color: null, colorIntensity: null, width: null, height: null},
+		corner: {visible: false, color: null, colorIntensity: null, width: null, height: null},
+		icon: {visible: false, color: null, size: null, spacing: null, rotate: 0, flipH: false, flipV: false},
+		titleBar: {visible: false, color: null,colorIntensity: null},
 		text: {color: null, labelBoundsHeight: null, labelBoundsOffSetLeft: null},
-		dividerLine: {visible: false, color: null, colorSwatch: null},
-		container: {visible: false, color: null, colorSwatch: null},
-		decorator: {component: {color: WHITE, colorSwatch: null, width: null, height: null, offSet: null}},
-		tag: {visible: false, shape: 'circle', fill: {color: null, colorSwatch: null}, line: {color: null, colorSwatch: null}, text: null, textColor: null},
+		dividerLine: {visible: false, color: null, colorIntensity: null},
+		container: {visible: false, color: null, colorIntensity: null},
+		decorator: {component: {color: WHITE, width: null, height: null, offSet: null}},
+		tag: {visible: false, shape: 'circle', fill: {color: null, colorIntensity: null}, line: {color: null, colorIntensity: null}, text: null, textColor: null},
 	};
 
 	// if the shape is set to legend some of the style properties get overridden
@@ -344,7 +335,7 @@ mxIBM2MondrianBase.prototype.getShapeVisualDefinition = function (
 	shapeVD.shape.leftOffSet = dimensions.shapeLeftOffSet;
 
 	//outerLine
-	shapeVD.outerLine.colorSwatch = this.getColorSwatch(colorFamily, colorFillIcon, 'outerLine', shapeLayout, shapeVD.shape.type);
+	shapeVD.outerLine.colorIntensity = this.getColorIntensity(colorFillIcon, 'outerLine', shapeVD.shape.type);
 	shapeVD.outerLine.secondLineOffSet = dimensions.secondLineOffSet;
 
 	shapeVD.multiplicity.spacing = dimensions.multiplicitySpacing;
@@ -352,9 +343,9 @@ mxIBM2MondrianBase.prototype.getShapeVisualDefinition = function (
 	//titleBar
 	shapeVD.titleBar.visible = (shapeVD.shape.visible && shapeLayout === 'expanded' && colorFillText != 'noColor');
 	if(shapeVD.shape.type === 'ts')
-		shapeVD.titleBar.colorSwatch = this.getColorSwatch(colorFamily, colorFillIcon, 'corner', shapeLayout, shapeVD.shape.type);
+		shapeVD.titleBar.colorIntensity = this.getColorIntensity(colorFillIcon, 'corner', shapeVD.shape.type);
 	else
-		shapeVD.titleBar.colorSwatch = this.getColorSwatch(colorFamily, colorFillText, 'titleBar', shapeLayout, shapeVD.shape.type);
+		shapeVD.titleBar.colorIntensity = this.getColorIntensity(colorFillText, 'titleBar', shapeVD.shape.type);
 
 	// icon
 	shapeVD.icon.visible = (shapeLayout === 'expanded' || shapeLayout === 'collapsed' || (shapeLayout === 'legend' && shapeSubLayout === 'icon')) && (iconImage != 'noIcon');
@@ -381,55 +372,55 @@ mxIBM2MondrianBase.prototype.getShapeVisualDefinition = function (
 		}
 
 	//bar & corner
-	shapeVD.corner.colorSwatch = this.getColorSwatch(colorFamily, colorFillIcon, 'corner', shapeLayout, shapeVD.shape.type);
-	shapeVD.corner.visible = shapeVD.shape.visible && (shapeVD.icon.visible || shapeVD.corner.colorSwatch != 'noColor');
+	shapeVD.corner.colorIntensity = this.getColorIntensity(colorFillIcon, 'corner', shapeVD.shape.type);;
+	shapeVD.corner.visible = shapeVD.shape.visible && (shapeVD.icon.visible || shapeVD.corner.colorIntensity != 'noColor');
 	shapeVD.corner.width = (shapeVD.corner.visible) ? dimensions.cornerWidth : 0;
 	shapeVD.corner.height = dimensions.minRectHeight;
 
-	shapeVD.bar.colorSwatch = shapeVD.outerLine.colorSwatch;
+	shapeVD.bar.colorIntensity = shapeVD.outerLine.colorIntensity; 
 	shapeVD.bar.visible = (shapeVD.shape.type === 'pg' || shapeVD.shape.type === 'lg') && ((colorFillIcon != 'noColor') || (shapeVD.shape.layout == 'legend' && shapeSubLayout === 'shape')); // color fill is a workaround to enable hiding the bar
 	shapeVD.bar.width = (shapeVD.bar.visible) ? dimensions.barWidth : 0;
 	shapeVD.bar.height = dimensions.barHeight;
 
 	//container
 	shapeVD.container.visible = shapeVD.shape.visible && (shapeVD.shape.layout === 'expanded') && (shapeVD.shape.height - dimensions.titleBarHeight > 0);
-	shapeVD.container.colorSwatch = this.getColorSwatch(colorFamily, colorFillContainer, 'container', shapeLayout, shapeVD.shape.type);
+	shapeVD.container.colorIntensity = this.getColorIntensity(colorFillContainer, 'container', shapeVD.shape.type);
 
 	//dividerLine
 	shapeVD.dividerLine.visible = false;//shapeVD.container.visible && (shapeVD.shape.type !== 'pg' && shapeVD.shape.type != 'lg');
-	shapeVD.dividerLine.colorSwatch = (shapeVD.titleBar.colorSwatch === 'swatch_10') ? 'swatch_30' : 'swatch_20';
+	shapeVD.dividerLine.colorIntensity = 'undefined';
 
 	// Get the HEX values for each Shape part
-	shapeVD.outerLine.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.outerLine.colorSwatch];
-	shapeVD.bar.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.bar.colorSwatch];
-	shapeVD.corner.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.corner.colorSwatch];
-	shapeVD.titleBar.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.titleBar.colorSwatch];
-	shapeVD.dividerLine.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.dividerLine.colorSwatch];
-	shapeVD.container.color = this.getSelectedColorSpecification(colorFamily)[shapeVD.container.colorSwatch];
+	shapeVD.outerLine.color = this.getColor(colorFamily, shapeVD.outerLine.colorIntensity);
+	shapeVD.bar.color = this.getColor(colorFamily, shapeVD.bar.colorIntensity);
+	shapeVD.corner.color = this.getColor(colorFamily, shapeVD.corner.colorIntensity);
+	shapeVD.titleBar.color = this.getColor(colorFamily, shapeVD.titleBar.colorIntensity);
+	shapeVD.dividerLine.color = this.getColor(colorFamily, shapeVD.dividerLine.colorIntensity);
+	shapeVD.container.color = this.getColor(colorFamily, shapeVD.container.colorIntensity);
 
-	shapeVD.icon.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorSwatch)) && shapeVD.corner.visible ?  WHITE : BLACK;
+	shapeVD.icon.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorIntensity)) && shapeVD.corner.visible ?  WHITE : BLACK;
 
 	if(shapeLayout === 'collapsed' || shapeLayout === 'legend')
 	{
 		shapeVD.text.color = BLACK;
 		shapeVD.text.labelBoundsOffSetLeft = dimensions.lableBoundOffsetLeft;
-		shapeVD.style.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorSwatch)) ?  WHITE : shapeVD.outerLine.color;
+		shapeVD.style.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorIntensity)) ?  WHITE : shapeVD.outerLine.color;
 
 		if(shapeVD.outerLine.dashed)
-			shapeVD.outerLine.secondLine = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorSwatch));
+			shapeVD.outerLine.secondLine = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorIntensity));
 	}
 	else if (shapeLayout === 'expanded')
 	{
-		shapeVD.text.color = (this.isDarkColor(shapeVD.titleBar.color, shapeVD.titleBar.colorSwatch)) ?  WHITE : BLACK;
+		shapeVD.text.color = (this.isDarkColor(shapeVD.titleBar.color, shapeVD.titleBar.colorIntensity)) ?  WHITE : BLACK;
 		shapeVD.text.labelBoundsOffSetLeft = shapeVD.corner.width;
 		shapeVD.style.color = shapeVD.outerLine.color;
 
 		if(shapeVD.shape.type === 'ts')
 		{
 			if(shapeVD.style.type === 'strikethrough')
-				shapeVD.style.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorSwatch)) ?  WHITE : shapeVD.outerLine.color;
+				shapeVD.style.color = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorIntensity)) ?  WHITE : shapeVD.outerLine.color;
 			else if(shapeVD.outerLine.dashed)
-				shapeVD.outerLine.secondLine = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorSwatch));
+				shapeVD.outerLine.secondLine = (this.isDarkColor(shapeVD.corner.color, shapeVD.corner.colorIntensity));
 
 			shapeVD.text.labelBoundsOffSetLeft = (shapeVD.icon.visible) ? shapeVD.text.labelBoundsOffSetLeft : 0;
 		}
@@ -451,14 +442,14 @@ mxIBM2MondrianBase.prototype.getShapeVisualDefinition = function (
 		let tagColorFill = mxUtils.getValue(thisShape.style, mxIBM2MondrianBase.prototype.cst.TAG_COLOR_FILL, mxIBM2MondrianBase.prototype.cst.TAG_COLOR_FILL_DEFAULT);
 		let tagColorLine = (tagColorFill == mxIBM2MondrianBase.prototype.colorIntensity.DARK || tagColorFill == mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM) ? tagColorFill : colorFillIcon;
 
-		shapeVD.tag.fill.colorSwatch = this.getColorSwatch(tagColorFamily, tagColorFill, 'tag', shapeLayout, shapeVD.shape.type);
-		shapeVD.tag.fill.color = this.getSelectedColorSpecification(tagColorFamily)[shapeVD.tag.fill.colorSwatch];
+		shapeVD.tag.fill.colorIntensity = this.getColorIntensity(tagColorFill, 'tag', shapeVD.shape.type);
+		shapeVD.tag.fill.color = this.getColor(tagColorFamily, shapeVD.tag.fill.colorIntensity);
 
-		shapeVD.tag.line.colorSwatch = this.getColorSwatch(tagColorFamily, tagColorLine, 'tagLine', shapeLayout, shapeVD.shape.type);
-		shapeVD.tag.line.color = this.getSelectedColorSpecification(tagColorFamily)[shapeVD.tag.line.colorSwatch];
+		shapeVD.tag.line.colorIntensity = this.getColorIntensity(tagColorLine, 'tagLine', shapeVD.shape.type);
+		shapeVD.tag.line.color = this.getColor(tagColorFamily, shapeVD.tag.line.colorIntensity);
 
 		shapeVD.tag.text = thisShape.state.cell.getAttribute('Tag-Text',null);
-		shapeVD.tag.textColor = (this.isDarkColor(shapeVD.tag.fill.color, shapeVD.tag.fill.colorSwatch)) ?  WHITE : BLACK;
+		shapeVD.tag.textColor = (this.isDarkColor(shapeVD.tag.fill.color, shapeVD.tag.fill.colorIntensity)) ?  WHITE : BLACK;
 	}
 
 	return shapeVD;
@@ -2045,10 +2036,9 @@ mxIBM2MondrianLegend.prototype.paintVertexShape = function(c, x, y, w, h)
 	let legendColor = mxUtils.getValue(this.style, 
 		mxIBM2MondrianLegend.prototype.cst.LEGEND_COLOR, mxIBM2MondrianLegend.prototype.cst.LEGEND_COLOR_DEFAULT).split(':');
 
-	let textColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(legendColor[0]).swatch_50;
-	let strokeColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(legendColor[1]).swatch_50;
-	let fillColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(legendColor[2]).swatch_50;
-
+	let textColor = mxIBM2MondrianBase.prototype.getColor(legendColor[0], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	let strokeColor = mxIBM2MondrianBase.prototype.getColor(legendColor[1], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	let fillColor = mxIBM2MondrianBase.prototype.getColor(legendColor[2], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
 
 	c.translate(x, y);
 	c.setFillColor(fillColor);
@@ -2056,8 +2046,8 @@ mxIBM2MondrianLegend.prototype.paintVertexShape = function(c, x, y, w, h)
 	c.rect(0, 0, w, h);
 	c.fillAndStroke();
 
-	const standardBlack = mxIBM2MondrianBase.prototype.getSelectedColorSpecification('black').swatch_50;
-	const standardGray = mxIBM2MondrianBase.prototype.getSelectedColorSpecification('gray').swatch_50;
+	const standardBlack = mxIBM2MondrianBase.prototype.getColor('black', mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	const standardGray = mxIBM2MondrianBase.prototype.getColor('gray', mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
 
 	fontColor = this.style.fontColor;
 	if(fontColor != textColor && (fontColor === standardBlack || fontColor === standardGray || fontColor === 'undefined'))
@@ -2159,7 +2149,7 @@ mxIBM2MondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (
 	// VD properties
 	let shapeVD = {
 		shape: {visible:false, type: shapeType, width: null, height: null, radius: null, leftOffSet: null},
-		icon: {visible: false, color: null, colorSwatch: null, size: null, spacing: null, rotate: 0, flipH: false, flipV: false},
+		icon: {visible: false, color: null, size: null, spacing: null, rotate: 0, flipH: false, flipV: false},
 		text: {color: null, labelBoundsHeight: 16, labelBoundsOffSetLeft: 24},
 	};
 
@@ -2201,9 +2191,9 @@ mxIBM2MondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (
 
 	 let duColor = mxUtils.getValue(this.style, mxIBM2MondrianBaseDeploymentUnit.prototype.cst.DU_COLOR, mxIBM2MondrianBaseDeploymentUnit.prototype.cst.DU_COLOR_DEFAULT).split(':');
  
-	 let textColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(duColor[0]).swatch_50;
-	 let strokeColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(duColor[1]).swatch_50;
-	 let fillColor = mxIBM2MondrianBase.prototype.getSelectedColorSpecification(duColor[2]).swatch_50;
+	 let textColor = mxIBM2MondrianBase.prototype.getColor(legendColor[0], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	 let strokeColor = mxIBM2MondrianBase.prototype.getColor(legendColor[1], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	 let fillColor = mxIBM2MondrianBase.prototype.getColor(legendColor[2], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
  
 	 c.translate(x, y);
 	 
@@ -2215,8 +2205,8 @@ mxIBM2MondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (
 	 
 	 this.paintIcon(c);
  
-	 const standardBlack = mxIBM2MondrianBase.prototype.getSelectedColorSpecification('black').swatch_50;
-	 const standardGray = mxIBM2MondrianBase.prototype.getSelectedColorSpecification('gray').swatch_50;
+	 const standardBlack = mxIBM2MondrianBase.prototype.getColor('black', mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	 const standardGray = mxIBM2MondrianBase.prototype.getColor('gray', mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
  
 	 fontColor = this.style.fontColor;
 	 if(fontColor != textColor && (fontColor === standardBlack || fontColor === standardGray || fontColor === 'undefined'))
