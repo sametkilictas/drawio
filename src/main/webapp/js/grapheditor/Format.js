@@ -4221,7 +4221,11 @@ StyleFormatPanel.prototype.init = function()
 
 		if (ss.fill)
 		{
-			this.container.appendChild(this.addFill(this.createPanel()));
+			/* MONDRIAN: Hide Style Fill Panel */
+			if(ss.style.shape != 'mxgraph.ibm2mondrian.base') 
+			{
+				this.container.appendChild(this.addFill(this.createPanel()));
+			}
 		}
 	
 		this.container.appendChild(this.addStroke(this.createPanel()));

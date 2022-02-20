@@ -4535,7 +4535,8 @@
 		{
 			var sstate = this.editorUi.getSelectionState();
 
-			if (sstate.style.shape != 'image' && !sstate.containsLabel && sstate.cells.length > 0)
+			/* MONDRIAN: Hide Style Color Palette Panel */
+			if (sstate.style.shape != 'image' && !sstate.containsLabel && sstate.cells.length > 0 && sstate.style.shape != 'mxgraph.ibm2mondrian.base')
 			{
 				this.container.appendChild(this.addStyles(this.createPanel()));
 			}
