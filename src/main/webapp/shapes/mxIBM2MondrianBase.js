@@ -70,6 +70,14 @@ mxIBM2MondrianBase.prototype.cst = {
 mxIBM2MondrianBase.prototype.getColor = function(colorFamily, colorIntensity) {
 	let colorPalette = mxIBM2MondrianBase.prototype.cst.COLOR_PALETTE;
 
+	switch(colorFamily)
+	{
+		case 'noColor':
+			return 'none';
+		case 'white':
+			return '#ffffff';
+	}
+
 	switch(colorIntensity) 
 	{
 		case mxIBM2MondrianBase.prototype.colorIntensity.NO_COLOR:
@@ -2190,13 +2198,12 @@ mxIBM2MondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (
 	 this.shapeVisualDefinition = mxIBM2MondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition(this,this.shapeType);
 
 	 let duColor = mxUtils.getValue(this.style, mxIBM2MondrianBaseDeploymentUnit.prototype.cst.DU_COLOR, mxIBM2MondrianBaseDeploymentUnit.prototype.cst.DU_COLOR_DEFAULT).split(':');
- 
-	 let textColor = mxIBM2MondrianBase.prototype.getColor(legendColor[0], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
-	 let strokeColor = mxIBM2MondrianBase.prototype.getColor(legendColor[1], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
-	 let fillColor = mxIBM2MondrianBase.prototype.getColor(legendColor[2], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
- 
+	 let textColor = mxIBM2MondrianBase.prototype.getColor(duColor[0], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	 let strokeColor = mxIBM2MondrianBase.prototype.getColor(duColor[1], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+	 let fillColor = mxIBM2MondrianBase.prototype.getColor(duColor[2], mxIBM2MondrianBase.prototype.colorIntensity.MEDIUM);
+
 	 c.translate(x, y);
-	 
+
 	 //this.paintLabel(c);
 	 c.setFillColor(fillColor);
 	 c.setStrokeColor(strokeColor);
