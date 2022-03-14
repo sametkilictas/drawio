@@ -1719,7 +1719,7 @@ Actions.prototype.init = function()
 			        		var style = graph.getCurrentCellStyle(cells[0]);
 			        		
 							/* MONDRIAN: Enable Image Upload */
-			        		if (style[mxConstants.STYLE_SHAPE] != 'image' && style[mxConstants.STYLE_SHAPE] != 'label' && style[mxConstants.STYLE_SHAPE] != 'mxgraph.ibm2mondrian.base')
+			        		if (style[mxConstants.STYLE_SHAPE] != 'image' && style[mxConstants.STYLE_SHAPE] != 'label' && style[mxConstants.STYLE_SHAPE] != 'mxgraph.mondrian.base')
 			        		{
 			        			graph.setCellStyles(mxConstants.STYLE_SHAPE, 'image', cells);
 			        		}
