@@ -145,6 +145,13 @@
         }
     },
 
+    "Elements":{
+        "Athena-Sample":
+        {
+            "uri": "mondrian/elements/athena.sample.json"
+        }
+    },
+
     "Fonts":{
         "F0.1":
         {

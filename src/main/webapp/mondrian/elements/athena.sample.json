@@ -1,0 +1,14 @@
+{
+    "ABB-ID":
+    {
+        "Element-Name": "Name of ABB",
+        "Icon-Name": "building-block-architecture",
+        "Tag-Text": "ABB"
+    },
+    "SBB-ID":
+    {
+        "Element-Name": "Name of SBB",
+        "Icon-Name": "building-block-solution",
+        "Tag-Text": "SBB"
+    }
+}

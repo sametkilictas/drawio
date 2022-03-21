@@ -552,6 +552,8 @@ mxMondrianBase.prototype.textSpacing = 4;
  */
 mxMondrianBase.prototype.init = function(container)
 {
+	//console.log(Sidebar.prototype.mondrianRepo);
+
 	if (!mxUtils.isNode(this.state.cell.value)) {
 		let obj = mxUtils.createXmlDocument().createElement('UserObject');
 		obj.setAttribute('label', this.state.cell.value);
@@ -567,6 +569,8 @@ mxMondrianBase.prototype.init = function(container)
 		}
 	}
 
+	mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
+
 	mxShape.prototype.init.apply(this, arguments);
 
 	this.templateConversion();
@@ -574,6 +578,23 @@ mxMondrianBase.prototype.init = function(container)
 	this.cellID = this.state.cell.id;
 	this.installListeners();
 };
+
+mxMondrianBase.prototype.setAttributesFromRepo = function(thisCell)
+{
+	let elementID = thisCell.getAttribute('Element-ID');
+	if(Sidebar.prototype.mondrianRepo.hasElement(elementID))
+	{
+		let element = Sidebar.prototype.mondrianRepo.getElement(elementID);
+
+		for (let attribute in thisCell.value.attributes)
+		{
+			let attributeName = thisCell.value.attributes[attribute].nodeName;
+
+			if(attributeName != 'undefined' && element.hasOwnProperty(attributeName))
+				thisCell.setAttribute(attributeName, element[attributeName]);	
+		}
+	}
+}
 
 /* temporary function to support coversion of old diagrams  */
 mxMondrianBase.prototype.colorBackgroundConversion = function(colorFillText, colorFillContainer)
@@ -645,7 +666,6 @@ mxMondrianBase.prototype.templateConversion = function()
 					shapeUpdate = true;
 				}
 			}
-				
 		
 			if(styleUpdate)
 			{
@@ -729,6 +749,8 @@ mxMondrianBase.prototype.installListeners = function()
 			{
 				if(evt.properties.change.constructor.name === 'mxValueChange' && (evt.properties.change.cell.id === this.cellID))
 				{
+					mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
+
 					const currentIconAttribute = evt.properties.change.value.attributes.getNamedItem('Icon-Name');
 					const previousIconAttribute = evt.properties.change.previous.attributes.getNamedItem('Icon-Name');
 	
@@ -748,7 +770,6 @@ mxMondrianBase.prototype.installListeners = function()
 				{
 					const styleCurrent = evt.properties.change.style;
 					
-					console.log(this.CONFIG);
 					const isMondrianShape = (styleCurrent.indexOf(mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE) > 0);
 					if(isMondrianShape)
 					{
@@ -1580,21 +1601,21 @@ mxMondrianBase.prototype.paintIcon = function(c)
 		{
 			let iconName = mxMondrianBase.prototype.cst.MONDRIAN_ICONS_STENCIL_REGISTRY + iconStencilName;
 
-			if(Sidebar.prototype.mondrianRepo.hasOwnProperty(iconName))
-				iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo[iconName].stencil);
+			if(Sidebar.prototype.mondrianRepo.hasStencil(iconName))
+				iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo.getStencil(iconName));
 			
 			if(iconStencil == null) // try an alias
 			{
 				iconName = iconStencilName;
 
-				if(Sidebar.prototype.mondrianRepo.hasOwnProperty(iconName))
-					iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo[iconName].stencil);
+				if(Sidebar.prototype.mondrianRepo.hasStencil(iconName))
+					iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo.getStencil(iconName));
 			}
-
+			
 			if(iconStencil == null) // the iconStencilName cannot be found, so the 'notfound' Icon is retrieved
 			{
 				iconName = mxMondrianBase.prototype.cst.MONDRIAN_BASE_STENCIL_REGISTRY + 'notfound';
-				iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo[iconName].stencil);
+				iconStencil = mxStencilRegistry.getStencil(Sidebar.prototype.mondrianRepo.getStencil(iconName));
 
 				stencilIconIsUndefined = true;
 			}
@@ -2342,7 +2363,6 @@ mxCellRenderer.registerShape(mxMondrianBaseDeploymentUnit.prototype.cst.MONDRIAN
 /**
  * IBM Mondrian Design Method shape registration for backward compatibility
  **/
-
 mxIBM2MondrianBase.config = {
 	BASE_SHAPE: 'mxgraph.ibm2mondrian.base',
 	LEGEND_SHAPE: 'mxgraph.ibm2mondrian.legend',

@@ -6,7 +6,7 @@
 		MONDRIAN_CONFIG_FILE: 'baseConfig.json',
 		STENCIL_REPOSITORY: 'stencils/stencilRepository.json',
 
-		BASE_SHAPE : 'mxgraph.',
+		BASE_SHAPE : 'mxgraph.mondrian.base',
 		LEGEND_SHAPE : 'mxgraph.mondrian.legend',
 		DU_SHAPE : 'mxgraph.mondrian.du',
 
@@ -39,6 +39,41 @@
 		},
 	}
 
+	Sidebar.prototype.mondrianRepo = {
+		STENCILS: {},
+		ELEMENTS: {},
+
+		addStencil: function(name, stencil)
+		{
+			Sidebar.prototype.mondrianRepo.STENCILS[name] = {stencil: stencil};
+		},
+
+		hasStencil: function(name)
+		{
+			return Sidebar.prototype.mondrianRepo.STENCILS.hasOwnProperty(name);
+		},
+
+		getStencil: function(name)
+		{
+			return Sidebar.prototype.mondrianRepo.STENCILS[name].stencil;
+		},
+
+		addElement: function(id, element)
+		{
+			Sidebar.prototype.mondrianRepo.ELEMENTS[id] = {element: element};
+		},
+
+		hasElement: function(id)
+		{
+			return Sidebar.prototype.mondrianRepo.ELEMENTS.hasOwnProperty(id);
+		},
+
+		getElement: function(id)
+		{
+			return Sidebar.prototype.mondrianRepo.ELEMENTS[id].element;
+		}
+	};
+
 	Sidebar.prototype.addMondrianPalette = function()
 	{
 		let MBS = Sidebar.prototype.mondrian;
@@ -59,6 +94,16 @@
 		}
 
 		this.buildStencilRepo(mxStencilRegistry.stencils);
+
+		// ELEMENTS
+		for (let elementsKey in mondrianConfig.Elements) {
+			let elements = JSON.parse(mxUtils.load(mondrianConfig.Elements[elementsKey].uri).getText())
+
+			for (let elementKey in elements)
+			{
+				Sidebar.prototype.mondrianRepo.addElement(elementKey, elements[elementKey]);
+			}
+		}
 
 		// SIDEBARS
 		let sideBars = {};
@@ -90,8 +135,6 @@
 		this.GenerateMondrianPalette(mondrianConfig.Sidebars);
 	}
 
-	Sidebar.prototype.mondrianRepo = {};
-
 	Sidebar.prototype.buildStencilRepo = function(stencils)
 	{
 		let MBS = Sidebar.prototype.mondrian;
@@ -99,7 +142,7 @@
 		// load all stencils
 		for(let stencil in stencils)
 		{
-			Sidebar.prototype.mondrianRepo[stencil] = {stencil: stencil};
+			Sidebar.prototype.mondrianRepo.addStencil(stencil, stencil);			
 		}
 
 		// add the repository to get the alias
@@ -107,11 +150,11 @@
 
 		for(let stencil in stencilRepo)
 		{
-			if(Sidebar.prototype.mondrianRepo.hasOwnProperty(stencil))
+			if(Sidebar.prototype.mondrianRepo.hasStencil(stencil))
 			{
 				let alias = stencilRepo[stencil].alias;
 				for (let i = 0; i < alias.length; i++) {
-					Sidebar.prototype.mondrianRepo[alias[i]] = {stencil: stencil}
+					Sidebar.prototype.mondrianRepo.addStencil(alias[i], stencil);
 				}	
 			}
 		}
@@ -120,9 +163,9 @@
 		for(let stencil in stencils)
 		{
 			let stencilName = stencil.split('.').pop();
-			if(!Sidebar.prototype.mondrianRepo.hasOwnProperty(stencilName)) // an alias has precendence
+			if(Sidebar.prototype.mondrianRepo.hasStencil(stencil)) // an alias has precendence
 			{
-				Sidebar.prototype.mondrianRepo[stencilName] = {stencil: stencil};
+				Sidebar.prototype.mondrianRepo.addStencil(stencilName, stencil);
 			}
 		}
 
