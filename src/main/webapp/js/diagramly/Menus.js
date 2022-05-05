@@ -202,6 +202,14 @@
 		
 		shareCursorAction.setToggleAction(true);
 		shareCursorAction.setSelectedCallback(function() { return editorUi.isShareCursorPosition(); });
+		
+		var showRemoteCursorsAction = editorUi.actions.addAction('showRemoteCursors', function()
+		{
+			editorUi.setShowRemoteCursors(!editorUi.isShowRemoteCursors());;
+		});
+		
+		showRemoteCursorsAction.setToggleAction(true);
+		showRemoteCursorsAction.setSelectedCallback(function() { return editorUi.isShowRemoteCursors(); });
 
 		// Adds context menu items
 		var menuCreatePopupMenu = Menus.prototype.createPopupMenu;
@@ -212,10 +220,11 @@
 
 			var file = editorUi.getCurrentFile();
 
-			if (graph.isEnabled() && urlParams['embed'] != '1' && graph.isSelectionEmpty() &&
-				DrawioFile.ENABLE_FAST_SYNC && file != null && file.isFastSync())
+			if ((urlParams['embed'] != '1' || urlParams['embedRT'] == '1') && graph.isSelectionEmpty() &&
+				file != null && file.isRealtimeEnabled() && file.isRealtimeSupported())
 			{
-				this.addMenuItems(menu, ['-', 'shareCursor'], null, evt);
+				this.addMenuItems(menu, ['-', 'showRemoteCursors',
+					'shareCursor'], null, evt);
 			}
 		};
 
@@ -321,7 +330,8 @@
 				{
 					if (this.freehandWindow == null)
 					{
-						this.freehandWindow = new FreehandWindow(editorUi, document.body.offsetWidth - 420, 102, 176, 84);
+						var withBrush = !mxClient.IS_IE && !mxClient.IS_IE11;
+						this.freehandWindow = new FreehandWindow(editorUi, document.body.offsetWidth - 420, 102, 176, withBrush? 120 : 84, withBrush);
 					}
 					
 					if (graph.freehand.isDrawing())
@@ -435,7 +445,7 @@
 				editorUi.showDialog(new PrintDialog(editorUi, mxResources.get('formatPdf')).container, 360,
 						(editorUi.pages != null && editorUi.pages.length > 1 && (editorUi.editor.editable ||
 						urlParams['hide-pages'] != '1')) ?
-						450 : 370, true, true);
+						470 : 390, true, true);
 			}
 			else
 			{
@@ -786,7 +796,7 @@
 				};
 	
 				var dlg = new BackgroundImageDialog(editorUi, apply);
-				editorUi.showDialog(dlg.container, 320, 170, true, true);
+				editorUi.showDialog(dlg.container, 400, 170, true, true);
 				dlg.init();
 			}
 		}));
@@ -1664,7 +1674,8 @@
 			mxResources.parse('createSidebarEntry=Create Sidebar Entry');
 			mxResources.parse('testCheckFile=Check File');
 			mxResources.parse('testDiff=Diff/Sync');
-			mxResources.parse('testInspectOwnPages=Check Own Pages');
+			mxResources.parse('testInspectPages=Check Pages');
+			mxResources.parse('testFixPages=Fix Pages');
 			mxResources.parse('testInspect=Inspect');
 			mxResources.parse('testShowConsole=Show Console');
 			mxResources.parse('testXmlImageExport=XML Image Export');
@@ -1869,9 +1880,9 @@
 				{
 					var buttons = [['Snapshot', function(evt, input)
 					{
-						snapshot = editorUi.getPagesForNode(mxUtils.parseXml(
-							editorUi.getFileData(true)).documentElement);
-						dlg.textarea.value = 'Snapshot updated ' + new Date().toLocaleString();
+						snapshot = editorUi.getPagesForXml(editorUi.getFileData(true));
+						dlg.textarea.value = 'Snapshot updated ' + new Date().toLocaleString() +
+							' Checksum ' + editorUi.getHashValueForPages(snapshot);
 					}], ['Diff', function(evt, input)
 					{
 						try
@@ -1907,9 +1918,9 @@
 			    	
 					if (snapshot == null)
 					{
-						snapshot = editorUi.getPagesForNode(mxUtils.parseXml(
-							editorUi.getFileData(true)).documentElement);
-						dlg.textarea.value = 'Snapshot created ' + new Date().toLocaleString();
+						snapshot = editorUi.getPagesForXml(editorUi.getFileData(true));
+						dlg.textarea.value = 'Snapshot created ' + new Date().toLocaleString() +
+							' Checksum ' + editorUi.getHashValueForPages(snapshot);
 					}
 					else
 					{
@@ -1926,26 +1937,104 @@
 				}
 			}));
 
-			editorUi.actions.addAction('testInspectOwnPages', mxUtils.bind(this, function()
+			editorUi.actions.addAction('testInspectPages', mxUtils.bind(this, function()
 			{
 				var file = editorUi.getCurrentFile();
+				console.log('editorUi', editorUi, 'file', file);
 
-				console.log('editorUi', editorUi);
-
-				if (file != null && file.ownPages != null)
+				if (file != null && file.isRealtime())
 				{
-					if (file.shadowPages != null)
+					console.log('Checksum ownPages',
+						editorUi.getHashValueForPages(
+							file.ownPages));
+					console.log('Checksum theirPages',
+						editorUi.getHashValueForPages(
+							file.theirPages));
+					console.log('diff ownPages/theirPages',
+						editorUi.diffPages(file.ownPages,
+							file.theirPages));
+
+					var shadow = file.getShadowPages();
+					
+					if (shadow != null)
 					{
-						console.log('diff ownPages/shadowPages', editorUi.diffPages(file.ownPages, file.shadowPages));
+						console.log('Checksum shadowPages',
+							editorUi.getHashValueForPages(shadow));
+						console.log('diff shadowPages/ownPages',
+							editorUi.diffPages(shadow, file.ownPages));
+						console.log('diff ownPages/shadowPages',
+							editorUi.diffPages(file.ownPages, shadow));
+						console.log('diff theirPages/shadowPages',
+							editorUi.diffPages(file.theirPages, shadow));
+					}
+
+					if (file.sync != null && file.sync.snapshot != null)
+					{
+						console.log('Checksum snapshot',
+							editorUi.getHashValueForPages(
+								file.sync.snapshot));
+						console.log('diff ownPages/snapshot',
+							editorUi.diffPages(file.ownPages,
+								file.sync.snapshot));
+						console.log('diff theirPages/snapshot',
+							editorUi.diffPages(file.theirPages,
+								file.sync.snapshot));
+
+						if (editorUi.pages != null)
+						{
+							console.log('diff snapshot/actualPages',
+								editorUi.diffPages(file.sync.snapshot,
+									editorUi.pages));
+						}
 					}
 
 					if (editorUi.pages != null)
 					{
-						console.log('diff ownPages/actualPages', editorUi.diffPages(file.ownPages, editorUi.pages));
+						console.log('diff ownPages/actualPages',
+							editorUi.diffPages(file.ownPages,
+								editorUi.pages));
+						console.log('diff theirPages/actualPages',
+							editorUi.diffPages(file.theirPages,
+								editorUi.pages));
 					}
+				}
+
+				if (file != null)
+				{
+					console.log('Shadow pages',
+						[editorUi.getXmlForPages(
+							file.getShadowPages())]);
+				}
+
+				if (editorUi.pages != null)
+				{
+					console.log('Checksum actualPages',
+						editorUi.getHashValueForPages(
+							editorUi.pages));
 				}
 			}));
 			
+			editorUi.actions.addAction('testFixPages', mxUtils.bind(this, function()
+			{
+				console.log('editorUi', editorUi);
+				var file = editorUi.getCurrentFile();
+
+				if (file != null && file.isRealtime() &&
+					file.shadowPages != null)
+				{
+					console.log('patching actualPages to shadowPages',
+						file.patch([editorUi.diffPages(
+							file.shadowPages, editorUi.pages)]));
+					file.ownPages = editorUi.clonePages(editorUi.pages);
+					file.theirPages = editorUi.clonePages(editorUi.pages);
+					file.shadowPages = editorUi.clonePages(editorUi.pages);
+
+					if (file.sync != null)
+					{
+						file.sync.snapshot = editorUi.clonePages(editorUi.pages);
+					}
+				}
+			}));
 	
 			editorUi.actions.addAction('testInspect', mxUtils.bind(this, function()
 			{
@@ -1954,7 +2043,6 @@
 			
 			editorUi.actions.addAction('testXmlImageExport', mxUtils.bind(this, function()
 			{
-				var bg = '#ffffff';
 				var scale = 1;
 				var b = 1;
 				
@@ -1969,7 +2057,8 @@
 				
 			    // Renders graph. Offset will be multiplied with state's scale when painting state.
 				var xmlCanvas = new mxXmlCanvas2D(root);
-				xmlCanvas.translate(Math.floor((b / scale - bounds.x) / vs), Math.floor((b / scale - bounds.y) / vs));
+				xmlCanvas.translate(Math.floor((b / scale - bounds.x) / vs),
+					Math.floor((b / scale - bounds.y) / vs));
 				xmlCanvas.scale(scale / vs);
 				
 				var stateCounter = 0;
@@ -2024,9 +2113,8 @@
 			this.put('testDevelop', new Menu(mxUtils.bind(this, function(menu, parent)
 			{
 				this.addMenuItems(menu, ['createSidebarEntry', 'showBoundingBox', '-',
-					'testInspectOwnPages', 'testCheckFile', 'testDiff', '-',
-					'testInspect', '-', 'testXmlImageExport', '-',
-					'testShowConsole'], parent);
+					'testInspectPages', 'testFixPages', '-', 'testCheckFile', 'testDiff', '-',
+					'testInspect', '-', 'testXmlImageExport', '-', 'testShowConsole'], parent);
 			})));
 		}
 
@@ -2690,15 +2778,6 @@
 				}, parent);
 			}
 
-			if (editorUi.notion != null)
-			{
-				menu.addSeparator(parent);
-				menu.addItem(mxResources.get('notion') + '...', null, function()
-				{
-					pickFileFromService(editorUi.notion);
-				}, parent);
-			}
-
 			if (editorUi.trello != null)
 			{
 				menu.addItem(mxResources.get('trello') + '...', null, function()
@@ -3320,15 +3399,6 @@
 				}, parent);
 			}
 
-			if (editorUi.notion != null)
-			{
-				menu.addSeparator(parent);
-				menu.addItem(mxResources.get('notion') + '...', null, function()
-				{
-					editorUi.pickFile(App.MODE_NOTION);
-				}, parent);
-			}
-
 			if (editorUi.trello != null)
 			{
 				menu.addItem(mxResources.get('trello') + '...', null, function()
@@ -3460,15 +3530,6 @@
 						editorUi.showLibraryDialog(null, null, null, null, App.MODE_GITLAB);
 					}, parent);
 				}
-				
-				if (editorUi.notion != null)
-				{
-					menu.addSeparator(parent);
-					menu.addItem(mxResources.get('notion') + '...', null, function()
-					{
-						editorUi.showLibraryDialog(null, null, null, null, App.MODE_NOTION);
-					}, parent);
-				}
 
 				if (editorUi.trello != null)
 				{
@@ -3570,15 +3631,6 @@
 					menu.addItem(mxResources.get('gitlab') + '...', null, function()
 					{
 						editorUi.pickLibrary(App.MODE_GITLAB);
-					}, parent);
-				}
-				
-				if (editorUi.notion != null)
-				{
-					menu.addSeparator(parent);
-					menu.addItem(mxResources.get('notion') + '...', null, function()
-					{
-						editorUi.pickLibrary(App.MODE_NOTION);
 					}, parent);
 				}
 
@@ -3831,19 +3883,14 @@
 
 			this.addMenuItems(menu, ['copyConnect', 'collapseExpand', '-'], parent);
 			
-			if (urlParams['embed'] != '1' && (isLocalStorage || mxClient.IS_CHROMEAPP))
-			{
-				this.addMenuItems(menu, ['showStartScreen'], parent);
-			}
-
 			if (urlParams['embed'] != '1')
 			{
 				var file = editorUi.getCurrentFile();
 
-				if (graph.isEnabled() && graph.isSelectionEmpty() && file != null &&
-					DrawioFile.ENABLE_FAST_SYNC && file.isFastSync())
+				if (file != null && file.isRealtimeEnabled() && file.isRealtimeSupported())
 				{
-					this.addMenuItems(menu, ['shareCursor'], parent);
+					this.addMenuItems(menu, ['showRemoteCursors',
+						'shareCursor'], parent);
 				}
 
 				this.addMenuItems(menu, ['autosave'], parent);
@@ -3863,7 +3910,14 @@
 				this.addMenuItems(menu, ['diagramLanguage']);
 			}
 			
-			this.addMenuItems(menu, ['-', 'configuration'], parent);
+			menu.addSeparator(parent);
+
+			if (urlParams['embed'] != '1' && (isLocalStorage || mxClient.IS_CHROMEAPP))
+			{
+				this.addMenuItems(menu, ['showStartScreen'], parent);
+			}
+
+			this.addMenuItems(menu, ['configuration'], parent);
 			
 			// Adds trailing separator in case new plugin entries are added
 			menu.addSeparator(parent);
@@ -4074,8 +4128,9 @@
 					var filename = (file.getTitle() != null) ?
 						file.getTitle() : editorUi.defaultFilename;
 					
-					if (!/(\.html)$/i.test(filename) &&
-						!/(\.svg)$/i.test(filename))
+					if ((file.constructor == DriveFile && file.sync != null &&
+						file.sync.isConnected()) || (!/(\.html)$/i.test(filename) &&
+						!/(\.svg)$/i.test(filename)))
 					{
 						this.addMenuItems(menu, ['-', 'properties']);
 					}
