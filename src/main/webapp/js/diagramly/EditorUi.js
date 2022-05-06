@@ -13472,7 +13472,7 @@
 						parentIndex = i;
 					}
 					
-					attribs.push(mxUtils.trim(keys[i]).replace(/[^a-z0-9]+/ig, '_').
+					attribs.push(mxUtils.trim(keys[i]).replace(/[^a-z0-9-]+/ig, '_').
 						replace(/^\d+/, '').replace(/_+$/, ''));
 	    		}
 				
