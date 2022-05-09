@@ -141,12 +141,6 @@ mxMondrianBase.prototype.colorIntensity = {
 	DARK: 'dark'
 }
 
-mxMondrianBase.prototype.getTagTextProperties = function()
-{
-	console.log(this);
-	return [{val:'noText', dispName: 'None'}, {val:'Tag-Text', dispName: 'Tag-Text'}, {val:'Element-ID', dispName: 'Element-ID'}];
-}
-
 mxMondrianBase.prototype.getTagText = function(thisShape)
 {
 	let tagTextAttribute = mxUtils.getValue(thisShape.style, mxMondrianBase.prototype.cst.TAG_TEXT, mxMondrianBase.prototype.cst.TAG_TEXT_DEFAULT);
@@ -541,8 +535,8 @@ mxMondrianBase.prototype.customProperties = [
 		enumList:[
 		{val:'noTag', dispName: 'None'}, {val:'circle', dispName: 'Circle'}, {val:'diamond', dispName: 'Diamond'}, 
 		{val:'square', dispName: 'Square'}, {val:'triangle', dispName: 'Triangle'}, {val:'hexagon', dispName: 'Hexagon'}, {val:'octagon', dispName: 'Octagon'}]},
-	{name:'tagText', dispName:'Tag (Text)', type:'enum', defVal:'Tag-Text',
-		enumList:mxMondrianBase.prototype.getTagTextProperties()},
+	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'Tag-Text',
+		enumList:[{val:'noText', dispName: 'None'}]},
 	{name:'tagColorFamily', dispName:'Tag (Color)', type:'enum', defVal:'black',
 		enumList:[{val:'blue', dispName: 'Blue'}, {val:'black', dispName: 'Black'}, {val:'cyan', dispName: 'Cyan'}, {val:'green', dispName: 'Green'}, {val:'gray', dispName: 'Gray'}, {val:'magenta', dispName: 'Magenta'}, {val:'purple', dispName: 'Purple'}, {val:'red', dispName: 'Red'}, {val:'teal', dispName: 'Teal'}, {val:'yellow', dispName: 'Yellow'}, {val:'orange', dispName: 'Orange'}]},
 	{name:'tagColorFill', dispName:'Tag (Fill)', type:'enum', defVal:'medium',

@@ -4870,10 +4870,41 @@
 				{
 					td.appendChild(createCheckbox(pName, pValue, prop));
 				}
-				else if (pType == 'enum')
+				else if (pType == 'enum' || pType == 'dynamicEnum')
 				{
 					var pEnumList = prop.enumList;
+					/* MONDRIAN: Added dynamicEnum property */
+					if(pType == 'dynamicEnum')
+					{
+						let selectedCells = graph.getSelectionCells();
+						let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders'];
+						let dynamicAttributes = [];
+
+						pEnumList = pEnumList.filter(function (value, index, arr) { return !value.isDynamic;});
+
+						for (let selectedCellIdx in selectedCells)
+						{
+							let selectedCell = selectedCells[selectedCellIdx];
+
+							for (let attribute in selectedCell.value.attributes)
+							{
+								let attributeName = selectedCell.value.attributes[attribute].nodeName;
+								
+								if(!excludedAttributes.includes(attributeName) && !dynamicAttributes.includes(attributeName))
+									dynamicAttributes.push(attributeName);
+							}
+						}
+
+						dynamicAttributes.sort();
+
+						for (let i = 0; i < dynamicAttributes.length; i++)
+						{
+							let enumItem = {val: dynamicAttributes[i], dispName: dynamicAttributes[i], isDynamic: true};
 					
+							pEnumList.push(enumItem);
+						}
+					}
+
 					for (var i = 0; i < pEnumList.length; i++)
 					{
 						var op = pEnumList[i];
