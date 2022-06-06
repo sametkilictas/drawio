@@ -1,0 +1,33 @@
+{
+
+    "SBB-DCS-C-0400":
+    {
+        "Element-Name": "Virtualisatie",
+        "Icon-Name": "virtual-server"
+    },
+
+    "TN-DCS-0700.01":
+    {
+        "Element-Name": "Rubrik Cluster",
+        "Icon-Name": "cluster",
+	    "Product": "Rubrik Cloud Data Management"
+    },
+    "TN-DCS-0700.02":
+    {
+        "Element-Name": "Rubrik Brik",
+        "Icon-Name": "backup",
+	    "Product": "Rubrik CDM"
+    },
+    "TN-DCS-0700.03":
+    {
+        "Element-Name": "Rubrik Node",
+        "Icon-Name": "disk",
+	    "Product": "Rubrik CDM"
+    },
+    "TN-DCS-0700.04":
+    {
+        "Element-Name": "Rubrik Edge",
+        "Icon-Name": "backup",
+	    "Product": "Rubrik CDM"
+    }
+}

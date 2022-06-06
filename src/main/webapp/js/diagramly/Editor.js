@@ -4798,7 +4798,7 @@
 				return btn;
 			};
 			
-			function createStaticArrList(pName, pValue, subType, defVal, size, myRow, flipBkg)
+			function createStaticArrList(pName, pValue, subType, defVal, size, myRow, flipBkg, enumList, onChange)
 			{
 				if (size > 0)
 				{
@@ -4810,8 +4810,8 @@
 					{
 						vals[i] = curVals[i] != null? curVals[i] : (defVal != null? defVal : '');
 					}
-					
-					secondLevel.push({name: pName, values: vals, type: subType, defVal: defVal, parentRow: myRow, flipBkg: flipBkg, size: size});
+					/* MONDRIAN: Extend staticArr type */
+					secondLevel.push({name: pName, values: vals, type: subType, defVal: defVal, parentRow: myRow, flipBkg: flipBkg, size: size, enumList: enumList, onChange: onChange});
 				}
 				
 				return document.createElement('div'); //empty cell
@@ -4956,7 +4956,7 @@
 				}
 				else if (pType == 'staticArr')
 				{
-					td.appendChild(createStaticArrList(pName, pValue, prop.subType, prop.subDefVal, prop.size, row, flipBkg));
+					td.appendChild(createStaticArrList(pName, pValue, prop.subType, prop.subDefVal, prop.size, row, flipBkg, prop.enumList, prop.onChange));
 				}
 				else if (pType == 'readOnly')
 				{
@@ -5176,7 +5176,8 @@
 				}
 				else if (prop.type == 'staticArr') //if dynamic values are needed, a more elegant technique is needed to replace such values
 				{
-					prop.size = parseInt(state.style[prop.sizeProperty] || properties[prop.sizeProperty].defVal) || 0;
+					/* MONDRIAN: Extend staticArr type */
+					prop.size = parseInt(prop.size || state.style[prop.sizeProperty] || properties[prop.sizeProperty].defVal) || 0;
 				}
 				else if (prop.dependentProps != null)
 				{
@@ -5208,7 +5209,8 @@
 				for (var j = 0; j < prop.values.length; j++)
 				{
 					//mxUtils.clone failed because of the HTM element, so manual cloning is used
-					var iProp = {type: prop.type, parentRow: prop.parentRow, isDeletable: prop.isDeletable, index: j, defVal: prop.defVal, countProperty: prop.countProperty, size: prop.size};
+					/* MONDRIAN: Extend staticArr type */
+					var iProp = {type: prop.type, parentRow: prop.parentRow, isDeletable: prop.isDeletable, index: j, defVal: prop.defVal, countProperty: prop.countProperty, size: prop.size, enumList: prop.enumList, onChange: prop.onChange};
 					var arrItem = createPropertyRow(prop.name, prop.values[j], iProp, j % 2 == 0, prop.flipBkg);
 					insertAfter(arrItem, insertElem);
 					insertElem = arrItem;

@@ -146,9 +146,21 @@
     },
 
     "Elements":{
+        "Default":
+        {
+            "uri": "mondrian/elements/default.json"
+        },
         "Athena-Sample":
         {
             "uri": "mondrian/elements/athena.sample.json"
+        },
+        "Athena-DCS":
+        {
+            "uri": "mondrian/elements/athena.dcs.json"
+        },
+        "Athena-ROD":
+        {
+            "uri": "mondrian/elements/athena.rod.json"
         }
     },
 

@@ -1,0 +1,166 @@
+{
+    "RG":
+    {
+        "Element-Name": "Region",
+        "Icon-Name": "region"
+    },
+    "AZ":
+    {
+        "Element-Name": "Availability Zone",
+        "Icon-Name": "location"
+    },
+    "DC":
+    {
+        "Element-Name": "Data Center",
+        "Icon-Name": "data-center"
+    },
+    "DR":
+    {
+        "Element-Name": "Data Room"
+    },
+    "RK":
+    {
+        "Element-Name": "Rack"
+    },
+
+
+    "RG-A":
+    {
+        "Element-Name": "Region: A",
+        "Icon-Name": "region"
+    },
+    "RG-B":
+    {
+        "Element-Name": "Region: B",
+        "Icon-Name": "region"
+    },
+    "RG-C":
+    {
+        "Element-Name": "Region: C",
+        "Icon-Name": "region"
+    },
+    "RG-D":
+    {
+        "Element-Name": "Region: D",
+        "Icon-Name": "region"
+    },
+
+    "AZ-A":
+    {
+        "Element-Name": "Availability Zone: A",
+        "Icon-Name": "location"
+    },
+    "AZ-B":
+    {
+        "Element-Name": "Availability Zone: B",
+        "Icon-Name": "location"
+    },
+    "AZ-C":
+    {
+        "Element-Name": "Availability Zone: C",
+        "Icon-Name": "location"
+    },
+    "AZ-D":
+    {
+        "Element-Name": "Availability Zone: D",
+        "Icon-Name": "location"
+    },
+
+
+    "DC-A1":
+    {
+        "Element-Name": "Data Center: A1",
+        "Icon-Name": "data-center"
+    },
+    "DC-A2":
+    {
+        "Element-Name": "Data Center: A2",
+        "Icon-Name": "data-center"
+    },
+    "DC-B1":
+    {
+        "Element-Name": "Data Center: B1",
+        "Icon-Name": "data-center"
+    },
+    "DC-B2":
+    {
+        "Element-Name": "Data Center: B2",
+        "Icon-Name": "data-center"
+    },
+    "DC-C1":
+    {
+        "Element-Name": "Data Center: C1",
+        "Icon-Name": "data-center"
+    },
+    "DC-C2":
+    {
+        "Element-Name": "Data Center: C2",
+        "Icon-Name": "data-center"
+    },
+    "DC-D1":
+    {
+        "Element-Name": "Data Center: D1",
+        "Icon-Name": "data-center"
+    },
+    "DC-D2":
+    {
+        "Element-Name": "Data Center: D22",
+        "Icon-Name": "data-center"
+    },
+
+    "DC-STR-01":
+    {
+        "Element-Name": "Twin DC1",
+        "Icon-Name": "data-center",
+	"Location": "Stroe",
+	"Availability-Zone": "AZ-A-01",
+	"Region": "A"
+    },
+    "DC-STR-02":
+    {
+        "Element-Name": "Twin DC2",
+        "Icon-Name": "data-center",
+	"Location": "Stroe",
+	"Availability-Zone": "AZ-A-02",
+	"Region": "A"
+    },
+    "DC-WND-01":
+    {
+        "Element-Name": "Uitwijk DC1",
+        "Icon-Name": "data-center",
+	"Location": "Woensdrecht",
+	"Availability-Zone": "AZ-B-01",
+	"Region": "B"
+    },
+
+    "DC-CNA-01":
+    {
+        "Element-Name": "A145",
+        "Icon-Name": "data-center",
+	"Location": "CNA",
+	"Availability-Zone": "AZ-C-01",
+	"Region": "C"
+    },
+
+    "DC-MLD-01":
+    {
+        "Element-Name": "Maasland",
+        "Icon-Name": "data-center",
+	"Location": "Maasland",
+	"Availability-Zone": "AZ-D-01",
+	"Region": "D"
+    },
+
+    "DC-DHD-01":
+    {
+        "Element-Name": "Den Helder",
+        "Icon-Name": "data-center",
+	"Location": "Den Helder",
+	"Availability-Zone": "AZ-E-01",
+	"Region": "E"
+    }
+
+
+
+
+}

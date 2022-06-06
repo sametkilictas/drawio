@@ -60,6 +60,12 @@ mxMondrianBase.prototype.cst = {
 	POSITION_TEXT : 'positionText', 
 	POSITION_TEXT_DEFAULT : 'bottom',
 
+	FORMAT_TEXT : 'formatText', 
+	FORMAT_TEXT_DEFAULT : 'default:1,2',
+
+	ATTRIBUTES_TEXT : 'attributesText', 
+	ATTRIBUTES_TEXT_DEFAULT : 'default',
+
 	TAG : 'tag',
 	TAG_DEFAULT : 'noTag',
 	TAG_TEXT : 'tagText',
@@ -527,6 +533,40 @@ mxMondrianBase.prototype.customProperties = [
 		{val:'stencilIcon_Rotate90', dispName: 'Yes (Rotate 90)'}, {val:'stencilIcon_Rotate180', dispName: 'Yes (Rotate 180)'}, {val:'stencilIcon_Rotate270', dispName: 'Yes (Rotate 270)'},
 		{val:'stencilIcon_FlipH', dispName: 'Yes (Flip Horizontal)'}, {val:'stencilIcon_FlipV', dispName: 'Yes (Flip Vertical)'},
 		]},
+	
+	// Label
+	{name:'formatText', dispName:'Label (Format)', type:'enum', defVal:'default:1,2',
+		enumList:[
+		{val:'nolabel', dispName: 'None'},
+		{val:'default:1', dispName: 'Default: Attribute 1'},
+		{val:'default:1,2', dispName: 'Default: Attribute 1 <> Attribute 2'},
+		{val:'default:1,2,3', dispName: 'Default: Attribute 1 <> Attribute 2: Attribute 3'},
+		{val:'custom', dispName: 'Custom'},
+		],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+			
+			for (let i = 0; i < selectedCells.length; i++)
+			{	
+				let attributesText = mxMondrianBase.prototype.getStyleValue(selectedCells[i].style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT);
+				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(newValue,attributesText,selectedCells[i]));
+			}
+		}
+	},
+	{name: 'attributesText', dispName: 'Label (Attributes)', type: 'staticArr', subType: 'dynamicEnum', size: '3', subDefVal: 'default',
+		enumList:[{val:'noText', dispName: 'None'}, {val:'default', dispName: 'Default'}],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+			
+			for (let i = 0; i < selectedCells.length; i++)
+			{			
+				let formatText = mxMondrianBase.prototype.getStyleValue(selectedCells[i].style, mxMondrianBase.prototype.cst.FORMAT_TEXT);
+				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(formatText,newValue,selectedCells[i]));
+			}
+		}
+	},
 	{name:'positionText', dispName:'Label (Position)', type:'enum', defVal:'bottom',
 		enumList:[{val:'bottom', dispName: 'Bottom'}, {val:'top', dispName: 'Top'}, {val:'left', dispName: 'Left'}, {val:'right', dispName: 'Right'}]},
 
@@ -536,7 +576,8 @@ mxMondrianBase.prototype.customProperties = [
 		{val:'noTag', dispName: 'None'}, {val:'circle', dispName: 'Circle'}, {val:'diamond', dispName: 'Diamond'}, 
 		{val:'square', dispName: 'Square'}, {val:'triangle', dispName: 'Triangle'}, {val:'hexagon', dispName: 'Hexagon'}, {val:'octagon', dispName: 'Octagon'}]},
 	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'Tag-Text',
-		enumList:[{val:'noText', dispName: 'None'}]},
+		enumList:[{val:'noText', dispName: 'None'}]
+	},
 	{name:'tagColorFamily', dispName:'Tag (Color)', type:'enum', defVal:'black',
 		enumList:[{val:'blue', dispName: 'Blue'}, {val:'black', dispName: 'Black'}, {val:'cyan', dispName: 'Cyan'}, {val:'green', dispName: 'Green'}, {val:'gray', dispName: 'Gray'}, {val:'magenta', dispName: 'Magenta'}, {val:'purple', dispName: 'Purple'}, {val:'red', dispName: 'Red'}, {val:'teal', dispName: 'Teal'}, {val:'yellow', dispName: 'Yellow'}, {val:'orange', dispName: 'Orange'}]},
 	{name:'tagColorFill', dispName:'Tag (Fill)', type:'enum', defVal:'medium',
@@ -564,8 +605,6 @@ mxMondrianBase.prototype.textSpacing = 4;
  */
 mxMondrianBase.prototype.init = function(container)
 {
-	//console.log(Sidebar.prototype.mondrianRepo);
-
 	if (!mxUtils.isNode(this.state.cell.value)) {
 		let obj = mxUtils.createXmlDocument().createElement('UserObject');
 		obj.setAttribute('label', this.state.cell.value);
@@ -582,6 +621,11 @@ mxMondrianBase.prototype.init = function(container)
 	}
 
 	mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
+	
+	mxMondrianBase.prototype.defineLabel(
+		mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
+		mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
+		this.state.cell);
 
 	mxShape.prototype.init.apply(this, arguments);
 
@@ -591,6 +635,43 @@ mxMondrianBase.prototype.init = function(container)
 	this.installListeners();
 };
 
+mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, currentCell)
+{
+	let currentLabelValue = currentCell.getAttribute('label');
+	currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
+
+	let elementDefaultSettings = Sidebar.prototype.mondrianRepo.getElement('defaultSettings');
+	let labelFormats = elementDefaultSettings.labelFormats;
+	let labelDefaults = elementDefaultSettings.labelDefaultAttributes;
+
+	let attributes = (attributesText == 'undefined' || attributesText == undefined) ? labelDefaults : attributesText.split(',');
+				
+	let labelFormatFilter = (formatText == 'undefined' || formatText == undefined) ? elementDefaultSettings.labelDefaultFormat : formatText;
+	let labelAttributes = [];
+
+	for(let textAttributeIDX in attributes)
+	{
+		let textAttribute = attributes[textAttributeIDX];
+		
+		if(textAttribute == 'default')
+			labelAttributes.push(labelDefaults[textAttributeIDX]);
+		else if(textAttribute == 'noText')
+			labelAttributes.push('');
+		else
+			labelAttributes.push(textAttribute);
+	}
+
+	let labelValue = (labelFormats[labelFormatFilter] != undefined) ? labelFormats[labelFormatFilter] : labelFormats['default'];
+
+	for (let i = 0; i < labelAttributes.length; i++)
+	{
+		labelValue = labelValue.replace('@'+i,labelAttributes[i]);
+		labelValue = labelValue.replace('%%','');
+	}
+
+	return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
+}
+
 mxMondrianBase.prototype.setAttributesFromRepo = function(thisCell)
 {
 	let elementID = thisCell.getAttribute('Element-ID');
@@ -598,12 +679,9 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisCell)
 	{
 		let element = Sidebar.prototype.mondrianRepo.getElement(elementID);
 
-		for (let attribute in thisCell.value.attributes)
+		for (let attributeInRepo in element)
 		{
-			let attributeName = thisCell.value.attributes[attribute].nodeName;
-
-			if(attributeName != 'undefined' && element.hasOwnProperty(attributeName))
-				thisCell.setAttribute(attributeName, element[attributeName]);	
+			thisCell.setAttribute(attributeInRepo, element[attributeInRepo]);
 		}
 	}
 }
