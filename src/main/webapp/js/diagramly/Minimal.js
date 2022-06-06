@@ -686,7 +686,7 @@ EditorUi.initMinimalTheme = function()
 					icon.style.top = '2px';
 					icon.style.width = '12px';
 					icon.style.height = '12px';
-					icon.style.cursor = 'default';
+					// icon.style.cursor = 'default';
 
 					var err = file.getRealtimeError();
 					var state = file.getRealtimeState();
@@ -710,16 +710,7 @@ EditorUi.initMinimalTheme = function()
 							status += ' (' + mxResources.get('disconnected') + ')';
 						}
 					}
-
-					mxEvent.addListener(icon, 'click', mxUtils.bind(this, function(evt)
-					{
-						this.showError(mxResources.get('realtimeCollaboration'),
-							mxUtils.htmlEntities(state == 1 ? mxResources.get('online') :
-								((err != null && err.message != null) ?
-								err.message : mxResources.get('disconnected'))));
-						mxEvent.consume(evt);
-					}));
-		
+					
 					icon.setAttribute('title', status);
 					elt.style.paddingRight = '4px';
 					elt.appendChild(icon);
@@ -1115,8 +1106,6 @@ EditorUi.initMinimalTheme = function()
         ui.actions.get('outline').label = mxResources.get('outline') + '...';
         ui.actions.get('layers').label = mxResources.get('layers') + '...';
         ui.actions.get('tags').label = mxResources.get('tags') + '...';
-		ui.actions.get('forkme').visible = urlParams['sketch'] != '1';
-		ui.actions.get('downloadDesktop').visible = urlParams['sketch'] != '1';
 		ui.actions.get('comments').label = mxResources.get('comments') + '...';
 
         var toggleDarkModeAction = ui.actions.put('toggleDarkMode', new Action(mxResources.get('dark'), function(e)
@@ -1272,12 +1261,6 @@ EditorUi.initMinimalTheme = function()
 			{
 				menu.addSeparator(parent);
 
-				if (file.isRealtimeEnabled() && file.isRealtimeSupported())
-				{
-					this.addMenuItems(menu, ['showRemoteCursors',
-						'shareCursor'], parent);
-				}
-
 				if (file.constructor == DriveFile)
 				{
 					ui.menus.addMenuItems(menu, ['share'], parent);
@@ -1350,13 +1333,7 @@ EditorUi.initMinimalTheme = function()
 					menu.addSeparator(parent);
 
 					if (file != null)
-					{
-						if (file.isRealtimeEnabled() && file.isRealtimeSupported())
-						{
-							this.addMenuItems(menu, ['showRemoteCursors',
-								'shareCursor'], parent);
-						}
-									
+					{		
 						if (file.constructor == DriveFile)
 						{
 							ui.menus.addMenuItems(menu, ['share'], parent);
@@ -1389,16 +1366,9 @@ EditorUi.initMinimalTheme = function()
 				ui.menus.addSubmenu('importFrom', menu, parent);
 			}
 
-			menu.addSeparator(parent);
-
-			if (urlParams['sketch'] != '1')
-			{
-				ui.menus.addMenuItems(menu, ['outline'], parent);
-			}
-
 			if (ui.commentsSupported())
 			{
-				ui.menus.addMenuItems(menu, ['comments'], parent);
+				ui.menus.addMenuItems(menu, ['-', 'comments'], parent);
 			}
 
 			ui.menus.addMenuItems(menu, ['-', 'findReplace', 'outline',
@@ -1560,13 +1530,21 @@ EditorUi.initMinimalTheme = function()
 				{
 					ui.menus.addMenuItem(menu, 'plugins', parent);
 				}
-	
-				menu.addSeparator(parent);
-				
-				if (ui.mode != App.MODE_ATLAS) 
-				{
-					this.addMenuItems(menu, ['fullscreen'], parent);
-				}	
+			}
+
+			var file = ui.getCurrentFile();
+			
+			if (file != null && file.isRealtimeEnabled() && file.isRealtimeSupported())
+			{
+				this.addMenuItems(menu, ['-', 'showRemoteCursors',
+					'shareCursor', '-'], parent);
+			}
+			
+			menu.addSeparator(parent);
+
+			if (ui.mode != App.MODE_ATLAS) 
+			{
+				this.addMenuItems(menu, ['fullscreen'], parent);
 			}
 
 			if (urlParams['embedInline'] != '1' && Editor.isDarkMode() ||
@@ -1600,8 +1578,8 @@ EditorUi.initMinimalTheme = function()
 					}
 					
 					ui.menus.addMenuItems(menu, ['insertImage', 'insertLink', '-'], parent);
-					ui.menus.addSubmenu('insertLayout', menu, parent, mxResources.get('layout'));
 					ui.menus.addSubmenu('insertAdvanced', menu, parent, mxResources.get('advanced'));
+					ui.menus.addSubmenu('layout', menu, parent);
 				}
 				else
 				{
@@ -2282,7 +2260,7 @@ EditorUi.initMinimalTheme = function()
 			ui.picker = picker;
 			var statusVisible = false;
 			
-			if (urlParams['embed'] != '1')
+			if (urlParams['embed'] != '1' && ui.getServiceName() != 'atlassian')
 			{
 				mxEvent.addListener(menubar, 'mouseenter', function()
 				{
@@ -2321,7 +2299,7 @@ EditorUi.initMinimalTheme = function()
 			{
 				ui.setStatusText(ui.editor.getStatus());
 
-				if (urlParams['embed'] != '1')
+				if (urlParams['embed'] != '1' && ui.getServiceName() != 'atlassian')
 				{
 					ui.statusContainer.style.display = 'inline-block';
 					statusVisible = true;
@@ -2569,15 +2547,17 @@ EditorUi.initMinimalTheme = function()
 		{
 			var fitFunction = function(evt)
 	        {
-	            graph.popupMenuHandler.hideMenu();
-
-				if (mxEvent.isAltDown(evt) || mxEvent.isShiftDown(evt))
+				if (mxEvent.isShiftDown(evt))
 				{
-					ui.actions.get('customZoom').funct();
+					ui.hideCurrentMenu();
+					ui.actions.get('smartFit').funct();
+					mxEvent.consume(evt);
 				}
-				else
+				else if (mxEvent.isAltDown(evt))
 				{
-		        	ui.actions.get('smartFit').funct();
+					ui.hideCurrentMenu();
+					ui.actions.get('customZoom').funct();
+					mxEvent.consume(evt);
 				}
 	        };
 
@@ -2684,10 +2664,11 @@ EditorUi.initMinimalTheme = function()
 					' (' + Editor.ctrlKey + ' -/Alt+Mousewheel)', zoomOutAction, Editor.zoomOutImage);
 				footer.appendChild(zoomOutElt);
 
-				var elt = document.createElement('div');
+				var elt = menuObj.addMenu('100%', viewZoomMenu.funct);
+				elt.setAttribute('title', mxResources.get('zoom'));
 				elt.innerHTML = '100%';
-				elt.setAttribute('title', mxResources.get('fitWindow') + '/' + mxResources.get('resetView') + ' (Enter)');
 				elt.style.display = 'inline-block';
+				elt.style.color = 'inherit';
 				elt.style.cursor = 'pointer';
 				elt.style.textAlign = 'center';
 				elt.style.whiteSpace = 'nowrap';
@@ -2700,8 +2681,6 @@ EditorUi.initMinimalTheme = function()
 				elt.style.opacity = '0.4';
 				footer.appendChild(elt);
 				
-				mxEvent.addListener(elt, 'click', fitFunction);
-
 				var zoomInElt = addMenuItem('', zoomInAction.funct, true, mxResources.get('zoomIn') +
 					' (' + Editor.ctrlKey + ' +/Alt+Mousewheel)', zoomInAction, Editor.zoomInImage);
 				footer.appendChild(zoomInElt);
@@ -2790,10 +2769,13 @@ EditorUi.initMinimalTheme = function()
 	        	elt.style.backgroundRepeat = 'no-repeat';
 				wrapper.appendChild(elt);
 			}
-		        
+
 	    	// Updates the label if the scale changes
 			(function(elt)
 			{
+				// Adds shift+/alt+click on zoom label
+				mxEvent.addListener(elt, 'click', fitFunction);
+
 				var updateZoom = mxUtils.bind(this, function()
 				{
 					elt.innerHTML = '';

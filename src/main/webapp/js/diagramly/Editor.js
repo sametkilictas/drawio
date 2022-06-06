@@ -689,6 +689,10 @@
 		'#\n' +
 		'# height: auto\n' +
 		'#\n' +
+		'## Collapsed state for vertices. Possible values are true or false. Default is false.\n' +
+		'#\n' +
+		'# collapsed: false\n' +
+		'#\n' +
 		'## Padding for autosize. Default is 0.\n' +
 		'#\n' +
 		'# padding: -12\n' +
@@ -715,8 +719,8 @@
 		'# edgespacing: 40\n' +
 		'#\n' +
 		'## Name or JSON of layout. Possible values are auto, none, verticaltree, horizontaltree,\n' +
-		'## verticalflow, horizontalflow, organic, circle or a JSON string as used in Layout, Apply.\n' +
-		'## Default is auto.\n' +
+		'## verticalflow, horizontalflow, organic, circle, orgchart or a JSON string as used in\n' +
+		'## Layout, Apply. Default is auto.\n' +
 		'#\n' +
 		'# layout: auto\n' +
 		'#\n' +
@@ -5978,7 +5982,7 @@
 		mxSvgCanvas2DUpdateTextNodes.apply(this, arguments);
 		Graph.processFontAttributes(g);
 	};
-		
+	
 	/**
 	 * Handles custom fonts in labels.
 	 */
@@ -5994,6 +5998,9 @@
 		}
 	};
 
+	/**
+	 * Creates the tags dialog.
+	 */
 	Graph.prototype.createTagsDialog = function(isEnabled, invert, addFn)
 	{
 		var graph = this;
@@ -6037,22 +6044,14 @@
 
 		function setAllVisible(visible)
 		{
-			if (visible)
-			{
-				graph.hiddenTags = [];
-			}
-			else
-			{
-				graph.hiddenTags = allTags.slice();
-			}
-
+			graph.setHiddenTags(visible ? [] : allTags.slice());
 			removeInvisibleSelectionCells();
 			graph.refresh();
 		};
 
 		var resetBtn = mxUtils.button(mxResources.get('reset'), function(evt)
 		{
-			graph.hiddenTags = [];
+			graph.setHiddenTags([]);
 
 			if (!mxEvent.isShiftDown(evt))
 			{
@@ -6079,6 +6078,7 @@
 				});
 			}
 		});
+		
 		addBtn.setAttribute('title', mxResources.get('add'));
 		addBtn.className = 'geBtn';
 		addBtn.style.margin = '0';
@@ -6113,7 +6113,7 @@
 								var temp = allTags.slice();
 								var index = mxUtils.indexOf(temp, tag);
 								temp.splice(index, 1);
-								graph.hiddenTags = temp;
+								graph.setHiddenTags(temp);
 								removeInvisibleSelectionCells();
 								graph.refresh();
 							};
@@ -6156,23 +6156,13 @@
 
 							mxEvent.addListener(img, 'click', function(evt)
 							{
-								var idx = mxUtils.indexOf(graph.hiddenTags, tag);
-
 								if (mxEvent.isShiftDown(evt))
 								{
 									setAllVisible(mxUtils.indexOf(graph.hiddenTags, tag) >= 0);
 								}
 								else
 								{
-									if (idx < 0)
-									{
-										graph.hiddenTags.push(tag);
-									}
-									else if (idx >= 0)
-									{
-										graph.hiddenTags.splice(idx, 1);
-									}
-
+									graph.toggleHiddenTag(tag);
 									removeInvisibleSelectionCells();
 									graph.refresh();
 								}
@@ -7060,7 +7050,7 @@
 							}
 						}
 
-						this.hiddenTags = hidden;
+						this.setHiddenTags(hidden);
 						this.refresh();
 					}
 
@@ -7305,6 +7295,34 @@
 			!this.isAllTagsHidden(this.getTagsForCell(cell));
 	};
   
+	/**
+	 * Returns the tags for the given cell as a string.
+	 */
+	Graph.prototype.setHiddenTags = function(tags)
+	{
+		this.hiddenTags = tags;
+		this.fireEvent(new mxEventObject('hiddenTagsChanged'));
+	};
+
+	/**
+	 * Returns the tags for the given cell as a string.
+	 */
+	 Graph.prototype.toggleHiddenTag = function(tag)
+	 {
+		var idx = mxUtils.indexOf(this.hiddenTags, tag);
+									
+		if (idx < 0)
+		{
+			this.hiddenTags.push(tag);
+		}
+		else if (idx >= 0)
+		{
+			this.hiddenTags.splice(idx, 1);
+		}
+		
+		this.fireEvent(new mxEventObject('hiddenTagsChanged'));
+	 };
+ 
 	/**
 	 * Returns the cells in the model (or given array) that have all of the
 	 * given tags in their tags property.

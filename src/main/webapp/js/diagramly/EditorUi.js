@@ -9348,8 +9348,8 @@
 			 		(mxEvent.isPopupTrigger(evt) && (me.getState() == null ||
 			 		mxEvent.isControlDown(evt) || mxEvent.isShiftDown(evt)));
 			};
-		}		
-
+		}
+		
 		// Starts editing PlantUML data
 		graph.cellEditor.editPlantUmlData = function(cell, trigger, data)
 		{
@@ -11099,12 +11099,19 @@
 				
 				if (plain != null && plain.length > 0 && plain.substring(0, 18) == '%3CmxGraphModel%3E')
 				{
-					var tmp = decodeURIComponent(plain);
-							
-					if (this.isCompatibleString(tmp))
+					try
 					{
-						override = true;
-						plain = tmp;
+						var tmp = decodeURIComponent(plain);
+						
+						if (this.isCompatibleString(tmp))
+						{
+							override = true;
+							plain = tmp;
+						}
+					}
+					catch (e)
+					{
+						// ignore
 					}
 				}
 			
@@ -12111,7 +12118,10 @@
 			this.setBackgroundImage(null);
 			this.editor.modified = false;
 
-			this.fireEvent(new mxEventObject('editInlineStop'));
+			if (urlParams['embed'] != '1')
+			{
+				this.fireEvent(new mxEventObject('editInlineStop'));
+			}
 		}
 	};
 	
@@ -12230,7 +12240,7 @@
 					}
 					else if (data.action == 'layout')
 					{
-						this.executeLayoutList(data.layouts)
+						this.executeLayouts(this.editor.graph.createLayouts(data.layouts));
 
 						return;
 					}
@@ -13216,33 +13226,47 @@
 		this.showDialog(this.importCsvDialog.container, 640, 520, true, true, null, null, null, null, true);
 		this.importCsvDialog.init();
 	};
-
-
+	
 	/**
-	 * Runs the layout from the given JavaScript array which is of the form [{layout: name, config: obj}, ...]
-	 * where name is the layout constructor name and config contains the properties of the layout instance.
+	 * Loads orgchart layouts and executes the given function.
 	 */
-	EditorUi.prototype.executeLayoutList = function(layoutList, done)
+	EditorUi.prototype.loadOrgChartLayouts = function(fn)
 	{
-		var graph = this.editor.graph;
-		var cells = graph.getSelectionCells();
-
-		for (var i = 0; i < layoutList.length; i++)
+		var onload = mxUtils.bind(this, function()
 		{
-			var layout = new window[layoutList[i].layout](graph);
-			
-			if (layoutList[i].config != null)
+			this.loadingOrgChart = false;
+			this.spinner.stop();
+			fn();
+		});
+
+		if (typeof mxOrgChartLayout === 'undefined' && !this.loadingOrgChart && !this.isOffline(true))
+		{
+			if (this.spinner.spin(document.body, mxResources.get('loading')))
 			{
-				for (var key in layoutList[i].config)
+				this.loadingOrgChart = true;
+				
+				if (urlParams['dev'] == '1')
 				{
-					layout[key] = layoutList[i].config[key];
+					mxscript('js/orgchart/bridge.min.js', function()
+					{
+						mxscript('js/orgchart/bridge.collections.min.js', function()
+						{
+							mxscript('js/orgchart/OrgChart.Layout.min.js', function()
+							{
+								mxscript('js/orgchart/mxOrgChartLayout.js', onload);											
+							});		
+						});	
+					});
+				}
+				else
+				{
+					mxscript('js/extensions.min.js', onload);
 				}
 			}
-			
-			this.executeLayout(function()
-			{
-				layout.execute(graph.getDefaultParent(), cells.length == 0 ? null : cells);
-			}, i == layoutList.length - 1, done);
+		}
+		else
+		{
+			onload();
 		}
 	};
 	
@@ -13250,6 +13274,17 @@
 	 *
 	 */
 	EditorUi.prototype.importCsv = function(text, done)
+	{
+		this.loadOrgChartLayouts(mxUtils.bind(this, function()
+		{
+			this.doImportCsv(text, done);
+		}));
+	};
+
+	/**
+	 *
+	 */
+	EditorUi.prototype.doImportCsv = function(text, done)
 	{
 		try
 		{
@@ -13279,6 +13314,7 @@
         		var namespace = '';
         		var width = 'auto';
         		var height = 'auto';
+				var collapsed = false;
         		var left = null;
         		var top = null;
         		var edgespacing = 40;
@@ -13405,6 +13441,10 @@
 		    				{
 		    					height = value;
 		    				}
+							else if (key == 'collapsed' && value != '-')
+		    				{
+		    					collapsed = value == 'true';
+		    				}
 		    				else if (key == 'left' && value.length > 0)
 		    				{
 		    					left = value;
@@ -13525,15 +13565,25 @@
     						cell = graph.model.getCell(id);
     					}
     					
-    					var exists = cell != null;
     					var newCell = new mxCell(label, new mxGeometry(x0, y,
 		    				0, 0), style || 'whiteSpace=wrap;html=1;');
-    					newCell.vertex = true;
+						newCell.collapsed = collapsed;
+						newCell.vertex = true;
     					newCell.id = id;
+						
+						if (cell != null)
+						{
+							graph.model.setCollapsed(cell, collapsed);
+						}
 						
 						for (var j = 0; j < values.length; j++)
 				    	{
 							graph.setAttributeForCell(newCell, attribs[j], values[j]);
+
+							if (cell != null)
+							{
+								graph.setAttributeForCell(cell, attribs[j], values[j]);
+							}
 				    	}
 						
 						if (labelname != null && labels != null)
@@ -13543,6 +13593,11 @@
 							if (tempLabel != null)
 							{
 								graph.labelChanged(newCell, tempLabel);
+
+								if (cell != null)
+								{
+									graph.cellLabelChanged(cell, tempLabel);
+								}
 							}
 						}
 
@@ -13559,8 +13614,10 @@
 						graph.setAttributeForCell(newCell, 'placeholders', '1');
 						newCell.style = graph.replacePlaceholders(newCell, newCell.style, vars);
 
-						if (exists)
+						if (cell != null)
 						{
+							graph.model.setStyle(cell, newCell.style);
+
 							if (mxUtils.indexOf(cells, cell) < 0)
 							{
 								cells.push(cell);
@@ -13573,6 +13630,7 @@
 							graph.fireEvent(new mxEventObject('cellsInserted', 'cells', [newCell]));
 						}
 
+    					var exists = cell != null;
 						cell = newCell;
     					
 						if (!exists)
@@ -13853,11 +13911,13 @@
 			    			// Required for layouts to work with new cells
 							var temp = afterInsert;
 			    			graph.view.validate();
-							this.executeLayoutList(JSON.parse(layout), function()
+
+							this.executeLayouts(graph.createLayouts(JSON.parse(layout)), function()
 							{
 								postProcess();
 								temp();
 							});
+
 							afterInsert = null;
 						}
 						else if (layout == 'circle')
@@ -13926,6 +13986,31 @@
 				    			
 			    			afterInsert = null;
 			    		}
+						else if (layout == 'orgchart')
+						{
+			    			// Required for layouts to work with new cells
+			    			graph.view.validate();
+							
+							var orgChartLayout = new mxOrgChartLayout(graph,
+								2, levelspacing, nodespacing);
+		
+		    				var orgChartLayoutIsVertexIgnored = orgChartLayout.isVertexIgnored;
+		
+			    			// Ignore other cells
+		    				orgChartLayout.isVertexIgnored = function(vertex)
+		    				{
+		    					return orgChartLayoutIsVertexIgnored.apply(this, arguments) ||
+		    						mxUtils.indexOf(cells, vertex) < 0;
+		    				};
+		
+		    	    		this.executeLayout(function()
+		    	    		{
+		    	    			orgChartLayout.execute(graph.getDefaultParent());
+				    			postProcess();
+		    	    		}, true, afterInsert);
+		    	    		
+		    	    		afterInsert = null;
+						}
 		    			else if (layout == 'organic' || (layout == 'auto' &&
 		    					select.length > cells.length))
 		    			{
@@ -13939,7 +14024,7 @@
 		
 		    				var organicLayoutIsVertexIgnored = organicLayout.isVertexIgnored;
 		
-			    				// Ignore other cells
+			    			// Ignore other cells
 		    				organicLayout.isVertexIgnored = function(vertex)
 		    				{
 		    					return organicLayoutIsVertexIgnored.apply(this, arguments) ||

@@ -210,24 +210,7 @@
 		
 		showRemoteCursorsAction.setToggleAction(true);
 		showRemoteCursorsAction.setSelectedCallback(function() { return editorUi.isShowRemoteCursors(); });
-
-		// Adds context menu items
-		var menuCreatePopupMenu = Menus.prototype.createPopupMenu;
 		
-		Menus.prototype.createPopupMenu = function(menu, cell, evt)
-		{
-			menuCreatePopupMenu.apply(this, arguments);
-
-			var file = editorUi.getCurrentFile();
-
-			if ((urlParams['embed'] != '1' || urlParams['embedRT'] == '1') && graph.isSelectionEmpty() &&
-				file != null && file.isRealtimeEnabled() && file.isRealtimeSupported())
-			{
-				this.addMenuItems(menu, ['-', 'showRemoteCursors',
-					'shareCursor'], null, evt);
-			}
-		};
-
 		var pointAction = editorUi.actions.addAction('points', function()
 		{
 			editorUi.editor.graph.view.setUnit(mxConstants.POINTS);
@@ -955,23 +938,6 @@
 			editorUi.openLink('https://www.youtube.com/watch?v=Z0D96ZikMkc');
 		});
 		
-		editorUi.actions.addAction('forkme', function()
-		{
-			if (EditorUi.isElectronApp)
-			{
-				editorUi.openLink('https://github.com/jgraph/drawio-desktop');
-			}
-			else
-			{
-				editorUi.openLink('https://github.com/jgraph/drawio');
-			}
-		}).label = 'Fork me on GitHub...';
-		
-		editorUi.actions.addAction('downloadDesktop...', function()
-		{
-			editorUi.openLink('https://get.diagrams.net/');
-		});
-		
 		action = editorUi.actions.addAction('tags', mxUtils.bind(this, function()
 		{
 			if (this.tagsWindow == null)
@@ -1346,23 +1312,51 @@
 				{
 					try
 					{
-						var layoutList = JSON.parse(newValue);
-						editorUi.executeLayoutList(layoutList)
-						editorUi.customLayoutConfig = layoutList;
+						var list = JSON.parse(newValue);
+						editorUi.executeLayouts(graph.createLayouts(list));
+						editorUi.customLayoutConfig = list;
+						editorUi.hideDialog();
 					}
 					catch (e)
 					{
 						editorUi.handleError(e);
-						
-						if (window.console != null)
-						{
-							console.error(e);
-						}
 					}
 				}
-			}, null, null, null, null, null, true, null, null,
-				'https://www.diagrams.net/doc/faq/apply-layouts');
-	    	
+			}, null, null, null, null, function(buttons, input)
+			{
+				var copyBtn = mxUtils.button(mxResources.get('copy'), function()
+				{
+					try
+					{
+						var orig = input.value;
+						input.value = JSON.stringify(JSON.parse(orig));
+						input.focus();
+						
+						if (mxClient.IS_GC || mxClient.IS_FF || document.documentMode >= 5)
+						{
+							input.select();
+						}
+						else
+						{
+							document.execCommand('selectAll', false, null);
+						}
+						
+						document.execCommand('copy');
+						editorUi.alert(mxResources.get('copiedToClipboard'));
+
+						input.value = orig;
+					}
+					catch (e)
+					{
+						editorUi.handleError(e);
+					}
+				});
+
+				copyBtn.setAttribute('title', 'copy');
+				copyBtn.className = 'geBtn';
+				buttons.appendChild(copyBtn);
+			}, true, null, null, 'https://www.diagrams.net/doc/faq/apply-layouts');
+
 			editorUi.showDialog(dlg.container, 620, 460, true, true);
 			dlg.init();
 		});
@@ -1376,19 +1370,16 @@
 
 			menu.addItem(mxResources.get('orgChart'), null, function()
 			{
-				var branchOptimizer = null, parentChildSpacingVal = 20, siblingSpacingVal = 20, notExecuted = true;
+				var branchOptimizer = null, parentChildSpacingVal = 20, siblingSpacingVal = 20;
 				
 				// Invoked when orgchart code was loaded
 				var delayed = function()
 				{
-					editorUi.loadingOrgChart = false;
-					editorUi.spinner.stop();
-					
-					if (typeof mxOrgChartLayout !== 'undefined' && branchOptimizer != null && notExecuted)
+					if (typeof mxOrgChartLayout !== 'undefined' && branchOptimizer != null)
 					{
 						var graph = editorUi.editor.graph;
-						var orgChartLayout = new mxOrgChartLayout(graph, branchOptimizer, parentChildSpacingVal, siblingSpacingVal);
-						
+						var orgChartLayout = new mxOrgChartLayout(graph,
+							branchOptimizer, parentChildSpacingVal, siblingSpacingVal);
 						var cell = graph.getDefaultParent();
 						
 						if (graph.model.getChildCount(graph.getSelectionCell()) > 1)
@@ -1397,41 +1388,6 @@
 						}
 						
 						orgChartLayout.execute(cell);
-						notExecuted = false;
-					}
-				};
-				
-				// Invoked from dialog
-				function doLayout()
-				{
-					if (typeof mxOrgChartLayout === 'undefined' && !editorUi.loadingOrgChart && !editorUi.isOffline(true))
-					{
-						if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
-						{
-							editorUi.loadingOrgChart = true;
-							
-							if (urlParams['dev'] == '1')
-							{
-								mxscript('js/orgchart/bridge.min.js', function()
-								{
-									mxscript('js/orgchart/bridge.collections.min.js', function()
-									{
-										mxscript('js/orgchart/OrgChart.Layout.min.js', function()
-										{
-											mxscript('js/orgchart/mxOrgChartLayout.js', delayed);											
-										});		
-									});	
-								});
-							}
-							else
-							{
-								mxscript('js/extensions.min.js', delayed);
-							}
-						}
-					}
-					else
-					{
-						delayed();
 					}
 				};
 
@@ -1526,26 +1482,29 @@
 						branchOptimizer = 2;
 					}
 					
-					doLayout();
+					editorUi.loadOrgChartLayouts(delayed);
 				});
 				
 				editorUi.showDialog(dlg.container, 355, 140, true, true);
 			}, parent, null, isGraphEnabled());
-						
+			
 			menu.addSeparator(parent);
-		
+			
 			menu.addItem(mxResources.get('parallels'), null, mxUtils.bind(this, function()
 			{
-				// Keeps parallel edges apart
 				var layout = new mxParallelEdgeLayout(graph);
 				layout.checkOverlap = true;
-				layout.spacing = 20;
+
+				editorUi.prompt(mxResources.get('spacing'), layout.spacing, mxUtils.bind(this, function(newValue)
+				{
+					layout.spacing = newValue;
 				
-	    		editorUi.executeLayout(function()
-	    		{
-	    			layout.execute(graph.getDefaultParent(), (!graph.isSelectionEmpty()) ?
-	    				graph.getSelectionCells() : null);
-	    		}, false);
+					editorUi.executeLayout(function()
+					{
+						layout.execute(graph.getDefaultParent(), (!graph.isSelectionEmpty()) ?
+							graph.getSelectionCells() : null);
+					}, false);
+				}));
 			}), parent);
 			
 			menu.addSeparator(parent);
@@ -1630,19 +1589,18 @@
 					
 					this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
 						'website', 'support', '-'], parent);
-						
+
 					if (urlParams['disableUpdate'] != '1')
 					{
-						this.addMenuItems(menu, ['check4Updates', '-'], parent);
+						this.addMenuItems(menu, ['check4Updates'], parent);
 					}
-						
-					this.addMenuItems(menu, ['forkme', '-', 'about'], parent);
 
+					this.addMenuItems(menu, ['openDevTools', '-', 'about'], parent);
 				}
 				else
 				{
-					this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
-						'support', '-', 'forkme', 'downloadDesktop', '-', 'about'], parent);
+					this.addMenuItems(menu, ['-', 'keyboardShortcuts',
+						'quickStart', 'support', '-', 'about'], parent);
 				}
 			}
 			
@@ -1679,6 +1637,7 @@
 			mxResources.parse('testInspect=Inspect');
 			mxResources.parse('testShowConsole=Show Console');
 			mxResources.parse('testXmlImageExport=XML Image Export');
+			mxResources.parse('testOptimize=Remove Inline Images');
 
 			editorUi.actions.addAction('createSidebarEntry', mxUtils.bind(this, function()
 			{
@@ -2035,6 +1994,43 @@
 					}
 				}
 			}));
+
+			editorUi.actions.addAction('testOptimize', mxUtils.bind(this, function()
+			{
+				graph.model.beginUpdate();
+				try
+				{
+					var all = graph.model.cells;
+					var imageCount = 0;
+					var images = [];
+					var cells = [];
+
+					for (var id in all)
+					{
+						var cell = all[id];
+						var style = graph.getCurrentCellStyle(cell);
+						var image = style[mxConstants.STYLE_IMAGE];
+
+						if (image != null && image.substring(0, 5) == 'data:')
+						{
+							if (images[image] == null)
+							{
+								images[image] = (images[image] || 0) + 1;
+								imageCount++;
+							}
+
+							cells.push(cell);
+						}
+					}
+
+					graph.setCellStyles(mxConstants.STYLE_IMAGE, null, cells);
+					console.log('Removed', imageCount, 'image(s) from', cells.length, 'cell(s): ', [cells, images]);
+				}
+				finally
+				{
+					graph.model.endUpdate();
+				}
+			}));
 	
 			editorUi.actions.addAction('testInspect', mxUtils.bind(this, function()
 			{
@@ -2114,7 +2110,8 @@
 			{
 				this.addMenuItems(menu, ['createSidebarEntry', 'showBoundingBox', '-',
 					'testInspectPages', 'testFixPages', '-', 'testCheckFile', 'testDiff', '-',
-					'testInspect', '-', 'testXmlImageExport', '-', 'testShowConsole'], parent);
+					'testInspect', 'testOptimize', '-', 'testXmlImageExport', '-',
+					'testShowConsole'], parent);
 			})));
 		}
 
@@ -2517,7 +2514,15 @@
 	
 			var saveAndExitAction = editorUi.actions.addAction('saveAndExit', function()
 			{
-				editorUi.actions.get('save').funct(true);
+				if (urlParams['toSvg'] == '1')
+				{
+					editorUi.sendEmbeddedSvgExport();
+				}
+				else
+				{
+					editorUi.actions.get('save').funct(true);
+				}
+
 			});
 			
 			saveAndExitAction.label = urlParams['publishClose'] == '1' ? mxResources.get('publish') : mxResources.get('saveAndExit');
@@ -3101,11 +3106,6 @@
 		editorUi.actions.put('useOffline', new Action(mxResources.get('useOffline') + '...', function()
 		{
 			editorUi.openLink('https://app.draw.io/')
-		}));
-		
-		editorUi.actions.put('downloadDesktop', new Action(mxResources.get('downloadDesktop') + '...', function()
-		{
-			editorUi.openLink('https://get.draw.io/')
 		}));
 
 		this.editorUi.actions.addAction('share...', mxUtils.bind(this, function()
@@ -3850,6 +3850,40 @@
 			
 			spellCheckAction.setToggleAction(true);
 			spellCheckAction.setSelectedCallback(function() { return enableSpellCheck; });
+
+			var enableStoreBkp = urlParams['enableStoreBkp'] == '1';
+
+			var storeBkpAction = editorUi.actions.addAction('autoBkp', function()
+			{
+				editorUi.toggleStoreBkp();
+				enableStoreBkp = !enableStoreBkp;
+			});
+			
+			storeBkpAction.setToggleAction(true);
+			storeBkpAction.setSelectedCallback(function() { return enableStoreBkp; });
+
+			editorUi.actions.addAction('openDevTools', function()
+			{
+				editorUi.openDevTools();
+			});
+
+			editorUi.actions.addAction('drafts...', function()
+			{
+				var dlg = new FilenameDialog(editorUi, (EditorUi.draftSaveDelay / 1000) + '', mxResources.get('apply'), mxUtils.bind(this, function(newValue)
+				{
+					var val = parseInt(newValue);
+					
+					if (val >= 0)
+					{
+						EditorUi.draftSaveDelay = val * 1000;
+						EditorUi.enableDrafts = val > 0;  //Disable if zero
+						mxSettings.setDraftSaveDelay(val);
+						mxSettings.save();		
+					}
+				}), mxResources.get('draftSaveInt'), null, null, null, null, null, null, 50, 250);
+				editorUi.showDialog(dlg.container, 320, 80, true, true);
+				dlg.init();
+			});
 		}
 
 		this.put('extras', new Menu(mxUtils.bind(this, function(menu, parent)
@@ -3878,7 +3912,7 @@
 	
 			if (EditorUi.isElectronApp)
 			{
-				this.addMenuItems(menu, ['spellCheck'], parent);	
+				this.addMenuItems(menu, ['spellCheck', 'autoBkp', 'drafts'], parent);
 			}
 
 			this.addMenuItems(menu, ['copyConnect', 'collapseExpand', '-'], parent);
