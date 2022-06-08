@@ -153,15 +153,18 @@ mxConstants.POINTS = 1;
 mxConstants.MILLIMETERS = 2;
 mxConstants.INCHES = 3;
 mxConstants.METERS = 4;
+
 /**
  * This ratio is with page scale 1
  */
 mxConstants.PIXELS_PER_MM = 3.937;
 mxConstants.PIXELS_PER_INCH = 100;
-
 mxConstants.SHADOW_OPACITY = 0.25;
 mxConstants.SHADOWCOLOR = '#000000';
 mxConstants.VML_SHADOWCOLOR = '#d0d0d0';
+
+mxCodec.allowlist = ['mxStylesheet', 'Array', 'mxGraphModel',
+	'mxCell', 'mxGeometry', 'mxRectangle', 'mxPoint'];
 mxGraph.prototype.pageBreakColor = '#c0c0c0';
 mxGraph.prototype.pageScale = 1;
 
@@ -5185,8 +5188,8 @@ Graph.prototype.getTooltipForCell = function(cell)
 			{
 				if (temp[i].name != 'link' || !this.isCustomLink(temp[i].value))
 				{
-					tip += ((temp[i].name != 'link') ? '<b>' + temp[i].name + ':</b> ' : '') +
-						mxUtils.htmlEntities(temp[i].value) + '\n';
+					tip += ((temp[i].name != 'link') ? '<b>' + mxUtils.htmlEntities(temp[i].name) +
+						':</b> ' : '') + mxUtils.htmlEntities(temp[i].value) + '\n';
 				}
 			}
 			
@@ -11890,7 +11893,7 @@ if (typeof mxVertexHandler !== 'undefined')
 					if (this.clearOnChange && this.textarea.innerHTML == this.getEmptyLabelText())
 					{
 						this.clearOnChange = false;
-						this.textarea.innerHTML = '';
+						this.textarea.innerText = '';
 					}
 					
 					// Removes newlines from HTML and converts breaks to newlines
@@ -13812,7 +13815,7 @@ if (typeof mxVertexHandler !== 'undefined')
 						}));
 					}
 	
-					this.linkHint.innerHTML = '';
+					this.linkHint.innerText = '';
 					
 					if (link != null)
 					{

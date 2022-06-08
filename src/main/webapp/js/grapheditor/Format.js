@@ -128,7 +128,7 @@ Format.prototype.init = function()
  */
 Format.prototype.clear = function()
 {
-	this.container.innerHTML = '';
+	this.container.innerText = '';
 	
 	// Destroy existing panels
 	if (this.panels != null)
@@ -970,7 +970,7 @@ BaseFormatPanel.prototype.createColorOption = function(label, getColorFn, setCol
 			div.style.margin = '3px';
 			div.style.border = '1px solid black';
 			div.style.backgroundColor = (tempColor == 'default') ? defaultColorValue : tempColor;
-			btn.innerHTML = '';
+			btn.innerText = '';
 			btn.appendChild(div);
 
 			if (color != null && color != mxConstants.NONE && color.length > 1 && typeof color === 'string')
@@ -5501,8 +5501,8 @@ StyleFormatPanel.prototype.addEffects = function(div)
 	{
 		ss = ui.getSelectionState();
 		
-		left.innerHTML = '';
-		right.innerHTML = '';
+		left.innerText = '';
+		right.innerText = '';
 		current = left;
 		
 		if (ss.rounded)
@@ -6101,7 +6101,7 @@ DiagramStylePanel.prototype.addView = function(div)
 		if (index >= 0 && index < pageCount)
 		{
 			dots[this.format.currentStylePage].style.background = 'transparent';
-			entries.innerHTML = '';
+			entries.innerText = '';
 			this.format.currentStylePage = index;
 			addEntries();
 		}
