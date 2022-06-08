@@ -61,10 +61,7 @@ mxMondrianBase.prototype.cst = {
 	POSITION_TEXT_DEFAULT : 'bottom',
 
 	FORMAT_TEXT : 'formatText', 
-	FORMAT_TEXT_DEFAULT : 'default:1,2',
-
 	ATTRIBUTES_TEXT : 'attributesText', 
-	ATTRIBUTES_TEXT_DEFAULT : 'default',
 
 	TAG : 'tag',
 	TAG_DEFAULT : 'noTag',
@@ -75,7 +72,6 @@ mxMondrianBase.prototype.cst = {
 	TAG_COLOR_FILL : 'tagColorFill', 
 	TAG_COLOR_FILL_DEFAULT : 'medium', 
 };
-
 
 mxMondrianBase.prototype.getColor = function(colorPalette, colorFamily, colorIntensity) {
 	switch(colorFamily)
@@ -621,11 +617,11 @@ mxMondrianBase.prototype.init = function(container)
 	}
 
 	mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
-	
-	mxMondrianBase.prototype.defineLabel(
-		mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
-		mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
-		this.state.cell);
+	this.state.cell.setAttribute('label',
+		mxMondrianBase.prototype.defineLabel(
+			mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
+			mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
+			this.state.cell));
 
 	mxShape.prototype.init.apply(this, arguments);
 
@@ -941,7 +937,7 @@ mxMondrianBase.prototype.installListeners = function()
 	}
 }
 
-mxMondrianBase.prototype.getStyleValue = function(style, key)
+mxMondrianBase.prototype.getStyleValue = function(style, key, defaultValue)
 {
 	var value = 'undefined';
 	var keyIndex = style.indexOf(key);
@@ -957,7 +953,7 @@ mxMondrianBase.prototype.getStyleValue = function(style, key)
 		value = style.substring(valueSeparator + 1, keySeparator);
 	}
 
-	return value;
+	return (value === 'undefined' &&  defaultValue != undefined) ? defaultValue : value;
 }
 
 /**
