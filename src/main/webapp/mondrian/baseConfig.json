@@ -150,6 +150,7 @@
         {
             "uri": "mondrian/elements/default.json"
         },
+
         "Athena-Sample":
         {
             "uri": "mondrian/elements/athena.sample.json"
@@ -161,6 +162,11 @@
         "Athena-ROD":
         {
             "uri": "mondrian/elements/athena.rod.json"
+        },
+
+        "Phoenix":
+        {
+            "uri": "mondrian/elements/phoenix.json"
         }
     },
 
@@ -184,33 +190,6 @@
         {
             "name": "Roboto Mono",
             "uri": "mondrian/fonts/RobotoMono-Regular.ttf"
-        },
-
-        "F1":
-        {
-            "name": "IBM Plex Sans Regular",
-            "uri": "mondrian/fonts/IBMPlexSans-Regular.woff"
-        },
-        "F2":
-        {
-            "name": "IBM Plex Sans SmBld",
-            "uri": "mondrian/fonts/IBMPlexSans-SemiBold.woff"
-        },
-        "F3":
-        {
-            "name": "IBM Plex Mono",
-            "uri": "mondrian/fonts/IBMPlexMono-Regular.woff"
-        },
-        "F4":
-        {
-            "name": "IBM Plex Sans Condensed",
-            "uri": "mondrian/fonts/IBMPlexSansCondensed-Regular.woff"
-        },
-
-        "F5":
-        {
-            "name": "Kyndryl Everett",
-            "uri": "mondrian/fonts/TWKEverett-Regular-web.woff"
         }
     }
 }

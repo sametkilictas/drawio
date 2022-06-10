@@ -1,0 +1,190 @@
+{
+    "DC-1":
+    {
+        "Element-Name": "DataCenter ODC",
+        "Icon-Name": "data-center",
+        "Address": "E0B DC ATWI - Richard Neutra Gasse 10 "
+    },
+    "DC-2":
+    {
+        "Element-Name": "DataCenter ARS",
+        "Icon-Name": "data-center",
+        "Address": "K0P DC ATWI - Arsenal 24"
+    },
+    "Pwr-1":
+    {
+        "Element-Name": "Power",
+        "Icon-Name": "service"
+    },
+    "OS-1":
+    {
+        "Element-Name": "OS",
+        "Icon-Name": "managed-element",
+        "Product": "AIX/PowerVM"
+    },
+    "Srv-1":
+    {
+        "Element-Name": "Server",
+        "Icon-Name": "server-bare-metal-1",
+        "Product": "E950"
+    },
+    "X86-1":
+    {
+        "Element-Name": "X86",
+        "Icon-Name": "service"
+    },
+    "Hyp-1":
+    {
+        "Element-Name": "Hypervisor",
+        "Icon-Name": "managed-element",
+        "Product": "vSphere&NSX"
+    },
+    "Srv-2":
+    {
+        "Element-Name": "Server",
+        "Icon-Name": "server-bare-metal-1",
+        "Product": "SR850V2"
+    },
+    "Pwr-2":
+    {
+        "Element-Name": "Power",
+        "Icon-Name": "service"
+    },
+    "OS-2":
+    {
+        "Element-Name": "OS",
+        "Icon-Name": "managed-element",
+        "Product": "AIX/PowerVM"
+    },
+    "Srv-3":
+    {
+        "Element-Name": "Server",
+        "Icon-Name": "server-bare-metal-1",
+        "Product": "E950"
+    },
+    "X86-2":
+    {
+        "Element-Name": "X86",
+        "Icon-Name": "service"
+    },
+    "Hyp-2":
+    {
+        "Element-Name": "Hypervisor",
+        "Icon-Name": "managed-element",
+        "Product": "vSphere&NSX"
+    },
+    "Srv-4":
+    {
+        "Element-Name": "Server",
+        "Icon-Name": "server-bare-metal-1",
+        "Product": "SR850V2"
+    },
+    "MF-1":
+    {
+        "Element-Name": "Mainframe",
+        "Icon-Name": "service",
+        "Product": "Z15"
+    },
+    "MF-2":
+    {
+        "Element-Name": "Mainframe",
+        "Icon-Name": "service",
+        "Product": "Z15"
+    },
+    "SVC-1":
+    {
+        "Element-Name": "SVC",
+        "Icon-Name": "virtualization"
+    },
+    "SVC-2":
+    {
+        "Element-Name": "SVC",
+        "Icon-Name": "virtualization"
+    },
+    "BU-1":
+    {
+        "Element-Name": "Backup",
+        "Icon-Name": "backup",
+        "Product": "Spectrum Protect"
+    },
+    "BU-2":
+    {
+        "Element-Name": "Backup",
+        "Icon-Name": "backup",
+        "Product": "VTS"
+    },
+    "BU-3":
+    {
+        "Element-Name": "Backup",
+        "Icon-Name": "backup",
+        "Product": "Spectrum Protect"
+    },
+    "BU-4":
+    {
+        "Element-Name": "Backup",
+        "Icon-Name": "backup",
+        "Product": "VTS"
+    },
+    "St-1":
+    {
+        "Element-Name": "Storage",
+        "Icon-Name": "block-storage",
+        "Product": "FS9500 & FS7300"
+    },
+    "St-2":
+    {
+        "Element-Name": "Storage",
+        "Icon-Name": "block-storage",
+        "Product": "DS8886"
+    },
+    "St-3":
+    {
+        "Element-Name": "Storage",
+        "Icon-Name": "block-storage",
+        "Product": "FS9500 & FS7300"
+    },
+    "St-4":
+    {
+        "Element-Name": "Storage",
+        "Icon-Name": "block-storage",
+        "Product": "DS8886"
+    },
+    "HS-1":
+    {
+        "Element-Name": "Housing",
+        "Icon-Name": "managed-element"
+    },
+    "HS-2":
+    {
+        "Element-Name": "Housing",
+        "Icon-Name": "managed-element"
+    },
+    "LAN-1":
+    {
+        "Element-Name": "DC-LAN",
+        "Icon-Name": "lan",
+        "Product": "CISCO-ACI"
+    },
+    "LAN-2":
+    {
+        "Element-Name": "DC-LAN",
+        "Icon-Name": "lan",
+        "Product": "CISCO-ACI"
+    },
+    "DCI-1":
+    {
+        "Element-Name": "DC Interconnect",
+        "Icon-Name": "direct-link",
+        "Product": "DWDM"
+    },
+    "Z15-1":
+    {
+        "Element-Name": "Z15",
+        "Icon-Name": "server-bare-metal-1"
+    },
+    "Z15-2":
+    {
+        "Element-Name": "Z15",
+        "Icon-Name": "server-bare-metal-1"
+    }
+}

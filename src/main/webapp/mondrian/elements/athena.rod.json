@@ -240,5 +240,63 @@
         "Element-Name": "SZ: Shared Services",
         "Icon-Name": "protection",
         "Rubricering": "Confi"
+    },
+    "SZ-MGMT-CenBo":
+    {
+        "Element-Name": "SZ: CenBo",
+        "Icon-Name": "protection",
+        "Rubricering": "DepV"
+    },
+    "SZ-MGMT-LGI":
+    {
+        "Element-Name": "SZ: LGI Management",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "VLAN-OOB":
+    {
+        "Element-Name": "VLAN: Out-of-Band Management",
+        "Icon-Name": "lan",
+        "Rubricering": "Confi"
+    },
+    "TEN-VDI":
+    {
+        "Element-Name": "VDI",
+        "Icon-Name": "tenant"
+    },
+    "TEN-SAP":
+    {
+        "Element-Name": "SAP",
+        "Icon-Name": "tenant"
+    },
+    "TEN-MULAN":
+    {
+        "Element-Name": "MULAN",
+        "Icon-Name": "tenant"
+    },
+    "TEN-GrIT":
+    {
+        "Element-Name": "GrIT - DepV",
+        "Icon-Name": "tenant"
+    },
+    "TEN-SS":
+    {
+        "Element-Name": "Share Services",
+        "Icon-Name": "tenant"
+    },
+    "TEN-CONFI":
+    {
+        "Element-Name": "GrIT - Confi",
+        "Icon-Name": "tenant"
+    },
+    "TEN-INFRA":
+    {
+        "Element-Name": "Infrastructure Services",
+        "Icon-Name": "tenant"
+    },
+    "TEN-MGMT":
+    {
+        "Element-Name": "Management Services",
+        "Icon-Name": "tenant"
     }
 }
