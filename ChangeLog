@@ -1,3 +1,16 @@
+12-JUN-2022: 20.0.1
+
+- Fixes bold math in print output for Chrome [2873]
+- Disables MathJax for Internet Explorer
+- Adds MathJax callback, fixes math in PDF export
+- Fixes style changes override default style [2164]
+
+11-JUN-2022: 20.0.0
+
+- Fixes font style button state before typing [2398]
+- Fixes overwritten style for new cell in CSV import
+- Updates to MathJax 3
+
 08-JUN-2022: 19.0.3
 
 - Adds allowlist for allowed constructors in mxCodec
