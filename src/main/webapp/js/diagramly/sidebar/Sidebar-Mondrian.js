@@ -58,19 +58,50 @@
 			return Sidebar.prototype.mondrianRepo.STENCILS[name].stencil;
 		},
 
-		addElement: function(id, element)
+		addElement: function(client, id, element)
 		{
-			Sidebar.prototype.mondrianRepo.ELEMENTS[id] = {element: element};
+			let elementKey = (client === 'default') ? id : client + '.' + id;
+			elementKey = elementKey.toLowerCase();
+
+			Sidebar.prototype.mondrianRepo.ELEMENTS[elementKey] = {element: element};
 		},
 
-		hasElement: function(id)
+		hasElement: function(predefinedElements, id)
 		{
-			return Sidebar.prototype.mondrianRepo.ELEMENTS.hasOwnProperty(id);
+			id = id.toLowerCase();
+
+			if((predefinedElements != 'undefined' && predefinedElements != 'default' && predefinedElements != ''))
+			{
+				for(let predefinedElement in predefinedElements)
+				{
+					if(Sidebar.prototype.mondrianRepo.ELEMENTS[predefinedElements[predefinedElement].toLowerCase() + '.' + id])
+						return true;
+				}
+			}
+
+			return Sidebar.prototype.mondrianRepo.ELEMENTS.hasOwnProperty(id)
 		},
 
-		getElement: function(id)
+		getElement: function(predefinedElements, id)
 		{
-			return Sidebar.prototype.mondrianRepo.ELEMENTS[id].element;
+			id = id.toLowerCase();
+
+			let definedElement;
+
+			if((predefinedElements != 'undefined' && predefinedElements != 'default' && predefinedElements != ''))
+			{
+				for(let predefinedElement in predefinedElements)
+				{
+					definedElement = Sidebar.prototype.mondrianRepo.ELEMENTS[predefinedElements[predefinedElement].toLowerCase() + '.' + id];
+
+					if(definedElement != undefined)
+						return definedElement.element	
+				}
+			}
+		
+			definedElement = Sidebar.prototype.mondrianRepo.ELEMENTS[id];
+
+			return definedElement.element;
 		}
 	};
 
@@ -99,9 +130,14 @@
 		for (let elementsKey in mondrianConfig.Elements) {
 			let elements = JSON.parse(mxUtils.load(mondrianConfig.Elements[elementsKey].uri).getText())
 
-			for (let elementKey in elements)
+			let clients = mondrianConfig.Elements[elementsKey].client.split(',');
+
+			for (let client in clients)
 			{
-				Sidebar.prototype.mondrianRepo.addElement(elementKey, elements[elementKey]);
+				for (let elementKey in elements)
+				{
+					Sidebar.prototype.mondrianRepo.addElement(clients[client], elementKey, elements[elementKey]);
+				}	
 			}
 		}
 
@@ -235,7 +271,6 @@
 						let stencilName = stencilFQN.pop();
 						let newStencilSection = stencilFQN.pop();
 
-						//console.log(currentStencilSection, newStencilSection);
 						if(newStencilSection != currentStencilSection)
 						{
 							sbEntries.push(this.addEntry(sideBarConfig.tags + " " + newStencilSection.toLowerCase(), this.createSection(newStencilSection.charAt(0).toUpperCase() + newStencilSection.slice(1))));

@@ -1,4 +1,13 @@
 {
+    "DC-1":
+    {
+        "Element-Name": "Twin DC1",
+        "Icon-Name": "data-center",
+        "Location": "Stroe",
+        "Availability-Zone": "AZ-A-01",
+        "Region": "A"
+    },
+
     "RG":
     {
         "Element-Name": "Region",

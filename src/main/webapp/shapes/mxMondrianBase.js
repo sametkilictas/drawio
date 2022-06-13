@@ -616,7 +616,7 @@ mxMondrianBase.prototype.init = function(container)
 		}
 	}
 
-	mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
+	mxMondrianBase.prototype.setAttributesFromRepo(this.state);
 	this.state.cell.setAttribute('label',
 		mxMondrianBase.prototype.defineLabel(
 			mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
@@ -636,7 +636,7 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	let currentLabelValue = currentCell.getAttribute('label');
 	currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
 
-	let elementDefaultSettings = Sidebar.prototype.mondrianRepo.getElement('defaultSettings');
+	let elementDefaultSettings = Sidebar.prototype.mondrianRepo.getElement('default','defaultSettings');
 	let labelFormats = elementDefaultSettings.labelFormats;
 	let labelDefaults = elementDefaultSettings.labelDefaultAttributes;
 
@@ -668,17 +668,36 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
 }
 
-mxMondrianBase.prototype.setAttributesFromRepo = function(thisCell)
+mxMondrianBase.prototype.setAttributesFromRepo = function(thisState)
 {
-	let elementID = thisCell.getAttribute('Element-ID');
-	if(Sidebar.prototype.mondrianRepo.hasElement(elementID))
+	let predefinedElements = ['undefined'];
+
+	if(thisState != null)
 	{
-		let element = Sidebar.prototype.mondrianRepo.getElement(elementID);
+		let canvasCell = thisState.view.graph.model.root;
+	
+		if(canvasCell != undefined && canvasCell.value != undefined)
+			predefinedElements = (canvasCell.hasAttribute('Predefined-Elements')) ? canvasCell.value.getAttribute('Predefined-Elements').split(',') : ['default'];
+	}
+
+	let elementID = thisState.cell.getAttribute('Element-ID');
+
+	if(Sidebar.prototype.mondrianRepo.hasElement(predefinedElements, elementID))
+	{
+		let element = Sidebar.prototype.mondrianRepo.getElement(predefinedElements, elementID);
+		let newRepoAttributes = [];
 
 		for (let attributeInRepo in element)
 		{
-			thisCell.setAttribute(attributeInRepo, element[attributeInRepo]);
+			thisState.cell.setAttribute(attributeInRepo, element[attributeInRepo]);
+			newRepoAttributes.push(attributeInRepo);
 		}
+
+		thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());
+	}
+	else
+	{
+		thisState.cell.setAttribute('repoAttributes', '');
 	}
 }
 
@@ -835,7 +854,7 @@ mxMondrianBase.prototype.installListeners = function()
 			{
 				if(evt.properties.change.constructor.name === 'mxValueChange' && (evt.properties.change.cell.id === this.cellID))
 				{
-					mxMondrianBase.prototype.setAttributesFromRepo(this.state.cell);
+					mxMondrianBase.prototype.setAttributesFromRepo(this.state);
 
 					const currentIconAttribute = evt.properties.change.value.attributes.getNamedItem('Icon-Name');
 					const previousIconAttribute = evt.properties.change.previous.attributes.getNamedItem('Icon-Name');

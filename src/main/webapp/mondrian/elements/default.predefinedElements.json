@@ -1,0 +1,12 @@
+{
+    "DC":
+    {
+        "Element-Name": "Data Center",
+        "Icon-Name": "data-center"
+    },
+    "DC-1":
+    {
+        "Element-Name": "Data Center - 1",
+        "Icon-Name": "data-center"
+    }
+}

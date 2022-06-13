@@ -1400,6 +1400,19 @@ var EditDataDialog = function(ui, cell)
 		{
 			meta = JSON.parse(temp);
 		}
+
+		//Mondrian addition: /*Control Repo Attributes
+		let repoAttributesItem = value.attributes.getNamedItem('repoAttributes');
+		
+		if(repoAttributesItem != null)
+		{
+			let repoAttributes = repoAttributesItem.value.split(',');
+
+			for(let repoAttribute in repoAttributes)
+			{
+				meta[repoAttributes[repoAttribute]] = {editable: false};
+			}
+		}
 	}
 	catch (e)
 	{
@@ -1486,7 +1499,14 @@ var EditDataDialog = function(ui, cell)
 			texts[index].setAttribute('rows', '2');
 		}
 		
-		addRemoveButton(texts[index], name);
+		if (meta[name] != null && meta[name].editable == false)
+		{
+			// skip
+		}
+		else
+		{
+			addRemoveButton(texts[index], name);
+		}
 		
 		if (meta[name] != null && meta[name].editable == false)
 		{
@@ -1499,7 +1519,7 @@ var EditDataDialog = function(ui, cell)
 
 	for (var i = 0; i < attrs.length; i++)
 	{
-		if ((isLayer || attrs[i].nodeName != 'label') && attrs[i].nodeName != 'placeholders')
+		if ((isLayer || attrs[i].nodeName != 'label') && attrs[i].nodeName != 'placeholders' && attrs[i].nodeName != 'repoAttributes') // MONDRIAN; hide repoAttributes
 		{
 			temp.push({name: attrs[i].nodeName, value: attrs[i].nodeValue});
 		}

@@ -148,25 +148,36 @@
     "Elements":{
         "Default":
         {
-            "uri": "mondrian/elements/default.json"
+            "uri": "mondrian/elements/defaultSettings.json",
+            "client": "default"
+        },
+
+        "Default-PredefinedElements":
+        {
+            "uri": "mondrian/elements/default.predefinedElements.json",
+            "client": "default"
         },
 
         "Athena-Sample":
         {
-            "uri": "mondrian/elements/athena.sample.json"
+            "uri": "mondrian/elements/athena.sample.json",
+            "client": "default,athena"
         },
         "Athena-DCS":
         {
-            "uri": "mondrian/elements/athena.dcs.json"
+            "uri": "mondrian/elements/athena.dcs.json",
+            "client": "athena"
         },
         "Athena-ROD":
         {
-            "uri": "mondrian/elements/athena.rod.json"
+            "uri": "mondrian/elements/athena.rod.json",
+            "client": "athena"
         },
 
         "Phoenix":
         {
-            "uri": "mondrian/elements/phoenix.json"
+            "uri": "mondrian/elements/phoenix.json",
+            "client": "phoenix"
         }
     },
 
