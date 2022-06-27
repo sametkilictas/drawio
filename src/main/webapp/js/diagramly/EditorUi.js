@@ -12750,18 +12750,23 @@
 							// SVG is generated from graph so parse optional XML
 							if (data.xml != null && data.xml.length > 0)
 							{
+								if (this.editor.graph.mathEnabled)
+								{
+									// Waits for MathJax autoloading and rendering
+									var editorOnMathJaxDone = Editor.onMathJaxDone;
+
+									Editor.onMathJaxDone = function()
+									{
+										editorOnMathJaxDone.apply(this, arguments);
+										graphReady();
+									};
+								}
+
 								ignoreChange = true;
 								this.setFileData(data.xml);
 								ignoreChange = false;
 
-								if (this.editor.graph.mathEnabled)
-								{
-									window.setTimeout(function()
-									{
-										window.MathJax.Hub.Queue(graphReady);
-									}, 0);
-								}
-								else
+								if (!this.editor.graph.mathEnabled)
 								{
 									graphReady();
 								}
@@ -13249,7 +13254,7 @@
 				}
 				else
 				{
-					mxscript('js/extensions.min.js', onload);
+					mxscript(DRAWIO_BASE_URL + '/js/orgchart.min.js', onload);
 				}
 			}
 		}
@@ -16233,35 +16238,7 @@ var CommentsWindow = function(editorUi, x, y, w, h, saveCallback)
 		this.window.fit();
 	}));
 	
-	this.window.setLocation = function(x, y)
-	{
-		var iw = window.innerWidth || document.body.clientWidth || document.documentElement.clientWidth;
-		var ih = window.innerHeight || document.body.clientHeight || document.documentElement.clientHeight;
-		
-		x = Math.max(0, Math.min(x, iw - this.table.clientWidth));
-		y = Math.max(0, Math.min(y, ih - this.table.clientHeight - 48));
-
-		if (this.getX() != x || this.getY() != y)
-		{
-			mxWindow.prototype.setLocation.apply(this, arguments);
-		}
-	};
-	
-	var resizeListener = mxUtils.bind(this, function()
-	{
-		var x = this.window.getX();
-		var y = this.window.getY();
-		
-		this.window.setLocation(x, y);
-	});
-	
-	mxEvent.addListener(window, 'resize', resizeListener);
-
-	this.destroy = function()
-	{
-		mxEvent.removeListener(window, 'resize', resizeListener);
-		this.window.destroy();
-	}
+	editorUi.installResizeHandler(this, true);
 };
 
 /**
