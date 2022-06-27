@@ -631,12 +631,12 @@ mxMondrianBase.prototype.init = function(container)
 	this.installListeners();
 };
 
-mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, currentCell)
+mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, currentCell, settings)
 {
 	let currentLabelValue = currentCell.getAttribute('label');
 	currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
 
-	let elementDefaultSettings = Sidebar.prototype.mondrianRepo.getElement('default','defaultSettings');
+	let elementDefaultSettings = Sidebar.prototype.mondrianRepo.getElement('default',(settings != undefined) ? settings : 'defaultSettings');
 	let labelFormats = elementDefaultSettings.labelFormats;
 	let labelDefaults = elementDefaultSettings.labelDefaultAttributes;
 
@@ -668,7 +668,7 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
 }
 
-mxMondrianBase.prototype.setAttributesFromRepo = function(thisState)
+mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedID)
 {
 	let predefinedElements = ['undefined'];
 
@@ -680,7 +680,7 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisState)
 			predefinedElements = (canvasCell.hasAttribute('Predefined-Elements')) ? canvasCell.value.getAttribute('Predefined-Elements').split(',') : ['default'];
 	}
 
-	let elementID = thisState.cell.getAttribute('Element-ID');
+	let elementID = thisState.cell.getAttribute((predefinedID != undefined) ? predefinedID : 'Element-ID');
 
 	if(Sidebar.prototype.mondrianRepo.hasElement(predefinedElements, elementID))
 	{
@@ -2459,11 +2459,170 @@ mxMondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (this
  };
 
 /**
+ * Class: mxMondrianBaseConnector
+ * Extends <mxArrowConnector> to implement connectors that connect Mondrian Shapes
+ */
+function mxMondrianBaseConnector()
+{
+	mxArrowConnector.call(this);
+};
+
+mxUtils.extend(mxMondrianBaseConnector, mxConnector);
+
+mxMondrianBaseConnector.prototype.cst = 
+{
+	MONDRIAN_CONNECTOR : 'mxgraph.mondrian.connector',
+	COLOR_FAMILY_LINE : 'colorFamilyLine',
+	COLOR_FAMILY_LINE_DEFAULT : 'black',
+	COLOR_INTENSITY_LINE : 'colorIntensityLine',
+	COLOR_INTENSITY_LINE_DEFAULT : 'medium',
+};
+
+mxMondrianBaseConnector.prototype.init = function(container)
+{
+	if(this.state != null)
+	{
+		if (!mxUtils.isNode(this.state.cell.value)) 
+			this.state.cell.value = mxUtils.createXmlDocument().createElement('UserObject');;
+
+		let mondrianAttributes = ['Interface-ID', 'Interface-Name'];
+		for (attributeIndex = 0; attributeIndex < mondrianAttributes.length; attributeIndex++ ) {
+			if(!this.state.cell.hasAttribute(mondrianAttributes[attributeIndex]))
+				this.state.cell.setAttribute(mondrianAttributes[attributeIndex],'')
+		}
+
+		mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
+		this.state.cell.setAttribute('label',
+			mxMondrianBase.prototype.defineLabel(
+				mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
+				mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
+				this.state.cell, 'defaultSettingsConnector'));
+
+		this.state.cell.setAttribute('placeholders','1')
+
+		let defaultStyles = [{prop: 'jumpStyle', value: 'line'}, {prop: 'jumpSize', value: '8'}, {prop: 'endArrow', value: 'none'}, {prop: 'startArrow', value: 'none'}, {prop: 'metaEdit', value: '1'}];
+		let currentStyle = this.state.cell.style;
+		let newStyle = currentStyle;
+		let styleChanged = false;
+
+		for (styleIndex = 0; styleIndex < defaultStyles.length; styleIndex++ ) {
+			let propValue = mxMondrianBase.prototype.getStyleValue(currentStyle, defaultStyles[styleIndex].prop);
+
+			if(propValue == 'undefined')
+			{
+				newStyle = mxUtils.setStyle(newStyle, defaultStyles[styleIndex].prop, defaultStyles[styleIndex].value);
+				this.state.style[defaultStyles[styleIndex].prop] = defaultStyles[styleIndex].value;
+				styleChanged = true;	
+			}	
+		}
+
+		if(styleChanged)
+		{
+			this.state.view.graph.model.beginUpdate();
+			this.state.view.graph.model.setStyle(this.state.cell, newStyle);
+			this.state.view.graph.model.endUpdate();
+		}
+	}
+
+	mxConnector.prototype.init.apply(this, arguments); 
+};
+
+mxMondrianBaseConnector.prototype.customProperties = [
+	{name:'colorFamilyLine', dispName:'Color', type:'enum', defVal:'black',
+		enumList:[{val:'blue', dispName: 'Blue'}, {val:'black', dispName: 'Black'}, {val:'cyan', dispName: 'Cyan'}, {val:'green', dispName: 'Green'}, {val:'gray', dispName: 'Gray'}, {val:'magenta', dispName: 'Magenta'}, {val:'purple', dispName: 'Purple'}, {val:'red', dispName: 'Red'}, {val:'teal', dispName: 'Teal'}, {val:'yellow', dispName: 'Yellow'}, {val:'orange', dispName: 'Orange'}],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+
+			for (let i = 0; i < selectedCells.length; i++)
+			{			
+				let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(
+					selectedCells[i].style, 
+					mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE, 
+					mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE_DEFAULT);
+
+				let mondrianColor = mxMondrianBase.prototype.getColor(mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, newValue, colorIntensityLine);
+
+				graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
+			}
+		}
+	},
+	{name:'colorIntensityLine', dispName:'Color (Intensity)', type:'enum', defVal:'medium',
+		enumList:[{val:'light', dispName: 'Light'}, {val:'medium', dispName: 'Medium'}, {val:'dark', dispName: 'Dark'}],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+
+			for (let i = 0; i < selectedCells.length; i++)
+			{			
+				let colorFamilyLine = mxMondrianBase.prototype.getStyleValue(
+					selectedCells[i].style, 
+					mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE, 
+					mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE_DEFAULT);
+
+				let mondrianColor = mxMondrianBase.prototype.getColor(mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, colorFamilyLine, newValue);
+
+				graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
+			}
+		}
+	},
+	// Label
+	{name:'formatText', dispName:'Label (Format)', type:'enum', defVal:'default:1',
+	enumList:[
+		{val:'nolabel', dispName: 'None'},
+		{val:'default:1', dispName: 'Default: Attribute 1'},
+		{val:'default:1,2', dispName: 'Default: Attribute 1 <> Attribute 2'},
+		{val:'default:1,2,3', dispName: 'Default: Attribute 1 <> Attribute 2: Attribute 3'},
+		{val:'custom', dispName: 'Custom'},
+		],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+			
+			for (let i = 0; i < selectedCells.length; i++)
+			{	
+				let attributesText = mxMondrianBase.prototype.getStyleValue(selectedCells[i].style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT);
+				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(newValue,attributesText,selectedCells[i],'defaultSettingsConnector'));
+			}
+		}
+	},
+	{name: 'attributesText', dispName: 'Label (Attributes)', type: 'staticArr', subType: 'dynamicEnum', size: '3', subDefVal: 'default',
+		enumList:[{val:'noText', dispName: 'None'}, {val:'default', dispName: 'Default'}],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+			
+			for (let i = 0; i < selectedCells.length; i++)
+			{			
+				let formatText = mxMondrianBase.prototype.getStyleValue(selectedCells[i].style, mxMondrianBase.prototype.cst.FORMAT_TEXT);
+				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(formatText,newValue,selectedCells[i],'defaultSettingsConnector'));
+			}
+		}
+	}
+];
+
+mxMondrianBaseConnector.prototype.origPaintEdgeShape = mxMondrianBaseConnector.prototype.paintEdgeShape;
+mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts, rounded)
+{
+	// Markers modify incoming points array
+	var temp = [];
+	
+	for (var i = 0; i < pts.length; i++)
+	{
+		temp.push(mxUtils.clone(pts[i]));
+	}
+	
+	mxMondrianBaseConnector.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
+};
+
+
+/**
  * Mondrian Design Method shape registration
  */
 mxCellRenderer.registerShape(mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE, mxMondrianBase);
 mxCellRenderer.registerShape(mxMondrianLegend.prototype.cst.MONDRIAN_LEGEND_SHAPE, mxMondrianLegend);
 mxCellRenderer.registerShape(mxMondrianBaseDeploymentUnit.prototype.cst.MONDRIAN_DU, mxMondrianBaseDeploymentUnit);
+mxCellRenderer.registerShape(mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR, mxMondrianBaseConnector);
 
 /**
  * IBM Mondrian Design Method shape registration for backward compatibility

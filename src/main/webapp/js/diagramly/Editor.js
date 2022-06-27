@@ -4527,7 +4527,7 @@
 			var sstate = this.editorUi.getSelectionState();
 
 			/* MONDRIAN: Hide Style Color Palette Panel */
-			if (sstate.style.shape != 'image' && !sstate.containsLabel && sstate.cells.length > 0 && sstate.style.shape != 'mxgraph.mondrian.base')
+			if (sstate.style.shape != 'image' && !sstate.containsLabel && sstate.cells.length > 0 && sstate.style.shape != mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE && sstate.style.shape != mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
 			{
 				this.container.appendChild(this.addStyles(this.createPanel()));
 			}
@@ -4845,7 +4845,7 @@
 					if(pType == 'dynamicEnum')
 					{
 						let selectedCells = graph.getSelectionCells();
-						let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders'];
+						let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes'];
 						let dynamicAttributes = [];
 
 						pEnumList = pEnumList.filter(function (value, index, arr) { return !value.isDynamic;});

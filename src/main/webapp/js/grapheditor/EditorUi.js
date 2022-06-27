@@ -858,7 +858,7 @@ EditorUi = function(editor, container, lightbox)
 				{
 					// Updates icon for edge shape
 					var edgeShapeDiv = this.toolbar.edgeShapeMenu.getElementsByTagName('div')[0];
-					
+
 					if (graph.currentEdgeStyle['shape'] == 'link')
 					{
 						edgeShapeDiv.className = 'geSprite geSprite-linkedge';
@@ -870,6 +870,10 @@ EditorUi = function(editor, container, lightbox)
 					else if (graph.currentEdgeStyle['shape'] == 'arrow')
 					{
 						edgeShapeDiv.className = 'geSprite geSprite-simplearrow';
+					}
+					else if (graph.currentEdgeStyle['shape'] == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+					{
+						edgeShapeDiv.className = 'geSprite geSprite-mondrian';
 					}
 					else
 					{

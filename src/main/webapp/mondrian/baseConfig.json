@@ -152,6 +152,12 @@
             "client": "default"
         },
 
+        "Default-Interfaces":
+        {
+            "uri": "mondrian/elements/default.interfaces.json",
+            "client": "default"
+        },
+
         "Default-PredefinedElements":
         {
             "uri": "mondrian/elements/default.predefinedElements.json",

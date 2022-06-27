@@ -2322,7 +2322,7 @@ Graph.prototype.init = function(container)
 		var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
 		var curved = mxUtils.getValue(state.style, mxConstants.STYLE_CURVED, false);
 		
-		return !curved && (shape == 'connector' || shape == 'filledEdge');
+		return !curved && (shape == 'connector' || shape == 'filledEdge' || shape == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR);
 	};
 	
 	/**
