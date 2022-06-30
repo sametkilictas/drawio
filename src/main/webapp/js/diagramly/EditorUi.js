@@ -13804,6 +13804,13 @@
 
 											var edgeCell = graph.insertEdge(null, null, label || '', (edge.invert) ?
 												ref : realCell, (edge.invert) ? realCell : ref, edgeStyle);
+
+											if(edge.attributes != null)
+											{
+												for (var attribute in edge.attributes) { 
+													graph.setAttributeForCell(edgeCell, attribute, edge.attributes[attribute]);
+												}
+											}
 											
 											// Adds additional edge labels
 											if (edge.labels != null)
