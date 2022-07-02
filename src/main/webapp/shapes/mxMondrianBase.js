@@ -2516,6 +2516,27 @@ mxMondrianBaseConnector.prototype.init = function(container)
 			}	
 		}
 
+		// set the stroke color
+		let colorFamilyLine = mxMondrianBase.prototype.getStyleValue(
+			currentStyle, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE_DEFAULT);
+
+		let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(
+			currentStyle, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE_DEFAULT);
+
+		let mondrianColor = mxMondrianBase.prototype.getColor(
+			mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, colorFamilyLine, colorIntensityLine);
+
+		if(mondrianColor != mxMondrianBase.prototype.getStyleValue(currentStyle, 'strokeColor'))
+		{
+			newStyle = mxUtils.setStyle(newStyle, 'strokeColor', mondrianColor);
+			this.state.style['strokeColor'] = mondrianColor;
+			styleChanged = true;
+		}
+
 		if(styleChanged)
 		{
 			this.state.view.graph.model.beginUpdate();

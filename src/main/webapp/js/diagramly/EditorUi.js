@@ -13805,10 +13805,17 @@
 											var edgeCell = graph.insertEdge(null, null, label || '', (edge.invert) ?
 												ref : realCell, (edge.invert) ? realCell : ref, edgeStyle);
 
+											// *Mondrian Extension
 											if(edge.attributes != null)
 											{
-												for (var attribute in edge.attributes) { 
-													graph.setAttributeForCell(edgeCell, attribute, edge.attributes[attribute]);
+												for (var attribute in edge.attributes) {
+													let attributeValue = edge.attributes[attribute];
+													let fromLabelAttribute = attributeValue.split(':');
+
+													if (fromLabelAttribute[0] === 'fromlabel')
+														attributeValue = dataCell.getAttribute(fromLabelAttribute[1]);
+
+													graph.setAttributeForCell(edgeCell, attribute, attributeValue);
 												}
 											}
 											
