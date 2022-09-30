@@ -1,3 +1,157 @@
+29-SEP-2022: 20.4.0
+
+- [conf cloud] Fixed bug that instances without configuration store diagrams as compressed XML [DID-6387]
+- Applies fill=stroke for some stencils [DS-918]
+- Fixed image export text shift in lightbox [DID-6374]
+
+27-SEP-2022: 20.3.7
+
+- [conf cloud] Fixes conf pdf export of diagrams with () in their name
+- Prevents loading compatible files (png, svg...) as local files in embed mode and on-prem [DID-6193]
+- Fixes call to fadeNodes in animation plugin [3070]
+- Added Spacing option to distribute to have equal spacing between cells [736]
+
+22-SEP-2022: 20.3.6
+
+- Fixes possible NPE in viewer lightbox [DS-917]
+
+22-SEP-2022: 20.3.5
+
+- Ignores OS setting for default dark mode [DS-916]
+
+22-SEP-2022: 20.3.4 - BUILD FAILED AT STAGE TESTING - https://github.com/jgraph/drawio-dev/commit/1bb7a0fc531d68ff85653534e4f11774914bcc30
+
+- Changes proxy 500 returns to 400 [DS-915]
+- Disables dark mode with UI in embed mode [DS-6350]
+- Fixes embed button offset and padding in sketch UI
+
+19-SEP-2022: 20.3.3
+
+- Replaces CSS classname in live UI refresh to avoid extension clash [DS-909]
+
+16-SEP-2022: 20.3.2
+
+- Keep SVG content attribute in DOMPurify [DID-6193]
+
+15-SEP-2022: 20.3.1
+
+- Multiple commits preparing for live UI switch [DS-909]
+- Disables java proxy by default [DS-912]
+- Removes click to stop drawing freehand [1109]
+- NPE fix [DS-913]
+- NPE fix [DS-914]
+- [conf cloud] Diagram count restrictions on free tier [DFCC-57]
+- Fixes scroll issue for CMD key in Safari 16 [3017]
+- Enables autosize for multiple vertices [1116]
+- Adds ui/safe to fix possible XSS in math [CSP-733]
+
+07-SEP-2022: 20.3.0
+
+- Uses organic as default layout to fix possible NPE in CSV import [DS-910]
+- Removes storage.googleapis.com from CSP as no longer needed for PWA [CSP-673]
+- Adds ALLOW_CUSTOM_PLUGINS for third party plugins [CSP-676]
+- Limits plugins to built-in or same domain [CSP-676]
+- Hides connect arrows while freehand drawing [1107]
+- Removes yarn.lock file as we removed package.json from this project [DS-911]
+- Fixes possible XSS in viewer back/refresh buttons [CSP-677]
+- Checks href attribute with no namespace in use tag [CSP-678]
+
+01-SEP-2022: 20.2.8
+
+- Fixes importing plain SVG images by drag and drop [DS-902]
+- Adds createToolbarButton helper function [3007]
+- Sets current stroke color and width independently [DS-903]
+- Fixes layout for CSV import in lightbox mode [DS-904]
+- Fixes repeated set default style not working [DS-905]
+- [conf cloud] Catches errors in diagram text extraction to not break re-indexing process [DS-908]
+- Applies fillColor=strokeColor for shapes where appropriate [DS-903]
+- Makes format window closable in min ui [DS-906]
+- Fixes file pattern for workbox [2977]
+- Smaller stencils.min, uses built-in base64 encoder [DS-907]
+- Allows for close icon in minimized format window [DS-906]
+- Adds support for stroke and fill color in stencils [DS-903]
+- Restricts proxy servlet, java disabled by default, all errors are 500 (not distinguishable), allow ports only by config [CSP-633]
+- Conf Cloud: Fixed error of renaming/changing view settings not published if no modification done to the diagram [DID-6141]
+- Adds custom starting unit number to Rack Cabinet shape [2967]
+
+22-AUG-2022: 20.2.7
+
+- Reduces cursor update frequency to reduce DO request count [DS-899]
+- Creates Github app specific to confluence cloud [DS-900]
+- Adds enumeration state in image export [2900]
+- Updates freehand library to fix security dependency issue
+- Fixes highlight for drag over AWS subnet [2966]
+
+21-AUG-2022: 20.2.6
+
+- Updates to latest GCP icon set [DS-898]
+- Changes language menu icon to SVG [DS-897]
+- Use relative URL for service worker [2740]
+
+18-AUG-2022: 20.2.5
+
+- [conf cloud] Adds support for anon users by using display name instead of email [DS-895]
+- [conf cloud] Adds private repository support to embed diagram github option  [DID-5931]
+- [conf cloud] Fixes hi res preview setting in viewer [DID-5978]
+
+15-AUG-2022: 20.2.4
+
+- [conf cloud] Adds support for legacy diagramly macros [DID-5823]
+
+03-AUG-2022: 20.2.3
+
+- [conf cloud] Fixes adding diagrams to unsaved global templates [DID-5761]
+
+26-JUL-2022: 20.2.2
+
+- Uses proxy for loading from template URL [DND-629]
+- [conf cloud] Fixes issue in page update of pageIDs import [DID-5641]
+
+26-JUL-2022: 20.2.1
+
+- Adds statistics to realtime CF worker
+- Adds checksums for merge(File) error logging
+
+22-JUL-2022: 20.2.0
+
+- Changes real-time collaboration CF worker to use the same DO for multiple files
+
+21-JUL-2022: 20.1.4
+
+- Fixes dark mode switch overlaps embed buttons
+- Fixes embed button styles in dark mode
+- Uses proxy for CSV descriptor URL if CSP is used
+
+20-JUL-2022: 20.1.3
+
+- Fixes curved/rounded checkbox in diagram style tab
+- Restores update of default curved/rounded style
+- Adds border width and type for color scheme [2924]
+- Fixes ignored expand style for image change [2921]
+
+19-JUL-2022: 20.1.2
+
+- Update mermaid to v9.1.3
+- Removes Advanced PDF export when printPdfExport is true
+- Adds A/S/D/F/X/C, moves Ctrl+(Shift)+K/X shortcuts
+- Fixes page background if ui URL parameter is used
+- Adds label in dialog/tooltip if diagram translated
+- Uses default browser language for online app
+
+12-JUL-2022: 20.1.1
+
+- Closes secret manager resources
+
+11-JUL-2022: 20.1.0
+
+- [conf cloud] Trial to add archived spaces support to Gliffy mass import
+- Improves performance for CSV parsing (RFC 4180)
+- Uses gcloud secret manager
+- [conf cloud] Changed page IDs export name to draw.io Export
+- [conf cloud] Using Page IDs import/export in cloud/server
+- [conf cloud] Added archived spaces support to Gliffy mass import
+- Changes  pusher.properties to pusher_properties
+
 29-JUN-2022: 20.0.4
 
 - [conf cloud] Adds tags to viewer/lightbox toolbar

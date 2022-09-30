@@ -1747,14 +1747,21 @@ Graph.sanitizeHtml = function(value, editing)
 /**
  * Returns the size of the page format scaled with the page size.
  */
-Graph.sanitizeLink = function(href)
-{
-	var a = document.createElement('a');
-	a.setAttribute('href', href);
-	Graph.sanitizeNode(a);
-	
-	return a.getAttribute('href');
-};
+ Graph.sanitizeLink = function(href)
+ {
+	 if (href == null)
+	 {
+		 return null;
+	 }
+	 else
+	 {
+		 var a = document.createElement('a');
+		 a.setAttribute('href', href);
+		 Graph.sanitizeNode(a);
+		 
+		 return a.getAttribute('href');
+	 }
+ };
 
 /**
  * Sanitizes the given DOM node in-place.
@@ -1767,11 +1774,23 @@ Graph.sanitizeNode = function(value)
 // Allows use tag in SVG with local references only
 DOMPurify.addHook('afterSanitizeAttributes', function(node)
 {
-	if (node.nodeName == 'use' && node.hasAttribute('xlink:href') &&
-		!node.getAttribute('xlink:href').match(/^#/))
+	if (node.nodeName == 'use' && ((node.getAttribute('xlink:href') != null &&
+		!node.getAttribute('xlink:href').startsWith('#')) ||
+		(node.getAttribute('href') != null && !node.getAttribute('href').startsWith('#'))))
 	{
 		node.remove();
-	} 
+	}
+});
+
+// Workaround for removed content with empty nodes
+DOMPurify.addHook('uponSanitizeAttribute', function (node, evt)
+{
+	if (node.nodeName == 'svg' && evt.attrName == 'content')
+	{
+		evt.forceKeepAttr = true;
+	}
+	
+	return node;
 });
 
 /**
@@ -1809,6 +1828,7 @@ Graph.clipSvgDataUri = function(dataUri, ignorePreserveAspect)
 			{
 				// Strips leading XML declaration and doctypes
 				div.innerHTML = Graph.sanitizeHtml(data.substring(idx));
+				//div.innerHTML = data.substring(idx);
 				
 				// Gets the size and removes from DOM
 				var svgs = div.getElementsByTagName('svg');
@@ -2027,6 +2047,11 @@ Graph.prototype.lightbox = false;
  * 
  */
 Graph.prototype.defaultPageBackgroundColor = '#ffffff';
+
+/**
+ * 
+ */
+Graph.prototype.simpleBackgroundColor = '#f0f0f0';
 
 /**
  * 
@@ -2271,7 +2296,8 @@ Graph.prototype.init = function(container)
 			(this.model.isVertex(state.cell) ||
 			mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) == 'arrow' ||
 			mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) == 'filledEdge' ||
-			mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) == 'flexArrow');
+			mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) == 'flexArrow' ||
+			mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null) == 'mxgraph.arrows2.wedgeArrow');
 	};
 	
 	/**
@@ -2972,6 +2998,12 @@ Graph.prototype.isViewer = function()
 Graph.prototype.labelLinkClicked = function(state, elt, evt)
 {
 	var href = elt.getAttribute('href');
+	
+	// Blocks and removes unsafe links in labels
+	if (href != Graph.sanitizeLink(href))
+	{
+		Graph.sanitizeNode(elt);
+	}
 	
 	if (href != null && !this.isCustomLink(href) && ((mxEvent.isLeftMouseButton(evt) &&
 		!mxEvent.isPopupTrigger(evt)) || mxEvent.isTouchEvent(evt)))
@@ -4537,7 +4569,7 @@ Graph.prototype.getIndexableText = function(cells)
 		{
 			if (this.isHtmlLabel(cell))
 			{
-				tmp.innerHTML = this.sanitizeHtml(this.getLabel(cell));
+				tmp.innerHTML = Graph.sanitizeHtml(this.getLabel(cell));
 				label = mxUtils.extractTextWithWhitespace([tmp]);
 			}
 			else
@@ -4696,14 +4728,15 @@ Graph.prototype.replaceDefaultColors = function(cell, style)
 		var bg = mxUtils.hex2rgb(this.shapeBackgroundColor);
 		var fg = mxUtils.hex2rgb(this.shapeForegroundColor);
 
-		this.replaceDefaultColor(style, mxConstants.STYLE_FONTCOLOR, fg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_FILLCOLOR, bg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_STROKECOLOR, fg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_IMAGE_BORDER, fg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_IMAGE_BACKGROUND, bg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_LABEL_BORDERCOLOR, fg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_SWIMLANE_FILLCOLOR, bg);
-		this.replaceDefaultColor(style, mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_FONTCOLOR, fg, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_FILLCOLOR, bg, fg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_GRADIENTCOLOR, fg, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_STROKECOLOR, fg, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_IMAGE_BORDER, fg, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_IMAGE_BACKGROUND, bg, fg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_LABEL_BORDERCOLOR, fg, bg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_SWIMLANE_FILLCOLOR, bg, fg);
+		this.replaceDefaultColor(style, mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, bg, fg);
 	}
 
 	return style;
@@ -4712,12 +4745,27 @@ Graph.prototype.replaceDefaultColors = function(cell, style)
 /**
  * Replaces the colors for the given key.
  */
-Graph.prototype.replaceDefaultColor = function(style, key, value)
+Graph.prototype.replaceDefaultColor = function(style, key, value, inverseValue)
 {
 	if (style != null && style[key] == 'default' && value != null)
 	{
-		style[key] = value;
+		style[key] = this.getDefaultColor(style, key, value, inverseValue);
 	}
+};
+
+/**
+ * Replaces the colors for the given key.
+ */
+Graph.prototype.getDefaultColor = function(style, key, defaultValue, inverseDefaultValue)
+{
+	var temp = 'default' + key.charAt(0).toUpperCase() + key.substring(1);
+
+	if (style[temp] == 'invert')
+	{
+		defaultValue = inverseDefaultValue;
+	}
+
+	return defaultValue;
 };
 
 /**
@@ -5147,7 +5195,7 @@ Graph.prototype.getTooltipForCell = function(cell)
 				tmp = this.replacePlaceholders(cell, tmp);
 			}
 			
-			tip = this.sanitizeHtml(tmp);
+			tip = Graph.sanitizeHtml(tmp);
 		}
 		else
 		{
@@ -5164,7 +5212,9 @@ Graph.prototype.getTooltipForCell = function(cell)
 			
 			for (var i = 0; i < attrs.length; i++)
 			{
-				if (mxUtils.indexOf(ignored, attrs[i].nodeName) < 0 && attrs[i].nodeValue.length > 0)
+				if (((Graph.translateDiagram && attrs[i].nodeName == 'label') ||
+					mxUtils.indexOf(ignored, attrs[i].nodeName) < 0) &&
+					attrs[i].nodeValue.length > 0)
 				{
 					temp.push({name: attrs[i].nodeName, value: attrs[i].nodeValue});
 				}
@@ -6091,8 +6141,9 @@ HoverIcons.prototype.getState = function(state)
  */
 HoverIcons.prototype.update = function(state, x, y)
 {
-	if (!this.graph.connectionArrowsEnabled || (state != null &&
-		mxUtils.getValue(state.style, 'allowArrows', '1') == '0'))
+	if (!this.graph.connectionArrowsEnabled ||
+		(this.graph.freehand != null && this.graph.freehand.isDrawing()) ||
+		(state != null && mxUtils.getValue(state.style, 'allowArrows', '1') == '0'))
 	{
 		this.reset();
 	}
@@ -10018,7 +10069,7 @@ if (typeof mxVertexHandler !== 'undefined')
 		 * horizontal - Boolean that specifies the direction of the distribution.
 		 * cells - Optional array of <mxCells> to be distributed. Edges are ignored.
 		 */
-		Graph.prototype.distributeCells = function(horizontal, cells)
+		Graph.prototype.distributeCells = function(horizontal, cells, spacing)
 		{
 			if (cells == null)
 			{
@@ -10030,6 +10081,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				var vertices = [];
 				var max = null;
 				var min = null;
+				var cellsSize = 0;
 				
 				for (var i = 0; i < cells.length; i++)
 				{
@@ -10043,6 +10095,11 @@ if (typeof mxVertexHandler !== 'undefined')
 							max = (max != null) ? Math.max(max, tmp) : tmp;
 							min = (min != null) ? Math.min(min, tmp) : tmp;
 							
+							if (spacing)
+							{
+								cellsSize += (horizontal) ? state.width : state.height;
+							}
+
 							vertices.push(state);
 						}
 					}
@@ -10055,6 +10112,12 @@ if (typeof mxVertexHandler !== 'undefined')
 						return (horizontal) ? a.x - b.x : a.y - b.y;
 					});
 		
+					if (spacing)
+					{
+						cellsSize -= (horizontal? (vertices[0].width / 2 + vertices[vertices.length - 1].width / 2) :
+									(vertices[0].height / 2 + vertices[vertices.length - 1].height / 2))
+					}
+
 					var t = this.view.translate;
 					var s = this.view.scale;
 					
@@ -10064,8 +10127,8 @@ if (typeof mxVertexHandler !== 'undefined')
 					this.getModel().beginUpdate();
 					try
 					{
-						var dt = (max - min) / (vertices.length - 1);
-						var t0 = min;
+						var dt = (max - min - cellsSize) / (vertices.length - 1);
+						var t0 = min + (spacing? (horizontal? vertices[0].width / 2 : vertices[0].height / 2) : 0);
 						
 						for (var i = 1; i < vertices.length - 1; i++)
 						{
@@ -10079,14 +10142,19 @@ if (typeof mxVertexHandler !== 'undefined')
 								
 								if (horizontal)
 								{
-									geo.x = Math.round(t0 - geo.width / 2) - pstate.origin.x;
+									geo.x = Math.round(t0 - (spacing? 0 : geo.width / 2)) - pstate.origin.x;
 								}
 								else
 								{
-									geo.y = Math.round(t0 - geo.height / 2) - pstate.origin.y;
+									geo.y = Math.round(t0 - (spacing? 0 : geo.height / 2)) - pstate.origin.y;
 								}
 								
 								this.getModel().setGeometry(vertices[i].cell, geo);
+							}
+
+							if (spacing)
+							{
+								t0 += horizontal? vertices[i].width : vertices[i].height;
 							}
 						}
 					}
@@ -10368,7 +10436,9 @@ if (typeof mxVertexHandler !== 'undefined')
 					
 					if ((ignoreSelection && lookup == null) || selected)
 					{
+						graph.view.redrawEnumerationState(state);
 						imgExportDrawCellState.apply(this, arguments);
+						this.doDrawShape(state.secondLabel, canvas);
 					}
 				};
 	
@@ -13827,6 +13897,7 @@ if (typeof mxVertexHandler !== 'undefined')
 						if (this.graph.isEnabled() && typeof this.graph.editLink === 'function')
 						{
 							var changeLink = document.createElement('img');
+							changeLink.className = 'geAdaptiveAsset';
 							changeLink.setAttribute('src', Editor.editImage);
 							changeLink.setAttribute('title', mxResources.get('editLink'));
 							changeLink.setAttribute('width', '11');
@@ -13834,12 +13905,6 @@ if (typeof mxVertexHandler !== 'undefined')
 							changeLink.style.marginLeft = '10px';
 							changeLink.style.marginBottom = '-1px';
 							changeLink.style.cursor = 'pointer';
-
-							if (Editor.isDarkMode())
-							{
-								changeLink.style.filter = 'invert(100%)';
-							}
-
 							this.linkHint.appendChild(changeLink);
 							
 							mxEvent.addListener(changeLink, 'click', mxUtils.bind(this, function(evt)

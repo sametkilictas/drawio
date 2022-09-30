@@ -338,13 +338,12 @@ DrawioFile.prototype.mergeFile = function(file, success, error, diffShadow)
 					var from = this.ui.hashValue(file.getCurrentEtag());
 					var to = this.ui.hashValue(this.getCurrentEtag());
 					
-					this.checksumError(error, patches,
-						'Shadow Details: ' + JSON.stringify(patchedDetails) +
-						'\nChecksum: ' + checksum + '\nCurrent: ' + current +
-						'\nCurrent Details: ' + JSON.stringify(currentDetails) +
-						'\nFrom: ' + from + '\nTo: ' + to +
-						'\n\nFile Data:\n' + fileData +
-						'\nPatched Shadow:\n' + data, null, 'mergeFile');
+					this.checksumError(error, patches, 'Shadow Details: ' +
+						JSON.stringify(patchedDetails) + '\nChecksum: ' +
+						checksum + '\nCurrent: ' + current + '\nCurrent Details: ' +
+						JSON.stringify(currentDetails) + '\nFrom: ' + from + '\nTo: ' +
+						to + '\n\nFile Data:\n' + fileData + '\nPatched Shadow:\n' +
+						data, null, 'mergeFile', checksum, current, file.getCurrentRevisionId());
 					
 					// Abnormal termination
 					return;
@@ -484,7 +483,7 @@ DrawioFile.prototype.compressReportData = function(data, limit, max)
 /**
  * Adds the listener for automatically saving the diagram for local changes.
  */
-DrawioFile.prototype.checksumError = function(error, patches, details, etag, functionName)
+DrawioFile.prototype.checksumError = function(error, patches, details, etag, functionName, checksum, current, rev)
 {
 	this.stats.checksumErrors++;
 	this.inConflictState = true;
@@ -553,29 +552,61 @@ DrawioFile.prototype.checksumError = function(error, patches, details, etag, fun
 			var uid = (user != null) ? user.id : 'unknown';
 			var id = (this.getId() != '') ? this.getId() :
 				('(' + this.ui.hashValue(this.getTitle()) + ')');
+			var bytes = JSON.stringify(patches).length;
+			var data = null;
 			
-			EditorUi.logError('Checksum Error in ' + functionName + ' ' + id,
-				null, this.getMode() + '.' + this.getId(),
-				'user_' + uid + ((this.sync != null) ?
-				'-client_' + this.sync.clientId : '-nosync') +
-				'-bytes_' + JSON.stringify(patches).length +
-				'-patches_' + patches.length +
-				'-size_' + this.getSize());
-			
-			// Logs checksum error for file
-			try
+			if (patches != null && this.constructor == DriveFile && bytes < 400)
 			{
-				EditorUi.logEvent({category: 'CHECKSUM-ERROR-SYNC-FILE-' + id,
-					action: functionName, label: 'user_' + uid + ((this.sync != null) ?
-					'-client_' + this.sync.clientId : '-nosync') +
-					'-bytes_' + JSON.stringify(patches).length +
-					'-patches_' + patches.length +
-					'-size_' + this.getSize()});
+				for (var i = 0; i < patches.length; i++)
+				{
+					this.ui.anonymizePatch(patches[i]);
+				}
+	
+				data = JSON.stringify(patches);
+	
+				if (data != null && data.length < 250)
+				{
+					data = Graph.compress(data);
+				}
+				else
+				{
+					data = null;
+				}
 			}
-			catch (e)
-			{
-				// ignore
-			}
+
+			this.getLatestVersion(mxUtils.bind(this, function(latestFile)
+			{				
+				// Logs checksum error for file
+				try
+				{
+					var type = (data != null) ? 'Report' : 'Error';
+					var latest = this.ui.getHashValueForPages(latestFile.getShadowPages());
+				
+					EditorUi.logError('Checksum ' + type + ' in ' + functionName + ' ' + id,
+						null, this.getMode() + '.' + this.getId(),
+						'user_' + uid + ((this.sync != null) ?
+						'-client_' + this.sync.clientId : '-nosync') +
+						'-bytes_' + bytes + '-patches_' + patches.length +
+						((data != null) ? ('-json_' + data) : '')  +
+						'-size_' + this.getSize() +
+						((checksum != null) ? ('-expected_' + checksum) : '') +
+						((current != null) ? ('-current_' + current) : '') +
+						((rev != null) ? ('-rev_' + this.ui.hashValue(rev)) : '') +
+						((latest != null) ? ('-latest_' + latest) : '') +
+						((latestFile != null) ? ('-latestRev_' + this.ui.hashValue(
+							latestFile.getCurrentRevisionId())) : ''));
+
+					EditorUi.logEvent({category: 'CHECKSUM-ERROR-SYNC-FILE-' + id,
+						action: functionName, label: 'user_' + uid + ((this.sync != null) ?
+						'-client_' + this.sync.clientId : '-nosync') +
+						'-bytes_' + bytes + '-patches_' + patches.length +
+						'-size_' + this.getSize()});
+				}
+				catch (e)
+				{
+					// ignore
+				}
+			}), error);
 		}
 	}
 	catch (e)
@@ -1336,7 +1367,7 @@ DrawioFile.prototype.isRealtimeSupported = function()
  */
 DrawioFile.prototype.isRealtimeEnabled = function()
 {
-	return urlParams['fast-sync'] != '0';
+	return Editor.enableRealtime && urlParams['fast-sync'] != '0';
 };
 
 /**
@@ -1499,6 +1530,15 @@ DrawioFile.prototype.getLatestVersion = function(success, error)
 };
 
 /**
+ * Hook for subclassers to get the latest version ID of this file
+ * and return it in the success handler.
+ */
+ DrawioFile.prototype.getLatestVersionId = function(success, error)
+ {
+	 success(-1);
+ };
+
+/**
  * Returns the last modified date of this file.
  */
 DrawioFile.prototype.getLastModifiedDate = function()
@@ -1520,6 +1560,11 @@ DrawioFile.prototype.setCurrentRevisionId = function(id)
 DrawioFile.prototype.getCurrentRevisionId = function()
 {
 	return this.getDescriptorRevisionId(this.getDescriptor());
+};
+
+DrawioFile.prototype.getPullingInterval = function()
+{
+	return 10000;
 };
 
 /**
