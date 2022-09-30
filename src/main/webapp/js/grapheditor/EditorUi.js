@@ -92,7 +92,7 @@ EditorUi = function(editor, container, lightbox)
 		var styles = ['rounded', 'shadow', 'glass', 'dashed', 'dashPattern', 'labelBackgroundColor',
 			'labelBorderColor', 'comic', 'sketch', 'fillWeight', 'hachureGap', 'hachureAngle', 'jiggle',
 			'disableMultiStroke', 'disableMultiStrokeFill', 'fillStyle', 'curveFitting',
-			'simplification', 'sketchStyle', 'pointerEvents'];
+			'simplification', 'sketchStyle', 'pointerEvents', 'strokeColor', 'strokeWidth'];
 		var connectStyles = ['shape', 'edgeStyle', 'curved', 'rounded', 'elbow', 'jumpStyle', 'jumpSize',
 			'comic', 'sketch', 'fillWeight', 'hachureGap', 'hachureAngle', 'jiggle',
 			'disableMultiStroke', 'disableMultiStrokeFill', 'fillStyle', 'curveFitting',
@@ -108,6 +108,15 @@ EditorUi = function(editor, container, lightbox)
 		{
 			try
 			{
+				if (graph.getModel().isEdge(cell))
+				{
+					edgeStyleIgnored = false;
+				}
+				else
+				{
+					vertexStyleIgnored = false;
+				}
+
 				var style = graph.getCellStyle(cell, false);
 				var values = [];
 				var keys = [];
@@ -132,6 +141,8 @@ EditorUi = function(editor, container, lightbox)
 					'keys', keys, 'values', values,
 					'cells', [cell]));
 				
+				// Blocks update of default style with style changes
+				// once the it was set using this function
 				if (graph.getModel().isEdge(cell))
 				{
 					edgeStyleIgnored = true;
@@ -176,12 +187,11 @@ EditorUi = function(editor, container, lightbox)
 		
 		// Keys that are ignored together (if one appears all are ignored)
 		var keyGroups = [['startArrow', 'startFill', 'endArrow', 'endFill'],
-						 ['startSize', 'endSize'],
-						 ['sourcePerimeterSpacing', 'targetPerimeterSpacing'],
-		                 ['strokeColor', 'strokeWidth'],
-		                 ['fillColor', 'gradientColor', 'gradientDirection'],
-		                 ['opacity'],
-		                 ['html']];
+						['startSize', 'endSize'],
+						['sourcePerimeterSpacing', 'targetPerimeterSpacing'],
+						['fillColor', 'gradientColor', 'gradientDirection'],
+						['opacity'],
+						['html']];
 		
 		// Adds all keys used above to the styles array
 		for (var i = 0; i < keyGroups.length; i++)
@@ -755,9 +765,9 @@ EditorUi = function(editor, container, lightbox)
 			for (var i = 0; i < keys.length; i++)
 			{
 				var common = mxUtils.indexOf(valueStyles, keys[i]) >= 0;
-				
+
 				// Ignores transparent stroke colors
-				if (keys[i] != 'strokeColor' || values[i] != null && values[i] != 'none')
+				if (keys[i] != 'strokeColor' || (values[i] != null && values[i] != 'none'))
 				{
 					// Special case: Edge style and shape
 					if (mxUtils.indexOf(connectStyles, keys[i]) >= 0)
@@ -2023,6 +2033,7 @@ EditorUi.prototype.updateCssForMarker = function(markerDiv, prefix, shape, marke
 		if (src != null)
 		{
 			var img = document.createElement('img');
+			img.className = 'geAdaptiveAsset';
 			img.style.position = 'absolute';
 			img.style.marginTop = '0.5px';
 			img.setAttribute('src', src);
@@ -2032,11 +2043,6 @@ EditorUi.prototype.updateCssForMarker = function(markerDiv, prefix, shape, marke
 			{
 				mxUtils.setPrefixedStyle(img.style, 'transform', 'scaleX(-1)');
 			}
-			
-			if (Editor.isDarkMode())
-			{
-				img.style.filter = 'invert(100%)';
-			}	
 
 			markerDiv.appendChild(img);
 		}
@@ -2544,11 +2550,16 @@ EditorUi.prototype.initCanvas = function()
 			
 			if (toolbarConfig.backBtn != null)
 			{
-				addButton(mxUtils.bind(this, function(evt)
+				var backUrl = Graph.sanitizeLink(toolbarConfig.backBtn.url);
+
+				if (backUrl != null)
 				{
-					window.location.href = toolbarConfig.backBtn.url;
-					mxEvent.consume(evt);
-				}), Editor.backImage, mxResources.get('back', null, 'Back'));
+					addButton(mxUtils.bind(this, function(evt)
+					{
+						window.location.href = backUrl;
+						mxEvent.consume(evt);
+					}), Editor.backImage, mxResources.get('back', null, 'Back'));
+				}
 			}
 			
 			if (this.isPagesEnabled())
@@ -2806,11 +2817,14 @@ EditorUi.prototype.initCanvas = function()
 
 			if (toolbarConfig.refreshBtn != null)
 			{
+				var refreshUrl = (toolbarConfig.refreshBtn.url == null) ? null :
+					Graph.sanitizeLink(toolbarConfig.refreshBtn.url);
+
 				addButton(mxUtils.bind(this, function(evt)
 				{
-					if (toolbarConfig.refreshBtn.url)
+					if (refreshUrl != null)
 					{
-						window.location.href = toolbarConfig.refreshBtn.url;
+						window.location.href = refreshUrl;
 					}
 					else
 					{
@@ -3419,6 +3433,14 @@ EditorUi.prototype.toggleFormatPanel = function(visible)
 };
 
 /**
+ * 
+ */
+EditorUi.prototype.isFormatPanelVisible = function()
+{
+	return this.formatWidth > 0;
+};
+
+/**
  * Adds support for placeholders in labels.
  */
 EditorUi.prototype.lightboxFit = function(maxHeight)
@@ -3576,6 +3598,7 @@ EditorUi.prototype.setCurrentMenu = function(menu, elt)
 {
 	this.currentMenuElt = elt;
 	this.currentMenu = menu;
+	this.hideShapePicker();
 };
 
 /**
@@ -4220,7 +4243,7 @@ EditorUi.prototype.updateActionStates = function()
 	this.actions.get('sendBackward').setEnabled(ss.cells.length == 1);
 	this.actions.get('rotation').setEnabled(ss.vertices.length == 1);
 	this.actions.get('wordWrap').setEnabled(ss.vertices.length == 1);
-	this.actions.get('autosize').setEnabled(ss.vertices.length == 1);
+	this.actions.get('autosize').setEnabled(ss.vertices.length > 0);
 	this.actions.get('copySize').setEnabled(ss.vertices.length == 1);
 	this.actions.get('clearWaypoints').setEnabled(ss.connections);
 	this.actions.get('curved').setEnabled(ss.edges.length > 0);
@@ -4442,6 +4465,23 @@ EditorUi.prototype.createDivs = function()
 	{
 		this.diagramContainer.style.border = 'none';
 	}
+};
+
+/**
+ * Hook for sidebar footer container. This implementation returns null.
+ */
+EditorUi.prototype.createSidebarContainer = function()
+{
+	var div = document.createElement('div');
+	div.className = 'geSidebarContainer';
+	div.style.position = 'absolute';
+	div.style.width = '100%';
+	div.style.height = '100%';
+	div.style.border = '1px solid whiteSmoke';
+	div.style.overflowX = 'hidden';
+	div.style.overflowY = 'auto';
+
+	return div;
 };
 
 /**
@@ -5342,40 +5382,23 @@ EditorUi.prototype.executeLayouts = function(layouts, post)
 EditorUi.prototype.executeLayout = function(exec, animate, post)
 {
 	var graph = this.editor.graph;
-
-	if (graph.isEnabled())
+	graph.getModel().beginUpdate();
+	try
 	{
-		graph.getModel().beginUpdate();
-		try
+		exec();
+	}
+	catch (e)
+	{
+		throw e;
+	}
+	finally
+	{
+		// Animates the changes in the graph model
+		if (this.allowAnimation && animate && graph.isEnabled())
 		{
-			exec();
-		}
-		catch (e)
-		{
-			throw e;
-		}
-		finally
-		{
-			// Animates the changes in the graph model except
-			// for Camino, where animation is too slow
-			if (this.allowAnimation && animate && (navigator.userAgent == null ||
-				navigator.userAgent.indexOf('Camino') < 0))
-			{
-				// New API for animating graph layout results asynchronously
-				var morph = new mxMorphing(graph);
-				morph.addListener(mxEvent.DONE, mxUtils.bind(this, function()
-				{
-					graph.getModel().endUpdate();
-					
-					if (post != null)
-					{
-						post();
-					}
-				}));
-				
-				morph.startAnimation();
-			}
-			else
+			// New API for animating graph layout results asynchronously
+			var morph = new mxMorphing(graph);
+			morph.addListener(mxEvent.DONE, mxUtils.bind(this, function()
 			{
 				graph.getModel().endUpdate();
 				
@@ -5383,6 +5406,17 @@ EditorUi.prototype.executeLayout = function(exec, animate, post)
 				{
 					post();
 				}
+			}));
+			
+			morph.startAnimation();
+		}
+		else
+		{
+			graph.getModel().endUpdate();
+			
+			if (post != null)
+			{
+				post();
 			}
 		}
 	}
@@ -5805,7 +5839,7 @@ EditorUi.prototype.createKeyHandler = function(editor)
 			{
 				if (action.isEnabled())
 				{
-					action.funct();
+					action.funct.apply(this, arguments);
 				}
 			};
     		
@@ -5895,7 +5929,7 @@ EditorUi.prototype.createKeyHandler = function(editor)
 		keyHandler.bindAction(73, true, 'italic'); // Ctrl+I
 		keyHandler.bindAction(76, true, 'lockUnlock'); // Ctrl+L
 		keyHandler.bindAction(76, true, 'layers', true); // Ctrl+Shift+L
-		keyHandler.bindAction(80, true, 'formatPanel', true); // Ctrl+Shift+P
+		keyHandler.bindAction(80, true, 'format', true); // Ctrl+Shift+P
 		keyHandler.bindAction(85, true, 'underline'); // Ctrl+U
 		keyHandler.bindAction(85, true, 'ungroup', true); // Ctrl+Shift+U
 		keyHandler.bindAction(190, true, 'superscript'); // Ctrl+.

@@ -25,29 +25,57 @@ var mxSettings =
 	{
 		mxSettings.settings.language = lang;
 	},
-	getUi: function()
+	isMainSettings: function()
 	{
-		return mxSettings.settings.ui;
+		return mxSettings.key == '.drawio-config';
 	},
-	setUi: function(ui)
+	getMainSettings: function()
 	{
-		// Writes to main configuration
 		var value = localStorage.getItem('.drawio-config');
-		
+
 		if (value == null)
 		{
 			value = mxSettings.getDefaults();
+			delete value.isNew;
 		}
 		else
 		{
 			value = JSON.parse(value);
+			value.version = mxSettings.currentVersion;
 		}
-		
-		value.ui = ui;
-		
-		delete value.isNew;
-		value.version = mxSettings.currentVersion;
-		localStorage.setItem('.drawio-config', JSON.stringify(value));
+
+		return value;
+	},
+	getUi: function()
+	{
+		return (mxSettings.isMainSettings()) ? mxSettings.settings.ui :
+			mxSettings.getMainSettings().ui;
+	},
+	setUi: function(ui)
+	{
+		if (mxSettings.isMainSettings())
+		{
+			mxSettings.settings.ui = ui;
+
+			if (ui == 'kennedy' || ui == '')
+			{
+				mxSettings.settings.darkMode = false;
+			}
+
+			mxSettings.save();
+		}
+		else
+		{
+			var value = mxSettings.getMainSettings();
+			value.ui = ui;
+
+			if (ui == 'kennedy')
+			{
+				value.darkMode = false;
+			}
+
+			localStorage.setItem('.drawio-config', JSON.stringify(value));
+		}
 	},
 	getShowStartScreen: function()
 	{
@@ -235,7 +263,8 @@ var mxSettings =
 			plugins: [],
 			recentColors: [],
 			formatWidth: mxSettings.defaultFormatWidth,
-			createTarget: urlParams['sketch'] == '1',
+			createTarget: urlParams['sketch'] == '1' ||
+				urlParams['live-ui'] == '1',
 			pageFormat: mxGraph.prototype.pageFormat,
 			search: true,
 			showStartScreen: true,

@@ -50,6 +50,9 @@ window.TEMPLATE_PATH = window.TEMPLATE_PATH || 'templates';
 window.NEW_DIAGRAM_CATS_PATH = window.NEW_DIAGRAM_CATS_PATH || 'newDiagramCats';
 window.PLUGINS_BASE_PATH = window.PLUGINS_BASE_PATH || '';
 
+// Allows third-party plugins to run
+window.ALLOW_CUSTOM_PLUGINS = window.ALLOW_CUSTOM_PLUGINS || false;
+
 // Directory for i18 files and basename for main i18n file
 window.RESOURCES_PATH = window.RESOURCES_PATH || 'resources';
 window.RESOURCE_BASE = window.RESOURCE_BASE || RESOURCES_PATH + '/dia';
@@ -181,6 +184,33 @@ if (window.mxLanguages == null)
 			window.mxLanguages.push(lang);
 		}
 	}
+
+	// Uses browser language if supported
+	if (window.mxLanguage == null &&
+		(window.location.hostname == 'test.draw.io' ||
+		window.location.hostname == 'www.draw.io' ||
+		window.location.hostname == 'viewer.diagrams.net' ||
+		window.location.hostname == 'embed.diagrams.net' ||
+		window.location.hostname == 'app.diagrams.net' ||
+		window.location.hostname == 'jgraph.github.io'))
+	{
+		var lang = navigator.language;
+
+		if (lang != null)
+		{
+			var dash = lang.indexOf('-');
+				
+			if (dash > 0)
+			{
+				lang = lang.substring(0, dash);
+			}
+
+			if (window.mxLanguages.indexOf(lang) >= 0)
+			{
+				window.mxLanguage = lang;
+			}
+		}
+	}
 }
 
 //Disable Google Drive when running in a WebView (e.g, MS Teams App) Since auth doesn't work with disallowd_useragent
@@ -294,7 +324,11 @@ window.uiTheme = window.uiTheme || (function()
 		urlParams['sketch'] = '1';
 		ui = 'min';
 	}
-		
+	else if (urlParams['dark'] == '1' && (ui == '' || ui == 'kennedy'))
+	{
+		ui = 'dark';
+	}
+	
 	return ui;
 })();
 
