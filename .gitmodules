@@ -1,0 +1,3 @@
+[submodule "src/main/webapp/modrianTst"]
+    path = src/main/webapp/modrianTst
+    url = ../drawio_mondrian_config.git

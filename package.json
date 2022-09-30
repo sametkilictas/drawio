@@ -5,6 +5,6 @@
 
   "scripts": {
     "deployPublic": "gh-pages -d src/main/webapp -r https://github.com/merijn-weiss/drawio.git",
-    "deployKyndryl": "gh-pages -d src/main/webapp -r git@github.kyndryl.net:Mondrian/drawio.git"
+    "deployKyndryl": "gh-pages -d src/main/webapp -r https://github.kyndryl.net/Mondrian/drawio.git"
   }
 }
