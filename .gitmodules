@@ -1,3 +1,4 @@
+
 [submodule "src/main/webapp/mondrian"]
 	path = src/main/webapp/mondrian
-	url = https://github.kyndryl.net/Mondrian/drawio_mondrian_config.git
+	url = ../drawio_mondrian_config.git
