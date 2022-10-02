@@ -12,16 +12,17 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Reset submodules recursively
-      run: |
-        git submodule foreach --recursive git reset --hard
-        git commit -m "Reset submodules" || echo "No changes to commit"
-        git push
     - uses: actions/checkout@v3
       with:
         ref: dev_mondrian
-        submodules: 'recursive'
+        #submodules: 'recursive'
         token: ${{ secrets.MONDRIAN_DRAWIO_TOKEN }}
+    - name: Reset submodules recursively
+      run: |
+        git submodule foreach --recursive git reset --hard
+        git submodule update --init --recursive
+        git commit -m "Reset submodules" || echo "No changes to commit"
+        git push
     - uses: actions/setup-node@v3
       with:
         node-version: 16
