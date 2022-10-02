@@ -27,7 +27,7 @@ jobs:
         git commit -m "Reset submodules" || echo "No changes to commit"
         git push
       env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MONDRIAN_DRAWIO_TOKEN }}
     - uses: actions/setup-node@v3
       with:
         node-version: 16
