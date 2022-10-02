@@ -19,6 +19,8 @@ jobs:
         token: ${{ secrets.MONDRIAN_DRAWIO_TOKEN }}
     - name: Reset submodules recursively
       run: |
+        git config user.email "actions@github.com"
+        git config user.name "GitHub Actions - reset submodules"
         git submodule foreach --recursive git reset --hard
         git submodule update --init --recursive
         git commit -m "Reset submodules" || echo "No changes to commit"
