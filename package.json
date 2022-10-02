@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "gh-pages": "^4.0.0"
+  },
+
+  "scripts": {
+    "page-deploy": "gh-pages -d src/main/webapp"
+  }
+}
