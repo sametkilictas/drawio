@@ -1,0 +1,29 @@
+name: Deploy gh-pages
+
+on:
+  push:
+    branches: 
+      - 'dev_mondrian'  
+      
+env:
+  GITHUB_SERVER: ${{ secrets.MONDRIAN_DRAWIO_GITHUB_URL }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        ref: dev_mondrian
+        submodules: 'recursive'
+        token: ${{ secrets.MONDRIAN_DRAWIO_TOKEN }}
+    - uses: actions/setup-node@v3
+      with:
+        node-version: 16
+    - run: npm install gh-pages
+    - name: Deploy with gh-pages
+      run: |
+        git remote set-url origin https://git:${GITHUB_TOKEN}@${GITHUB_SERVER}/${GITHUB_REPOSITORY}.git
+        npm run page-deploy -- -u "github-actions-bot <support+actions@github.com>"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
