@@ -1,0 +1,15 @@
+name: Reset submodule in draw.io
+  
+on:
+  workflow_dispatch:
+
+jobs:
+  update_parent_repos:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Pull & update submodules recursively
+        run: |
+          git submodule foreach --recursive git reset --hard
+          git commit -m "Reset submodules" || echo "No changes to commit"
+          git push
