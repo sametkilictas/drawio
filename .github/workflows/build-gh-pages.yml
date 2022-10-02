@@ -12,6 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Reset submodules recursively
+      run: |
+        git submodule foreach --recursive git reset --hard
+        git commit -m "Reset submodules" || echo "No changes to commit"
+        git push
     - uses: actions/checkout@v3
       with:
         ref: dev_mondrian
