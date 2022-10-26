@@ -2211,7 +2211,7 @@ mxMondrianLegend.prototype.init = function(container)
 	geo.height = legendDimensions.height;
 	this.state.view.graph.model.setGeometry(this.state.cell, geo);
 
-	 mxShape.prototype.redraw.apply(this, arguments);
+	mxShape.prototype.redraw.apply(this, arguments);
  };
 
 mxMondrianLegend.prototype.paintVertexShape = function(c, x, y, w, h)
@@ -2587,6 +2587,32 @@ mxMondrianBaseConnector.prototype.customProperties = [
 			}
 		}
 	},
+	{name:'formatConnector', dispName: 'Connector (Format)', type:'dynamicEnum', enumSource:'connectorFormats', defValue:'Default',
+		enumList:[],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+			let connectFormatString = Sidebar.prototype.mondrianRepo.getElement('default','connectorFormats').formats[newValue];
+			let connectFormat = connectFormatString.toString().split(';');
+
+			for (let i = 0; i < selectedCells.length; i++)
+			{	
+				for (let j = 0; j< connectFormat.length; j++)
+				{
+					let styleAttribute = connectFormat[j].toString().split('=');
+					graph.setCellStyles(styleAttribute[0], styleAttribute[1], [selectedCells[i]]);
+
+					if(styleAttribute[0] === 'colorFamilyLine')
+					{
+						console.log(styleAttribute[0]);
+						let mondrianColor = mxMondrianBase.prototype.getColor(mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, styleAttribute[1], 'medium');
+						console.log(mondrianColor);
+						graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
+					}	
+				}
+			}
+		}
+	},
 	// Label
 	{name:'formatText', dispName:'Label (Format)', type:'enum', defVal:'default:1',
 	enumList:[
@@ -2634,6 +2660,12 @@ mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts, rounded)
 	}
 	
 	mxMondrianBaseConnector.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
+};
+
+mxMondrianBaseConnector.prototype.getConnectorFormats = function()
+{
+	let connectorFormats = [{val:'format1', dispName:'Format 1'}];
+	return connectorFormats;
 };
 
 

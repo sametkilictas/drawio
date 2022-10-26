@@ -4803,26 +4803,37 @@
 					/* MONDRIAN: Added dynamicEnum property */
 					if(pType == 'dynamicEnum')
 					{
-						let selectedCells = graph.getSelectionCells();
-						let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes'];
+						let enumSource = prop.enumSource;
 						let dynamicAttributes = [];
-
 						pEnumList = pEnumList.filter(function (value, index, arr) { return !value.isDynamic;});
-
-						for (let selectedCellIdx in selectedCells)
+						
+						if(enumSource == undefined)
 						{
-							let selectedCell = selectedCells[selectedCellIdx];
-
-							for (let attribute in selectedCell.value.attributes)
+							let selectedCells = graph.getSelectionCells();
+							let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes'];
+	
+							for (let selectedCellIdx in selectedCells)
 							{
-								let attributeName = selectedCell.value.attributes[attribute].nodeName;
-								
-								if(!excludedAttributes.includes(attributeName) && !dynamicAttributes.includes(attributeName))
-									dynamicAttributes.push(attributeName);
+								let selectedCell = selectedCells[selectedCellIdx];
+	
+								for (let attribute in selectedCell.value.attributes)
+								{
+									let attributeName = selectedCell.value.attributes[attribute].nodeName;
+									
+									if(!excludedAttributes.includes(attributeName) && !dynamicAttributes.includes(attributeName))
+										dynamicAttributes.push(attributeName);
+								}
 							}
+	
+							dynamicAttributes.sort();	
 						}
-
-						dynamicAttributes.sort();
+						else
+						{
+							Object.entries(Sidebar.prototype.mondrianRepo.getElement('default',enumSource).formats).forEach((entry) => {
+								const [key, value] = entry;
+								dynamicAttributes.push(key);
+							  });
+						}
 
 						for (let i = 0; i < dynamicAttributes.length; i++)
 						{
