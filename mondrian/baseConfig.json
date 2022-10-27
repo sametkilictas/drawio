@@ -1,0 +1,212 @@
+{
+    "Sidebars":{
+        "shapes":{
+            "id":       "Mondrian",
+            "lib":      "Shapes",
+            "title":    "Mondrian Shapes",
+            "tags":     "mondrian base",
+            "type":     "JSON",
+            "uri":     "sidebars/mondrianBase.json",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "all":{
+            "id":       "Mondrian",
+            "lib":      "Icons (All)",
+            "title":    "Mondrian Icons (All)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "generic":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Generic)",
+            "title":    "Mondrian Icons (Generic)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.generic.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "network":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Network)",
+            "title":    "Mondrian Icons (Network)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.network.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "operations":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Operations)",
+            "title":    "Mondrian Icons (Operations)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.operations.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "platform":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Platform)",
+            "title":    "Mondrian Icons (Platform)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.platform.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "products":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Products)",
+            "title":    "Mondrian Icons (Products)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.products.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "security":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Security)",
+            "title":    "Mondrian Icons (Security)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.security.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "user":{
+            "id":       "Mondrian",
+            "lib":      "Icons (User)",
+            "title":    "Mondrian Icons (User)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.user.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+
+        "inventory":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Inventory)",
+            "title":    "Mondrian Icons (Inventory)",
+            "tags":     "mondrian inventory",
+            "type":     "STENCIL",
+            "uri":      "mondrianicons.inventory.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        },
+        "archive":{
+            "id":       "Mondrian",
+            "lib":      "Icons (Archive)",
+            "title":    "Mondrian Icons (Archive)",
+            "tags":     "mondrian icon",
+            "type":     "STENCIL",
+            "uri":      "mondrianiconarchive.",
+            "fontsettings": {"elementName": "Roboto Medium", "elementID": "Roboto"}
+        }
+    },
+
+    "Stencils":{
+        "S0":
+        {
+            "uri": "mondrian/stencils/mondrianBase.xml"
+        },
+        "S1":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.generic.xml"
+        },
+        "S7":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.user.xml"
+        },
+        "S3":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.platform.xml"
+        },
+        "S2":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.network.xml"
+        },
+        "S4":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.security.xml"
+        },
+        "S6":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.inventory.xml"
+        },
+        "S10":
+        {
+            "uri": "mondrian/stencils/mondrianIconArchive.xml"
+        },
+        "S11":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.products.xml"
+        },
+        "S12":
+        {
+            "uri": "mondrian/stencils/mondrianIcons.operations.xml"
+        }
+    },
+
+    "Elements":{
+        "Default":
+        {
+            "uri": "mondrian/elements/defaultSettings.json",
+            "client": "default"
+        },
+
+        "Default-Interfaces":
+        {
+            "uri": "mondrian/elements/default.interfaces.json",
+            "client": "default"
+        },
+
+        "Default-PredefinedElements":
+        {
+            "uri": "mondrian/elements/default.predefinedElements.json",
+            "client": "default"
+        },
+
+        "Athena-Sample":
+        {
+            "uri": "mondrian/elements/athena.sample.json",
+            "client": "default,athena"
+        },
+        "Athena-DCS":
+        {
+            "uri": "mondrian/elements/athena.dcs.json",
+            "client": "athena"
+        },
+        "Athena-ROD":
+        {
+            "uri": "mondrian/elements/athena.rod.json",
+            "client": "athena"
+        },
+
+        "Phoenix":
+        {
+            "uri": "mondrian/elements/phoenix.json",
+            "client": "phoenix"
+        }
+    },
+
+    "Fonts":{
+        "F0.1":
+        {
+            "name": "Roboto Medium",
+            "uri": "mondrian/fonts/Roboto-Medium.ttf"
+        },
+        "F0.2":
+        {
+            "name": "Roboto",
+            "uri": "mondrian/fonts/Roboto-Regular.ttf"
+        },
+        "F0.3":
+        {
+            "name": "Roboto Condensed",
+            "uri": "mondrian/fonts/RobotoCondensed-Regular.ttf"
+        },
+        "F0.4":
+        {
+            "name": "Roboto Mono",
+            "uri": "mondrian/fonts/RobotoMono-Regular.ttf"
+        }
+    }
+}

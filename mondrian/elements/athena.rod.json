@@ -1,0 +1,311 @@
+{
+    "DC-1":
+    {
+        "Element-Name": "Twin DC1",
+        "Icon-Name": "data-center",
+        "Location": "Stroe",
+        "Availability-Zone": "AZ-A-01",
+        "Region": "A"
+    },
+
+    "RG":
+    {
+        "Element-Name": "Region",
+        "Icon-Name": "region"
+    },
+    "AZ":
+    {
+        "Element-Name": "Availability Zone",
+        "Icon-Name": "location"
+    },
+    "DC":
+    {
+        "Element-Name": "Data Center",
+        "Icon-Name": "data-center"
+    },
+    "DR":
+    {
+        "Element-Name": "Data Room"
+    },
+    "RK":
+    {
+        "Element-Name": "Rack"
+    },
+    "RG-A":
+    {
+        "Element-Name": "Region: A",
+        "Icon-Name": "region",
+        "Region": "A"
+    },
+    "RG-B":
+    {
+        "Element-Name": "Region: B",
+        "Icon-Name": "region",
+        "Region": "B"
+    },
+    "RG-C":
+    {
+        "Element-Name": "Region: C",
+        "Icon-Name": "region",
+        "Region": "C"
+    },
+    "RG-D":
+    {
+        "Element-Name": "Region: D",
+        "Icon-Name": "region",
+        "Region": "D"
+    },
+    "AZ-A":
+    {
+        "Element-Name": "Availability Zone: A",
+        "Icon-Name": "location",
+        "Availability-Zone": "A"
+    },
+    "AZ-B":
+    {
+        "Element-Name": "Availability Zone: B",
+        "Icon-Name": "location",
+        "Availability-Zone": "B"
+    },
+    "AZ-C":
+    {
+        "Element-Name": "Availability Zone: C",
+        "Icon-Name": "location",
+        "Availability-Zone": "C"
+    },
+    "AZ-D":
+    {
+        "Element-Name": "Availability Zone: D",
+        "Icon-Name": "location",
+        "Availability-Zone": "D"
+    },
+    "DC-A1":
+    {
+        "Element-Name": "Data Center: A1",
+        "Icon-Name": "data-center"
+    },
+    "DC-A2":
+    {
+        "Element-Name": "Data Center: A2",
+        "Icon-Name": "data-center"
+    },
+    "DC-B1":
+    {
+        "Element-Name": "Data Center: B1",
+        "Icon-Name": "data-center"
+    },
+    "DC-B2":
+    {
+        "Element-Name": "Data Center: B2",
+        "Icon-Name": "data-center"
+    },
+    "DC-C1":
+    {
+        "Element-Name": "Data Center: C1",
+        "Icon-Name": "data-center"
+    },
+    "DC-C2":
+    {
+        "Element-Name": "Data Center: C2",
+        "Icon-Name": "data-center"
+    },
+    "DC-D1":
+    {
+        "Element-Name": "Data Center: D1",
+        "Icon-Name": "data-center"
+    },
+    "DC-D2":
+    {
+        "Element-Name": "Data Center: D2",
+        "Icon-Name": "data-center"
+    },
+    "DC-STR-01":
+    {
+        "Element-Name": "Twin DC1",
+        "Icon-Name": "data-center",
+        "Location": "Stroe",
+        "Availability-Zone": "AZ-A-01",
+        "Region": "A"
+    },
+    "DC-STR-02":
+    {
+        "Element-Name": "Twin DC2",
+        "Icon-Name": "data-center",
+        "Location": "Stroe",
+        "Availability-Zone": "AZ-A-02",
+        "Region": "A"
+    },
+    "DC-WND-01":
+    {
+        "Element-Name": "Uitwijk DC1",
+        "Icon-Name": "data-center",
+        "Location": "Woensdrecht",
+        "Availability-Zone": "AZ-B-01",
+        "Region": "B"
+    },
+    "DC-CNA-01":
+    {
+        "Element-Name": "A145",
+        "Icon-Name": "data-center",
+        "Location": "CNA",
+        "Availability-Zone": "AZ-C-01",
+        "Region": "C"
+    },
+    "DC-MLD-01":
+    {
+        "Element-Name": "Maasland",
+        "Icon-Name": "data-center",
+        "Location": "Maasland",
+        "Availability-Zone": "AZ-D-01",
+        "Region": "D"
+    },
+    "DC-DHD-01":
+    {
+        "Element-Name": "Den Helder",
+        "Icon-Name": "data-center",
+        "Location": "Den Helder",
+        "Availability-Zone": "AZ-E-01",
+        "Region": "E"
+    },
+    "RC":
+    {
+        "Element-Name": "Rubricerings Compartiment",
+        "Icon-Name": "tenant"
+    },
+    "SZ":
+    {
+        "Element-Name": "Security Zone",
+        "Icon-Name": "protection"
+    },
+    "TEN":
+    {
+        "Element-Name": "Tenant",
+        "Icon-Name": "tenant"
+    },
+    "VLAN":
+    {
+        "Element-Name": "VLAN",
+        "Icon-Name": "lan"
+    },
+    "SUBN":
+    {
+        "Element-Name": "Subnet",
+        "Icon-Name": "subnet"
+    },
+    "SG":
+    {
+        "Element-Name": "Security Group",
+        "Icon-Name": "protection"
+    },
+    "RI":
+    {
+        "Element-Name": "Rubricerings Instantie",
+        "Icon-Name": "building-block-solution"
+    },
+    "SZ-UN":
+    {
+        "Element-Name": "SZ: Services - Unclass",
+        "Icon-Name": "protection",
+        "Rubricering": "Unclass"
+    },
+    "SZ-DV":
+    {
+        "Element-Name": "SZ: Services - DepV",
+        "Icon-Name": "protection",
+        "Rubricering": "DepV"
+    },
+    "SZ-CONF":
+    {
+        "Element-Name": "SZ: Services - Confi",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "SZ-STG":
+    {
+        "Element-Name": "SZ: Services - Geheim",
+        "Icon-Name": "protection",
+        "Rubricering": "STG-G"
+    },
+    "SZ-AZ":
+    {
+        "Element-Name": "SZ: Access Zone",
+        "Icon-Name": "protection",
+        "Rubricering": "Unknown"
+    },
+    "SZ-MGMT":
+    {
+        "Element-Name": "SZ: Management",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "SZ-INFRA":
+    {
+        "Element-Name": "SZ: Infrastructure Services",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "SZ-SS":
+    {
+        "Element-Name": "SZ: Shared Services",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "SZ-MGMT-CenBo":
+    {
+        "Element-Name": "SZ: CenBo",
+        "Icon-Name": "protection",
+        "Rubricering": "DepV"
+    },
+    "SZ-MGMT-LGI":
+    {
+        "Element-Name": "SZ: LGI Management",
+        "Icon-Name": "protection",
+        "Rubricering": "Confi"
+    },
+    "VLAN-OOB":
+    {
+        "Element-Name": "VLAN: Out-of-Band Management",
+        "Icon-Name": "lan",
+        "Rubricering": "Confi"
+    },
+    "TEN-VDI":
+    {
+        "Element-Name": "VDI",
+        "Icon-Name": "tenant"
+    },
+    "TEN-SAP":
+    {
+        "Element-Name": "SAP",
+        "Icon-Name": "tenant"
+    },
+    "TEN-MULAN":
+    {
+        "Element-Name": "MULAN",
+        "Icon-Name": "tenant"
+    },
+    "TEN-GrIT":
+    {
+        "Element-Name": "GrIT - DepV",
+        "Icon-Name": "tenant"
+    },
+    "TEN-SS":
+    {
+        "Element-Name": "Share Services",
+        "Icon-Name": "tenant"
+    },
+    "TEN-CONFI":
+    {
+        "Element-Name": "GrIT - Confi",
+        "Icon-Name": "tenant"
+    },
+    "TEN-INFRA":
+    {
+        "Element-Name": "Infrastructure Services",
+        "Icon-Name": "tenant"
+    },
+    "TEN-MGMT":
+    {
+        "Element-Name": "Management Services",
+        "Icon-Name": "tenant"
+    }
+}

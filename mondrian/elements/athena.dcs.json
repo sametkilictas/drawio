@@ -1,0 +1,157 @@
+{
+    "SBB-DCS-C-0400":
+    {
+        "Element-Name": "Virtualisatie",
+        "Icon-Name": "virtual-server",
+        "SBB": "SBB-DCS-C-0400"
+    },
+    "TN-DCS-0410.03":
+    {
+        "Element-Name": "Nutanix Prism Central",
+        "Icon-Name": "virtual-server",
+        "Product": "Nutanix Cloud Management",
+        "SBB": "SBB-DCS-C-0400"
+    },
+    "TN-DCS-0410.02":
+    {
+        "Element-Name": "Nutanix AOS",
+        "Icon-Name": "virtual-server",
+        "Product": "Nutanix Cloud Infrastructure",
+        "SBB": "SBB-DCS-C-0400"
+    },
+    "TN-DCS-0410.04":
+    {
+        "Element-Name": "Nutanix AHV",
+        "Icon-Name": "virtual-server",
+        "Product": "Nutanix Cloud Infrastructure",
+        "SBB": "SBB-DCS-C-0400"
+    },
+    "TN-DCS-0410.02.01":
+    {
+        "Element-Name": "Nutanix CVM",
+        "Icon-Name": "virtual-server",
+        "Product": "Nutanix Cloud Infrastructure",
+        "SBB": "SBB-DCS-C-0400"
+    },
+    "SBB-DCS-C-0700":
+    {
+        "Element-Name": "VM Level Backup",
+        "Icon-Name": "backup",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.01":
+    {
+        "Element-Name": "Rubrik Cluster",
+        "Icon-Name": "cluster",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.01.01":
+    {
+        "Element-Name": "Rubrik Element Manager",
+        "Icon-Name": "management-element",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.02":
+    {
+        "Element-Name": "Rubrik Brik",
+        "Icon-Name": "backup",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.03":
+    {
+        "Element-Name": "Rubrik Node",
+        "Icon-Name": "disk",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.04":
+    {
+        "Element-Name": "Rubrik Edge",
+        "Icon-Name": "backup",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "TN-DCS-0700.05":
+    {
+        "Element-Name": "Rubrik Backup Service",
+        "Icon-Name": "backup",
+        "Product": "Rubrik CDM",
+        "SBB": "SBB-DCS-C-0700"
+    },
+    "SBB-DCS-C-0800":
+    {
+        "Element-Name": "File Storage",
+        "Icon-Name": "storage-file",
+        "SBB": "SBB-DCS-C-0800"
+    },
+    "SBB-DCS-C-1000":
+    {
+        "Element-Name": "Object Storage",
+        "Icon-Name": "storage-object",
+        "SBB": "SBB-DCS-C-1000"
+    },
+    "TN-CENBO-001.01":
+    {
+        "Element-Name": "CenBo Desktop",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-001.02":
+    {
+        "Element-Name": "CenBo SNMP",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-001.03":
+    {
+        "Element-Name": "CenBo Syslog ",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-002.01":
+    {
+        "Element-Name": "CenBo Radius",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-002.02":
+    {
+        "Element-Name": "CenBo AD",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-002.03":
+    {
+        "Element-Name": "CenBo PAM",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-004.01":
+    {
+        "Element-Name": "CenBo NTP",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-004.02":
+    {
+        "Element-Name": "CenBo DNS",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-003.01":
+    {
+        "Element-Name": "CenBo Vulnerability Scanner",
+        "SBB": "Huidige IT"
+    },
+    "TN-CENBO-002.04":
+    {
+        "Element-Name": "CenBo Subordinate CA",
+        "SBB": "Huidige IT"
+    },
+    "TN-EKMS":
+    {
+        "Element-Name": "External Key Manager",
+        "SBB": "Huidige IT"
+    },
+    "TN-IEGI-001.01":
+    {
+        "Element-Name": "Firewall Intern",
+        "Icon-Name": "firewall",
+        "SBB": "Huidige IT"
+    }
+}

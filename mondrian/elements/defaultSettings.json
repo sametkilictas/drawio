@@ -1,0 +1,35 @@
+{
+    "defaultSettings":
+    {
+        "labelDefaultFormat": "default",
+        "labelDefaultAttributes": ["Element-Name", "Element-ID", ""],
+        "labelFormats": {
+            "default":          "<span style='font-size:14px;font-family:Roboto Medium;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto;color:#666666'>%@1%</span>",
+            "default:1":        "<span style='font-size:14px;font-family:Roboto Medium;color:#000000'>%@0%</span>",
+            "default:1,2":      "<span style='font-size:14px;font-family:Roboto Medium;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto;color:#666666'>%@1%</span>",
+            "default:1,2,3":    "<span style='font-size:14px;font-family:Roboto Medium;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto;color:#666666'>%@1%: %@2%</span>",
+            "custom":           "CUSTOM"
+        }
+    },
+    "defaultSettingsConnector":
+    {
+        "labelDefaultFormat": "default:1",
+        "labelDefaultAttributes": ["Interface-ID", "Interface-Name", ""],
+        "labelFormats": {
+            "default":          "<span style='font-size:14px;font-family:Roboto Condensed;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto Condensed;color:#666666'>%@1%</span>",
+            "default:1":        "<span style='font-size:14px;font-family:Roboto Condensed;color:#000000'>%@0%</span>",
+            "default:1,2":      "<span style='font-size:14px;font-family:Roboto Condensed;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto Condensed;color:#666666'>%@1%</span>",
+            "default:1,2,3":    "<span style='font-size:14px;font-family:Roboto Condensed;color:#000000'>%@0%</span><br><span style='font-size:12px;font-family:Roboto Condensed;color:#666666'>%@1%: %@2%</span>",
+            "custom":           "CUSTOM"
+        }
+    },
+    "connectorFormats":
+    {
+        "formats": {
+            "Default":              "dashed=0;strokeWidth=1;colorFamilyLine=black;",
+            "Network: Coper-1G":    "dashed=0;strokeWidth=1;colorFamilyLine=yellow;",
+            "Network: Fiber-1G":    "dashed=1;strokeWidth=3;colorFamilyLine=purple;",
+            "Network: Fiber-10G":   "dashed=1;strokeWidth=5;colorFamilyLine=green;"
+        }
+    }
+}

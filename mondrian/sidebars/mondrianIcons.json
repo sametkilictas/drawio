@@ -1,0 +1,260 @@
+{
+    "Sidebars":{
+        "Base Icons":{
+            "App Catalogue":
+            {
+"cloud--alerting": {"icon": "cloud--alerting", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud--auditing": {"icon": "cloud--auditing", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud--logging": {"icon": "cloud--logging", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud--monitoring": {"icon": "cloud--monitoring", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud--service-management": {"icon": "cloud--service-management", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-foundry--1": {"icon": "cloud-foundry--1", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-satellite": {"icon": "cloud-satellite", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-satellite--config": {"icon": "cloud-satellite--config", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-satellite--link": {"icon": "cloud-satellite--link", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-satellite--services": {"icon": "cloud-satellite--services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud-services": {"icon": "cloud-services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"content-delivery-network": {"icon": "content-delivery-network", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--datastax": {"icon": "database--datastax", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--elastic": {"icon": "database--elastic", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--enterprisedb": {"icon": "database--enterprisedb", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--etcd": {"icon": "database--etcd", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--mongodb": {"icon": "database--mongodb", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--postgresql": {"icon": "database--postgresql", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--rabbit": {"icon": "database--rabbit", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"database--redis": {"icon": "database--redis", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"direct-link": {"icon": "direct-link", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"dns-services": {"icon": "dns-services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"flow-logs-vpc": {"icon": "flow-logs-vpc", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud": {"icon": "ibm-cloud", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud--dedicated-host": {"icon": "ibm-cloud--dedicated-host", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud--internet-services": {"icon": "ibm-cloud--internet-services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud--subnets": {"icon": "ibm-cloud--subnets", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud--vpc-endpoints": {"icon": "ibm-cloud--vpc-endpoints", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--applications": {"icon": "ibm-cloud-pak--applications", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--data": {"icon": "ibm-cloud-pak--data", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--integration": {"icon": "ibm-cloud-pak--integration", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--multicloud-mgmt": {"icon": "ibm-cloud-pak--multicloud-mgmt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--security": {"icon": "ibm-cloud-pak--security", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-cloud-pak--system": {"icon": "ibm-cloud-pak--system", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"ibm-security--services": {"icon": "ibm-security--services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"infrastructure--classic": {"icon": "infrastructure--classic", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--vpc": {"icon": "load-balancer--vpc", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"virtual-private-cloud--alt": {"icon": "virtual-private-cloud--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vlan--ibm": {"icon": "vlan--ibm", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Data":
+            {
+"archive": {"icon": "archive", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data--base": {"icon": "data--base", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data--base--alt": {"icon": "data--base--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"network--2": {"icon": "network--2", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"object-storage": {"icon": "object-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"policy": {"icon": "policy", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"virtual-machine": {"icon": "virtual-machine", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"virtual-private-cloud": {"icon": "virtual-private-cloud", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "File":
+            {
+"application": {"icon": "application", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cube": {"icon": "cube", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"document--protected": {"icon": "document--protected", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"document--security": {"icon": "document--security", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"document--signed": {"icon": "document--signed", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"document--unprotected": {"icon": "document--unprotected", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"rule": {"icon": "rule", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"security": {"icon": "security", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"script": {"icon": "script", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Systems / Application":
+            {
+"application--mobile": {"icon": "application--mobile", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"application--virtual": {"icon": "application--virtual", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"application--web": {"icon": "application--web", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"chat--operational": {"icon": "chat--operational", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"communication--unified": {"icon": "communication--unified", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"container-registry": {"icon": "container-registry", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"container-services": {"icon": "container-services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"directory-domain": {"icon": "directory-domain", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gui": {"icon": "gui", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gui--management": {"icon": "gui--management", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"id-management": {"icon": "id-management", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"kubernetes": {"icon": "kubernetes", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"mobility--services": {"icon": "mobility--services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vehicle--api": {"icon": "vehicle--api", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vehicle--connected": {"icon": "vehicle--connected", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vehicle--insights": {"icon": "vehicle--insights", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vehicle--services": {"icon": "vehicle--services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Systems / Data":
+            {
+"block-storage": {"icon": "block-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"block-storage--alt": {"icon": "block-storage--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data--center": {"icon": "data--center", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data-accessor": {"icon": "data-accessor", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data-backup": {"icon": "data-backup", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data-blob": {"icon": "data-blob", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"data-diode": {"icon": "data-diode", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"file-storage": {"icon": "file-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"file-storage--alt": {"icon": "file-storage--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"message-queue": {"icon": "message-queue", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"object-storage--alt": {"icon": "object-storage--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"slisor": {"icon": "slisor", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Systems / Network":
+            {
+"edge-node--alt": {"icon": "edge-node--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"floating-ip": {"icon": "floating-ip", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"hybrid-networking--alt": {"icon": "hybrid-networking--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--application": {"icon": "load-balancer--application", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--classic": {"icon": "load-balancer--classic", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--global": {"icon": "load-balancer--global", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--listener": {"icon": "load-balancer--listener", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--local": {"icon": "load-balancer--local", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--network": {"icon": "load-balancer--network", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"load-balancer--pool": {"icon": "load-balancer--pool", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"network--admin-control": {"icon": "network--admin-control", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"network--enterprise": {"icon": "network--enterprise", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"network--overlay": {"icon": "network--overlay", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"network--public": {"icon": "network--public", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"pcn--e-node": {"icon": "pcn--e-node", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"pcn--military": {"icon": "pcn--military", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"pcn--p-node": {"icon": "pcn--p-node", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"pcn--z-node": {"icon": "pcn--z-node", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"point-of-presence": {"icon": "point-of-presence", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"router": {"icon": "router", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"router--voice": {"icon": "router--voice", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"router--wifi": {"icon": "router--wifi", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"switch-layer-2": {"icon": "switch-layer-2", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"switch-layer-3": {"icon": "switch-layer-3", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vlan": {"icon": "vlan", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vpn--connection": {"icon": "vpn--connection", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"vpn--policy": {"icon": "vpn--policy", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wifi--controller": {"icon": "wifi--controller", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wifi--not-secure": {"icon": "wifi--not-secure", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wifi--secure": {"icon": "wifi--secure", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wifi-bridge": {"icon": "wifi-bridge", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wifi-bridge--alt": {"icon": "wifi-bridge--alt", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+	    },
+
+            "Systems / Security":
+            {
+"code-signing-service": {"icon": "code-signing-service", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"encryption": {"icon": "encryption", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"firewall": {"icon": "firewall", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"firewall--classic": {"icon": "firewall--classic", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway": {"icon": "gateway", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--api": {"icon": "gateway--api", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--mail": {"icon": "gateway--mail", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--public": {"icon": "gateway--public", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--security": {"icon": "gateway--security", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--user-access": {"icon": "gateway--user-access", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"gateway--vpn": {"icon": "gateway--vpn", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"group--access": {"icon": "group--access", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"group--account": {"icon": "group--account", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"group--resource": {"icon": "group--resource", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"group--security": {"icon": "group--security", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"intrusion-prevention": {"icon": "intrusion-prevention", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"security-services": {"icon": "security-services", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"session-border-control": {"icon": "session-border-control", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"subnet-acl-rules": {"icon": "subnet-acl-rules", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"two-factor-authentication": {"icon": "two-factor-authentication", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Systems / Server":
+            {
+"autoscaling": {"icon": "autoscaling", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"bare-metal-server": {"icon": "bare-metal-server", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"bare-metal-server--01": {"icon": "bare-metal-server--01", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"bare-metal-server--02": {"icon": "bare-metal-server--02", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"bastion-host": {"icon": "bastion-host", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"box--extra-large": {"icon": "box--extra-large", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"box--large": {"icon": "box--large", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"box--medium": {"icon": "box--medium", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"box--small": {"icon": "box--small", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"hardware-security-module": {"icon": "hardware-security-module", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"image-service": {"icon": "image-service", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"instance--classic": {"icon": "instance--classic", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"instance--virtual": {"icon": "instance--virtual", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"instance--bx": {"icon": "instance--bx", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"instance--cx": {"icon": "instance--cx", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"instance--mx": {"icon": "instance--mx", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"server--dns": {"icon": "server--dns", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"server--proxy": {"icon": "server--proxy", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"server--time": {"icon": "server--time", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"virtual-desktop": {"icon": "virtual-desktop", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "Systems / Storage":
+            {
+"volume--block-storage": {"icon": "volume--block-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"volume--file-storage": {"icon": "volume--file-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"volume--object-storage": {"icon": "volume--object-storage", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+	    },
+
+            "Technology":
+            {
+"devices": {"icon": "devices", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"edge-node": {"icon": "edge-node", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"fingerprint-recognition": {"icon": "fingerprint-recognition", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"function": {"icon": "function", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"laptop": {"icon": "laptop", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"logo--openshift": {"icon": "logo--openshift", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"mobile": {"icon": "mobile", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"password": {"icon": "password", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"tablet": {"icon": "tablet", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"radio--combat": {"icon": "radio--combat", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"radio--push-to-talk": {"icon": "radio--push-to-talk", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"sim-card": {"icon": "sim-card", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"terminal": {"icon": "terminal", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"transmission-lte": {"icon": "transmission-lte", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"wikis": {"icon": "wikis", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+
+            "User":
+            {
+"collaborate": {"icon": "collaborate", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"credentials": {"icon": "credentials", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"events": {"icon": "events", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"group": {"icon": "group", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"user": {"icon": "user", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"user--admin": {"icon": "user--admin", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"user--military": {"icon": "user--military", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"user--service-desk": {"icon": "user--service-desk", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"user--settings": {"icon": "user--settings", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            },
+         
+            "Other":
+            {
+"arrows-horizontal": {"icon": "arrows-horizontal", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"boot": {"icon": "boot", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"border--none": {"icon": "border--none", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"cloud": {"icon": "cloud", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"default": {"icon": "default", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"deploy": {"icon": "deploy", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"flag": {"icon": "flag", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"location": {"icon": "location", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"locked": {"icon": "locked", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"military-camp": {"icon": "military-camp", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"phone--application": {"icon": "phone--application", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"phone--settings": {"icon": "phone--settings", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},         
+"replicate": {"icon": "replicate", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"shuffle": {"icon": "shuffle", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"tank": {"icon": "tank", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"},
+"timer": {"icon": "timer", "$STOCK_ICON_DEFAULT_PROPERTIES": null, "format": "$STOCK_ICON"}
+            }
+        }
+    }, 
+    
+    "Variables":{
+        "$DEFAULT_TEXT_DETAIL": {"font": "", "position": null},
+        "$STOCK_ICON": {"type": "ln", "layout": "collapsed", "container": "no_container_transparent"},
+        "$STOCK_ICON_DEFAULT_PROPERTIES": {"id": "", "color": "$STOCK_ICON_DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL", "extra": ";colorFillIcon=light;", "multiplicity": false},
+        "$STOCK_ICON_DEFAULT_COLOR": {"family": "black", "fillIcon": null, "fillText": null, "fillContainer": null}
+    }
+}

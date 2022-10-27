@@ -1,0 +1,47 @@
+{
+    "ABB-ID":
+    {
+        "Element-Name": "Name of ABB",
+        "Icon-Name": "building-block-architecture",
+        "Tag-Text": "ABB"
+    },
+    "SBB-ID":
+    {
+        "Element-Name": "Name of SBB",
+        "Icon-Name": "building-block-solution",
+        "Tag-Text": "SBB"
+    },
+
+    "G-DCLAN":
+    {
+        "Element-Name": "DC LAN",
+        "Icon-Name": "lan",
+        "Tag-Text": "GrIT",
+        "Product": "Juniper"
+    },
+    "G-HCI":
+    {
+        "Element-Name": "HCI",
+        "Icon-Name": "hyper-converged-infrastructure",
+        "Tag-Text": "GrIT",
+        "Product": "Nutanix AOS & AHV"
+    },
+
+    "G-Load-Balancer":
+    {
+        "Element-Name": "Load Balancer",
+        "Icon-Name": "load-balancer",
+        "Product": "HAProxy"
+    },
+
+    "G-Object-Storage":
+    {
+        "Data":
+        {
+            "Element-Name": "Object Storage",
+            "Icon-Name": "storage-object",
+            "Tag-Text": "GrIT",
+            "Product": "Nutanix Objects Storage"
+        }
+    }
+}

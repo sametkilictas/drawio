@@ -1,0 +1,14 @@
+{
+    "WKP-22":
+    {
+        "Interface-Name": "Secure Shell Protocol",
+        "Port": "22",
+        "Protocol": "SSH"
+    },
+    "WKP-443":
+    {
+        "Interface-Name": "Hypertext Transfer Protocol Secure",
+        "Port": "443",
+        "Protocol": "HTTPS"
+    }
+}

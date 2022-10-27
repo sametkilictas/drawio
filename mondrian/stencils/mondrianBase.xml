@@ -1,0 +1,292 @@
+<shapes name="mondrianBase">
+<shape aspect="variable" h="32" name="undefined" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="28.8" y="3.2"/>
+            <line x="28.8" y="28.8"/>
+            <line x="3.2" y="28.8"/>
+            <line x="3.2" y="3.2"/>
+            <line x="28.8" y="3.2"/>
+            <move x="28.8" y="0"/>
+            <line x="3.2" y="0"/>
+            <arc large-arc-flag="0" rx="3.2" ry="3.2" sweep-flag="0" x="0" x-axis-rotation="0" y="3.2"/>
+            <line x="0" y="28.8"/>
+            <arc large-arc-flag="0" rx="3.2" ry="3.2" sweep-flag="0" x="3.2" x-axis-rotation="0" y="32"/>
+            <line x="28.8" y="32"/>
+            <arc large-arc-flag="0" rx="3.2" ry="3.2" sweep-flag="0" x="32" x-axis-rotation="0" y="28.8"/>
+            <line x="32" y="3.2"/>
+            <arc large-arc-flag="0" rx="3.2" ry="3.2" sweep-flag="0" x="28.8" x-axis-rotation="0" y="0"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="notfound" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="16" y="0"/>
+            <arc large-arc-flag="1" rx="16" ry="16" sweep-flag="0" x="32" x-axis-rotation="0" y="16"/>
+            <arc large-arc-flag="0" rx="16" ry="16" sweep-flag="0" x="16" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="16" y="29.714"/>
+            <arc large-arc-flag="1" rx="13.714" ry="13.714" sweep-flag="1" x="29.714" x-axis-rotation="0" y="16"/>
+            <arc large-arc-flag="0" rx="13.714" ry="13.714" sweep-flag="1" x="16" x-axis-rotation="0" y="29.714"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="3.429" w="3.429" x="14.286" y="22.857"/>
+        <fill/>
+        <path>
+            <move x="17.143" y="6.857"/>
+            <line x="15.429" y="6.857"/>
+            <arc large-arc-flag="0" rx="5.131" ry="5.131" sweep-flag="0" x="10.286" x-axis-rotation="0" y="12"/>
+            <line x="10.286" y="12.571"/>
+            <line x="12.571" y="12.571"/>
+            <line x="12.571" y="12"/>
+            <arc large-arc-flag="0" rx="2.857" ry="2.857" sweep-flag="1" x="15.429" x-axis-rotation="0" y="9.143"/>
+            <line x="17.143" y="9.143"/>
+            <arc large-arc-flag="0" rx="2.857" ry="2.857" sweep-flag="1" x="17.143" x-axis-rotation="0" y="14.857"/>
+            <line x="14.857" y="14.857"/>
+            <line x="14.857" y="20"/>
+            <line x="17.143" y="20"/>
+            <line x="17.143" y="17.143"/>
+            <arc large-arc-flag="0" rx="5.143" ry="5.143" sweep-flag="0" x="17.143" x-axis-rotation="0" y="6.857"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+
+<shape aspect="variable" h="32" name="du_d" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="16" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="9"/>
+            <line x="16" y="9"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="20" x-axis-rotation="0" y="13"/>
+            <line x="20" y="19"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="16" x-axis-rotation="0" y="23"/>
+            <close/>
+            <move x="14" y="21"/>
+            <line x="16" y="21"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="18" x-axis-rotation="0" y="19"/>
+            <line x="18" y="13"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="16" x-axis-rotation="0" y="11"/>
+            <line x="14" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_e" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="20" y="11"/>
+            <line x="20" y="9"/>
+            <line x="12" y="9"/>
+            <line x="12" y="23"/>
+            <line x="20" y="23"/>
+            <line x="20" y="21"/>
+            <line x="14" y="21"/>
+            <line x="14" y="17"/>
+            <line x="19" y="17"/>
+            <line x="19" y="15"/>
+            <line x="14" y="15"/>
+            <line x="14" y="11"/>
+            <line x="20" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_i" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="12" y="11"/>
+            <line x="15" y="11"/>
+            <line x="15" y="21"/>
+            <line x="12" y="21"/>
+            <line x="12" y="23"/>
+            <line x="20" y="23"/>
+            <line x="20" y="21"/>
+            <line x="17" y="21"/>
+            <line x="17" y="11"/>
+            <line x="20" y="11"/>
+            <line x="20" y="9"/>
+            <line x="12" y="9"/>
+            <line x="12" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_p" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="14" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="9"/>
+            <line x="18" y="9"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="20" x-axis-rotation="0" y="11"/>
+            <line x="20" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="18" x-axis-rotation="0" y="18"/>
+            <line x="14" y="18"/>
+            <close/>
+            <move x="14" y="16"/>
+            <line x="18" y="16"/>
+            <line x="18" y="11"/>
+            <line x="14" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_td" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="21" y="23"/>
+            <line x="17" y="23"/>
+            <line x="17" y="9"/>
+            <line x="21" y="9"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="25" x-axis-rotation="0" y="13"/>
+            <line x="25" y="19"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="21" x-axis-rotation="0" y="23"/>
+            <close/>
+            <move x="19" y="21"/>
+            <line x="21" y="21"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="23" x-axis-rotation="0" y="19"/>
+            <line x="23" y="13"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="21" x-axis-rotation="0" y="11"/>
+            <line x="19" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+        <path>
+            <move x="7" y="11"/>
+            <line x="10" y="11"/>
+            <line x="10" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="11"/>
+            <line x="15" y="11"/>
+            <line x="15" y="9"/>
+            <line x="7" y="9"/>
+            <line x="7" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_te" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="25" y="11"/>
+            <line x="25" y="9"/>
+            <line x="17" y="9"/>
+            <line x="17" y="23"/>
+            <line x="25" y="23"/>
+            <line x="25" y="21"/>
+            <line x="19" y="21"/>
+            <line x="19" y="17"/>
+            <line x="24" y="17"/>
+            <line x="24" y="15"/>
+            <line x="19" y="15"/>
+            <line x="19" y="11"/>
+            <line x="25" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+        <path>
+            <move x="7" y="11"/>
+            <line x="10" y="11"/>
+            <line x="10" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="11"/>
+            <line x="15" y="11"/>
+            <line x="15" y="9"/>
+            <line x="7" y="9"/>
+            <line x="7" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_ti" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="17" y="11"/>
+            <line x="20" y="11"/>
+            <line x="20" y="21"/>
+            <line x="17" y="21"/>
+            <line x="17" y="23"/>
+            <line x="25" y="23"/>
+            <line x="25" y="21"/>
+            <line x="22" y="21"/>
+            <line x="22" y="11"/>
+            <line x="25" y="11"/>
+            <line x="25" y="9"/>
+            <line x="17" y="9"/>
+            <line x="17" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+        <path>
+            <move x="7" y="11"/>
+            <line x="10" y="11"/>
+            <line x="10" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="11"/>
+            <line x="15" y="11"/>
+            <line x="15" y="9"/>
+            <line x="7" y="9"/>
+            <line x="7" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="du_tp" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="19" y="23"/>
+            <line x="17" y="23"/>
+            <line x="17" y="9"/>
+            <line x="23" y="9"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="25" x-axis-rotation="0" y="11"/>
+            <line x="25" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="23" x-axis-rotation="0" y="18"/>
+            <line x="19" y="18"/>
+            <close/>
+            <move x="19" y="16"/>
+            <line x="23" y="16"/>
+            <line x="23" y="10.998"/>
+            <line x="19" y="10.998"/>
+            <close/>
+        </path>
+        <fillstroke/>
+        <path>
+            <move x="7" y="11"/>
+            <line x="10" y="11"/>
+            <line x="10" y="23"/>
+            <line x="12" y="23"/>
+            <line x="12" y="11"/>
+            <line x="15" y="11"/>
+            <line x="15" y="9"/>
+            <line x="7" y="9"/>
+            <line x="7" y="11"/>
+            <close/>
+        </path>
+        <fillstroke/>
+    </foreground>
+</shape>
+</shapes>

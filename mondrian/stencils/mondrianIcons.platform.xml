@@ -1,0 +1,2030 @@
+<shapes name="mondrianIcons.platform">
+<shape aspect="variable" h="28" name="virtual-desktop" strokewidth="inherit" w="32.395">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="21.198" y="14"/>
+            <line x="11.198" y="14"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="9.198" x-axis-rotation="0" y="16"/>
+            <line x="9.198" y="22"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="11.198" x-axis-rotation="0" y="24"/>
+            <line x="15.198" y="24"/>
+            <line x="15.198" y="26"/>
+            <line x="12.198" y="26"/>
+            <line x="12.198" y="28"/>
+            <line x="20.198" y="28"/>
+            <line x="20.198" y="26"/>
+            <line x="17.198" y="26"/>
+            <line x="17.198" y="24"/>
+            <line x="21.198" y="24"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="23.198" x-axis-rotation="0" y="22"/>
+            <line x="23.198" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="21.198" x-axis-rotation="0" y="14"/>
+            <close/>
+            <move x="11.198" y="22"/>
+            <line x="11.198" y="16"/>
+            <line x="21.198" y="16"/>
+            <line x="21.199" y="22"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="26.019" y="8.124"/>
+            <arc large-arc-flag="0" rx="9.999" ry="9.999" sweep-flag="0" x="6.376" x-axis-rotation="0" y="8.124"/>
+            <arc large-arc-flag="0" rx="7.491" ry="7.491" sweep-flag="0" x="7.198" x-axis-rotation="0" y="22.975"/>
+            <line x="7.198" y="20.975"/>
+            <arc large-arc-flag="0" rx="5.494" ry="5.494" sweep-flag="1" x="7.321" x-axis-rotation="0" y="10.021"/>
+            <line x="8.158" y="9.964"/>
+            <line x="8.248" y="9.13"/>
+            <arc large-arc-flag="0" rx="7.998" ry="7.998" sweep-flag="1" x="24.149" x-axis-rotation="0" y="9.13"/>
+            <line x="24.239" y="9.964"/>
+            <line x="25.075" y="10.021"/>
+            <arc large-arc-flag="0" rx="5.494" ry="5.494" sweep-flag="1" x="25.198" x-axis-rotation="0" y="20.975"/>
+            <line x="25.198" y="22.975"/>
+            <arc large-arc-flag="0" rx="7.491" ry="7.491" sweep-flag="0" x="26.02" x-axis-rotation="0" y="8.124"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28.861" name="virtual-server" strokewidth="inherit" w="32.661">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="20.33" y="11.861"/>
+            <line x="12.33" y="11.861"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="10.33" x-axis-rotation="0" y="13.861"/>
+            <line x="10.33" y="26.861"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="12.33" x-axis-rotation="0" y="28.861"/>
+            <line x="20.33" y="28.861"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="22.33" x-axis-rotation="0" y="26.861"/>
+            <line x="22.33" y="13.861"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="20.33" x-axis-rotation="0" y="11.861"/>
+            <close/>
+            <move x="20.33" y="13.861"/>
+            <line x="20.33" y="16.861"/>
+            <line x="12.33" y="16.861"/>
+            <line x="12.33" y="13.861"/>
+            <close/>
+            <move x="20.33" y="18.861"/>
+            <line x="20.33" y="21.861"/>
+            <line x="12.33" y="21.861"/>
+            <line x="12.33" y="18.861"/>
+            <close/>
+            <move x="12.33" y="26.861"/>
+            <line x="12.33" y="23.861"/>
+            <line x="20.33" y="23.861"/>
+            <line x="20.33" y="26.861"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="26.24" y="8.991"/>
+            <arc large-arc-flag="0" rx="0.121" ry="0.121" sweep-flag="1" x="26.143" x-axis-rotation="0" y="8.896"/>
+            <arc large-arc-flag="0" rx="10.006" ry="10.006" sweep-flag="0" x="18.22" x-axis-rotation="0" y="1.042"/>
+            <arc large-arc-flag="0" rx="10.002" ry="10.002" sweep-flag="0" x="6.515" x-axis-rotation="0" y="8.896"/>
+            <arc large-arc-flag="0" rx="0.121" ry="0.121" sweep-flag="1" x="6.419" x-axis-rotation="0" y="8.992"/>
+            <arc large-arc-flag="0" rx="7.502" ry="7.502" sweep-flag="0" x="7.821" x-axis-rotation="0" y="23.861"/>
+            <line x="8.33" y="23.861"/>
+            <line x="8.33" y="21.861"/>
+            <line x="7.825" y="21.861"/>
+            <arc large-arc-flag="0" rx="5.511" ry="5.511" sweep-flag="1" x="2.386" x-axis-rotation="0" y="15.561"/>
+            <arc large-arc-flag="0" rx="5.699" ry="5.699" sweep-flag="1" x="7.1" x-axis-rotation="0" y="10.9"/>
+            <line x="8.117" y="10.717"/>
+            <arc large-arc-flag="0" rx="0.131" ry="0.131" sweep-flag="0" x="8.221" x-axis-rotation="0" y="10.613"/>
+            <line x="8.401" y="9.678"/>
+            <arc large-arc-flag="0" rx="8.28" ry="8.28" sweep-flag="1" x="15.248" x-axis-rotation="0" y="2.935"/>
+            <arc large-arc-flag="0" rx="7.957" ry="7.957" sweep-flag="1" x="18.095" x-axis-rotation="0" y="3.06"/>
+            <arc large-arc-flag="0" rx="8.22" ry="8.22" sweep-flag="1" x="24.243" x-axis-rotation="0" y="9.605"/>
+            <line x="24.437" y="10.613"/>
+            <arc large-arc-flag="0" rx="0.13" ry="0.13" sweep-flag="0" x="24.541" x-axis-rotation="0" y="10.717"/>
+            <line x="25.599" y="10.908"/>
+            <arc large-arc-flag="0" rx="5.782" ry="5.782" sweep-flag="1" x="28.7" x-axis-rotation="0" y="12.447"/>
+            <arc large-arc-flag="0" rx="5.505" ry="5.505" sweep-flag="1" x="24.837" x-axis-rotation="0" y="21.861"/>
+            <line x="24.33" y="21.861"/>
+            <line x="24.33" y="23.861"/>
+            <line x="24.837" y="23.861"/>
+            <arc large-arc-flag="0" rx="7.502" ry="7.502" sweep-flag="0" x="26.24" x-axis-rotation="0" y="8.991"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28.322" name="virtual-private-cloud" strokewidth="inherit" w="32.627">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="20.314" y="18.322"/>
+            <line x="20.314" y="15.322"/>
+            <arc large-arc-flag="0" rx="4" ry="4" sweep-flag="0" x="12.314" x-axis-rotation="0" y="15.322"/>
+            <line x="12.314" y="18.322"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="10.314" x-axis-rotation="0" y="20.322"/>
+            <line x="10.314" y="26.322"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="12.314" x-axis-rotation="0" y="28.322"/>
+            <line x="20.314" y="28.322"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="22.314" x-axis-rotation="0" y="26.322"/>
+            <line x="22.314" y="20.322"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="20.314" x-axis-rotation="0" y="18.322"/>
+            <close/>
+            <move x="14.314" y="15.322"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="18.314" x-axis-rotation="0" y="15.322"/>
+            <line x="18.314" y="18.322"/>
+            <line x="14.314" y="18.322"/>
+            <close/>
+            <move x="12.314" y="26.322"/>
+            <line x="12.314" y="20.322"/>
+            <line x="20.314" y="20.322"/>
+            <line x="20.315" y="26.322"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="26.143" y="8.437"/>
+            <arc large-arc-flag="0" rx="10.007" ry="10.007" sweep-flag="0" x="18.204" x-axis-rotation="0" y="0.503"/>
+            <arc large-arc-flag="0" rx="10.002" ry="10.002" sweep-flag="0" x="6.484" x-axis-rotation="0" y="8.437"/>
+            <arc large-arc-flag="0" rx="7.502" ry="7.502" sweep-flag="0" x="7.805" x-axis-rotation="0" y="23.322"/>
+            <line x="8.314" y="23.322"/>
+            <line x="8.314" y="21.322"/>
+            <line x="7.809" y="21.322"/>
+            <arc large-arc-flag="0" rx="5.502" ry="5.502" sweep-flag="1" x="6.84" x-axis-rotation="0" y="10.405"/>
+            <line x="8.189" y="10.161"/>
+            <line x="8.448" y="8.816"/>
+            <arc large-arc-flag="0" rx="8.011" ry="8.011" sweep-flag="1" x="24.179" x-axis-rotation="0" y="8.816"/>
+            <line x="24.438" y="10.161"/>
+            <line x="25.787" y="10.405"/>
+            <arc large-arc-flag="0" rx="5.502" ry="5.502" sweep-flag="1" x="24.821" x-axis-rotation="0" y="21.322"/>
+            <line x="24.314" y="21.322"/>
+            <line x="24.314" y="23.322"/>
+            <line x="24.821" y="23.322"/>
+            <arc large-arc-flag="0" rx="7.502" ry="7.502" sweep-flag="0" x="26.143" x-axis-rotation="0" y="8.437"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26.001" name="volume-block" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="15" y="17.001"/>
+            <line x="8" y="17.001"/>
+            <line x="8" y="10.001"/>
+            <line x="15" y="10.001"/>
+            <close/>
+            <move x="10" y="15.001"/>
+            <line x="13" y="15.001"/>
+            <line x="13" y="12.001"/>
+            <line x="10" y="12.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="15" y="26.001"/>
+            <line x="8" y="26.001"/>
+            <line x="8" y="19.001"/>
+            <line x="15" y="19.001"/>
+            <close/>
+            <move x="10" y="24.001"/>
+            <line x="13" y="24.001"/>
+            <line x="13" y="21.001"/>
+            <line x="10" y="21.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="24" y="17.001"/>
+            <line x="17" y="17.001"/>
+            <line x="17" y="10.001"/>
+            <line x="24" y="10.001"/>
+            <close/>
+            <move x="19" y="15.001"/>
+            <line x="22" y="15.001"/>
+            <line x="22" y="12.001"/>
+            <line x="19" y="12.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="24" y="26.001"/>
+            <line x="17" y="26.001"/>
+            <line x="17" y="19.001"/>
+            <line x="24" y="19.001"/>
+            <close/>
+            <move x="19" y="24.001"/>
+            <line x="22" y="24.001"/>
+            <line x="22" y="21.001"/>
+            <line x="19" y="21.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="6" y="24.001"/>
+            <line x="2" y="24.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="22.001"/>
+            <line x="0" y="2.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0.001"/>
+            <line x="9.586" y="0.001"/>
+            <arc large-arc-flag="0" rx="1.986" ry="1.986" sweep-flag="1" x="11" x-axis-rotation="0" y="0.587"/>
+            <line x="14.414" y="4.001"/>
+            <line x="26" y="4.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="6.001"/>
+            <line x="28" y="14.001"/>
+            <line x="26" y="14.001"/>
+            <line x="26" y="6.001"/>
+            <line x="13.586" y="6.001"/>
+            <line x="9.586" y="2.001"/>
+            <line x="2" y="2.001"/>
+            <line x="2" y="22.001"/>
+            <line x="6" y="22.001"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="27.001" name="volume-file" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="23.707" y="14.294"/>
+            <line x="18.707" y="9.294"/>
+            <arc large-arc-flag="0" rx="1" ry="1" sweep-flag="0" x="18" x-axis-rotation="0" y="9.001"/>
+            <line x="12" y="9.001"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="10" x-axis-rotation="0" y="11.001"/>
+            <line x="10" y="25.001"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="12" x-axis-rotation="0" y="27.001"/>
+            <line x="22" y="27.001"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="24" x-axis-rotation="0" y="25.001"/>
+            <line x="24" y="15.001"/>
+            <arc large-arc-flag="0" rx="1" ry="1" sweep-flag="0" x="23.707" x-axis-rotation="0" y="14.294"/>
+            <close/>
+            <move x="21.586" y="15.001"/>
+            <line x="18" y="15.001"/>
+            <line x="18" y="11.416"/>
+            <close/>
+            <move x="12" y="25.001"/>
+            <line x="12" y="11.001"/>
+            <line x="16" y="11.001"/>
+            <line x="16" y="15.001"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="18" x-axis-rotation="0" y="17.001"/>
+            <line x="22" y="17.001"/>
+            <line x="22" y="25.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="6" y="24.001"/>
+            <line x="2" y="24.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="22.001"/>
+            <line x="0" y="2.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0.001"/>
+            <line x="9.586" y="0.001"/>
+            <arc large-arc-flag="0" rx="1.986" ry="1.986" sweep-flag="1" x="11" x-axis-rotation="0" y="0.587"/>
+            <line x="14.414" y="4.001"/>
+            <line x="26" y="4.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="6.001"/>
+            <line x="28" y="14.001"/>
+            <line x="26" y="14.001"/>
+            <line x="26" y="6.001"/>
+            <line x="13.586" y="6.001"/>
+            <line x="9.586" y="2.001"/>
+            <line x="2" y="2.001"/>
+            <line x="2" y="22.001"/>
+            <line x="6" y="22.001"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26.001" name="volume-object" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="21" y="20.001"/>
+            <arc large-arc-flag="0" rx="2.98" ry="2.98" sweep-flag="0" x="18.962" x-axis-rotation="0" y="20.813"/>
+            <line x="14.959" y="18.411"/>
+            <arc large-arc-flag="0" rx="2.048" ry="2.048" sweep-flag="0" x="14.959" x-axis-rotation="0" y="17.592"/>
+            <line x="18.962" y="15.19"/>
+            <arc large-arc-flag="1" rx="3.246" ry="3.246" sweep-flag="0" x="18.041" x-axis-rotation="0" y="13.411"/>
+            <line x="14.038" y="15.813"/>
+            <arc large-arc-flag="1" rx="3" ry="3" sweep-flag="0" x="14.038" x-axis-rotation="0" y="20.19"/>
+            <line x="18.041" y="22.592"/>
+            <arc large-arc-flag="0" rx="2.973" ry="2.973" sweep-flag="0" x="18" x-axis-rotation="0" y="23.001"/>
+            <arc large-arc-flag="1" rx="3" ry="3" sweep-flag="0" x="21" x-axis-rotation="0" y="20.001"/>
+            <close/>
+            <move x="21" y="12.001"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="20" x-axis-rotation="0" y="13.001"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="21" x-axis-rotation="0" y="12.001"/>
+            <close/>
+            <move x="12" y="19.001"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="13" x-axis-rotation="0" y="18.001"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="12" x-axis-rotation="0" y="19.001"/>
+            <close/>
+            <move x="21" y="24.001"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="22" x-axis-rotation="0" y="23.001"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="21" x-axis-rotation="0" y="24.001"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="6" y="24.001"/>
+            <line x="2" y="24.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="22.001"/>
+            <line x="0" y="2.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0.001"/>
+            <line x="9.586" y="0.001"/>
+            <arc large-arc-flag="0" rx="1.986" ry="1.986" sweep-flag="1" x="11" x-axis-rotation="0" y="0.587"/>
+            <line x="14.414" y="4.001"/>
+            <line x="26" y="4.001"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="6.001"/>
+            <line x="28" y="14.001"/>
+            <line x="26" y="14.001"/>
+            <line x="26" y="6.001"/>
+            <line x="13.586" y="6.001"/>
+            <line x="9.586" y="2.001"/>
+            <line x="2" y="2.001"/>
+            <line x="2" y="22.001"/>
+            <line x="6" y="22.001"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="server-dns" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="14" y="0"/>
+            <arc large-arc-flag="1" rx="8" ry="8" sweep-flag="0" x="22" x-axis-rotation="0" y="8"/>
+            <arc large-arc-flag="0" rx="8.009" ry="8.009" sweep-flag="0" x="14" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="19.91" y="7"/>
+            <line x="17.472" y="7"/>
+            <arc large-arc-flag="0" rx="15.246" ry="15.246" sweep-flag="0" x="16.681" x-axis-rotation="0" y="2.64"/>
+            <arc large-arc-flag="0" rx="6.009" ry="6.009" sweep-flag="1" x="19.91" x-axis-rotation="0" y="7"/>
+            <close/>
+            <move x="14.022" y="13.999"/>
+            <line x="14.014" y="13.999"/>
+            <curve x1="13.633" x2="12.705" x3="12.535" y1="13.878" y2="12.178" y3="9"/>
+            <line x="15.465" y="9"/>
+            <curve x1="15.295" x2="14.371" x3="14.022" y1="12.176" y2="13.877" y3="13.999"/>
+            <close/>
+            <move x="12.535" y="7"/>
+            <curve x1="12.705" x2="13.629" x3="13.978" y1="3.824" y2="2.123" y3="2.001"/>
+            <line x="13.986" y="2.001"/>
+            <curve x1="14.367" x2="15.295" x3="15.465" y1="2.122" y2="3.822" y3="7"/>
+            <close/>
+            <move x="11.319" y="2.64"/>
+            <arc large-arc-flag="0" rx="15.246" ry="15.246" sweep-flag="0" x="10.528" x-axis-rotation="0" y="7"/>
+            <line x="8.09" y="7"/>
+            <arc large-arc-flag="0" rx="6.009" ry="6.009" sweep-flag="1" x="11.319" x-axis-rotation="0" y="2.64"/>
+            <close/>
+            <move x="8.09" y="9"/>
+            <line x="10.527" y="9"/>
+            <arc large-arc-flag="0" rx="15.246" ry="15.246" sweep-flag="0" x="11.319" x-axis-rotation="0" y="13.36"/>
+            <arc large-arc-flag="0" rx="6.009" ry="6.009" sweep-flag="1" x="8.09" x-axis-rotation="0" y="9"/>
+            <close/>
+            <move x="16.68" y="13.36"/>
+            <arc large-arc-flag="0" rx="15.246" ry="15.246" sweep-flag="0" x="17.472" x-axis-rotation="0" y="9"/>
+            <line x="19.91" y="9"/>
+            <arc large-arc-flag="0" rx="6.009" ry="6.009" sweep-flag="1" x="16.681" x-axis-rotation="0" y="13.36"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="26" y="28"/>
+            <line x="2" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="26"/>
+            <line x="0" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="18"/>
+            <line x="26" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="20"/>
+            <line x="28" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="26" x-axis-rotation="0" y="28"/>
+            <close/>
+            <move x="2" y="20"/>
+            <line x="2" y="26"/>
+            <line x="26" y="26"/>
+            <line x="26" y="20"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="22"/>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28.744" name="server-proxy" strokewidth="inherit" w="30">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="5" y="28.744"/>
+            <line x="25" y="28.744"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="27" x-axis-rotation="0" y="26.744"/>
+            <line x="27" y="20.744"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="25" x-axis-rotation="0" y="18.744"/>
+            <line x="5" y="18.744"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="3" x-axis-rotation="0" y="20.744"/>
+            <line x="3" y="26.744"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="5" x-axis-rotation="0" y="28.744"/>
+            <close/>
+            <move x="5" y="20.744"/>
+            <line x="25" y="20.744"/>
+            <line x="25" y="26.744"/>
+            <line x="5" y="26.744"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="7" y="22.744"/>
+        <fill/>
+        <path>
+            <move x="25" y="0.744"/>
+            <line x="23.59" y="2.154"/>
+            <line x="26.17" y="4.744"/>
+            <line x="21.315" y="4.744"/>
+            <arc large-arc-flag="0" rx="6.984" ry="6.984" sweep-flag="0" x="8.08" x-axis-rotation="0" y="8.744"/>
+            <line x="3.83" y="8.744"/>
+            <line x="6.41" y="6.154"/>
+            <line x="5" y="4.744"/>
+            <line x="0" y="9.744"/>
+            <line x="5" y="14.744"/>
+            <line x="6.41" y="13.334"/>
+            <line x="3.83" y="10.744"/>
+            <line x="8.685" y="10.744"/>
+            <arc large-arc-flag="0" rx="6.984" ry="6.984" sweep-flag="0" x="21.92" x-axis-rotation="0" y="6.744"/>
+            <line x="26.17" y="6.744"/>
+            <line x="23.59" y="9.334"/>
+            <line x="25" y="10.744"/>
+            <line x="30" y="5.744"/>
+            <close/>
+            <move x="20" y="7.744"/>
+            <arc large-arc-flag="0" rx="4.983" ry="4.983" sweep-flag="1" x="11.026" x-axis-rotation="0" y="10.744"/>
+            <line x="15" y="10.744"/>
+            <line x="15" y="8.744"/>
+            <line x="10.101" y="8.744"/>
+            <arc large-arc-flag="0" rx="4.985" ry="4.985" sweep-flag="1" x="18.974" x-axis-rotation="0" y="4.744"/>
+            <line x="15" y="4.744"/>
+            <line x="15" y="6.744"/>
+            <line x="19.899" y="6.744"/>
+            <arc large-arc-flag="0" rx="5.002" ry="5.002" sweep-flag="1" x="20" x-axis-rotation="0" y="7.744"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="server-time" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="28"/>
+            <line x="2" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="26"/>
+            <line x="0" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="18"/>
+            <line x="26" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="20"/>
+            <line x="28" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="26" x-axis-rotation="0" y="28"/>
+            <close/>
+            <move x="2" y="20"/>
+            <line x="2" y="26"/>
+            <line x="26" y="26"/>
+            <line x="26" y="20"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="22"/>
+        <fill/>
+        <path>
+            <move x="17" y="9.586"/>
+            <line x="15" y="7.586"/>
+            <line x="15" y="4"/>
+            <line x="13" y="4"/>
+            <line x="13" y="8.414"/>
+            <line x="15.586" y="11"/>
+            <line x="17" y="9.586"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="14" y="16"/>
+            <arc large-arc-flag="1" rx="8" ry="8" sweep-flag="1" x="22" x-axis-rotation="0" y="8"/>
+            <arc large-arc-flag="0" rx="8.009" ry="8.009" sweep-flag="1" x="14" x-axis-rotation="0" y="16"/>
+            <close/>
+            <move x="14" y="2"/>
+            <arc large-arc-flag="1" rx="6" ry="6" sweep-flag="0" x="20" x-axis-rotation="0" y="8"/>
+            <arc large-arc-flag="0" rx="6.007" ry="6.007" sweep-flag="0" x="14" x-axis-rotation="0" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26.229" name="storage-object" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="16.229"/>
+            <line x="24" y="16.229"/>
+            <line x="24" y="18.229"/>
+            <line x="26" y="18.229"/>
+            <line x="26" y="24.229"/>
+            <line x="2" y="24.229"/>
+            <line x="2" y="18.229"/>
+            <line x="12" y="18.229"/>
+            <line x="12" y="16.229"/>
+            <line x="2" y="16.229"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="0" x-axis-rotation="0" y="18.229"/>
+            <line x="0" y="24.229"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="26.229"/>
+            <line x="26" y="26.229"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="28" x-axis-rotation="0" y="24.229"/>
+            <line x="28" y="18.229"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26" x-axis-rotation="0" y="16.229"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="20.229"/>
+        <fill/>
+        <path>
+            <move x="19" y="10.229"/>
+            <arc large-arc-flag="0" rx="2.981" ry="2.981" sweep-flag="0" x="16.963" x-axis-rotation="0" y="11.04"/>
+            <line x="12.959" y="8.637"/>
+            <arc large-arc-flag="0" rx="2.958" ry="2.958" sweep-flag="0" x="13" x-axis-rotation="0" y="8.229"/>
+            <arc large-arc-flag="0" rx="2.958" ry="2.958" sweep-flag="0" x="12.959" x-axis-rotation="0" y="7.82"/>
+            <line x="16.963" y="5.418"/>
+            <arc large-arc-flag="1" rx="2.991" ry="2.991" sweep-flag="0" x="16" x-axis-rotation="0" y="3.229"/>
+            <arc large-arc-flag="0" rx="2.934" ry="2.934" sweep-flag="0" x="16.042" x-axis-rotation="0" y="3.638"/>
+            <line x="12.038" y="6.04"/>
+            <arc large-arc-flag="1" rx="3" ry="3" sweep-flag="0" x="12.038" x-axis-rotation="0" y="10.417"/>
+            <line x="16.042" y="12.819"/>
+            <arc large-arc-flag="0" rx="2.934" ry="2.934" sweep-flag="0" x="16" x-axis-rotation="0" y="13.229"/>
+            <arc large-arc-flag="1" rx="3" ry="3" sweep-flag="0" x="19" x-axis-rotation="0" y="10.229"/>
+            <close/>
+            <move x="19" y="2.229"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="18" x-axis-rotation="0" y="3.229"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="19" x-axis-rotation="0" y="2.229"/>
+            <close/>
+            <move x="10" y="9.229"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="11" x-axis-rotation="0" y="8.229"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="10" x-axis-rotation="0" y="9.229"/>
+            <close/>
+            <move x="19" y="14.229"/>
+            <arc large-arc-flag="1" rx="1" ry="1" sweep-flag="1" x="20" x-axis-rotation="0" y="13.229"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="19" x-axis-rotation="0" y="14.229"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="18" name="server-bare-metal-1" strokewidth="inherit" w="24">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="13" y="16"/>
+            <line x="13" y="10"/>
+            <line x="11" y="10"/>
+            <line x="11" y="16"/>
+            <line x="1" y="16"/>
+            <line x="1" y="18"/>
+            <line x="23" y="18"/>
+            <line x="23" y="16"/>
+            <line x="13" y="16"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="3"/>
+        <fill/>
+        <path>
+            <move x="22" y="8"/>
+            <line x="2" y="8"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="6"/>
+            <line x="0" y="2"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0"/>
+            <line x="22" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="2"/>
+            <line x="24" y="6"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="2" y="2"/>
+            <line x="2" y="6"/>
+            <line x="22" y="6"/>
+            <line x="22" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="server-bare-metal-2" strokewidth="inherit" w="24">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="13" y="26"/>
+            <line x="13" y="20"/>
+            <line x="11" y="20"/>
+            <line x="11" y="26"/>
+            <line x="1" y="26"/>
+            <line x="1" y="28"/>
+            <line x="23" y="28"/>
+            <line x="23" y="26"/>
+            <line x="13" y="26"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="13"/>
+        <fill/>
+        <path>
+            <move x="22" y="18"/>
+            <line x="2" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="16"/>
+            <line x="0" y="12"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="10"/>
+            <line x="22" y="10"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="12"/>
+            <line x="24" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="18"/>
+            <close/>
+            <move x="2" y="12"/>
+            <line x="2" y="16"/>
+            <line x="22" y="16"/>
+            <line x="22" y="12"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="3"/>
+        <fill/>
+        <path>
+            <move x="22" y="8"/>
+            <line x="2" y="8"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="6"/>
+            <line x="0" y="2"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0"/>
+            <line x="22" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="2"/>
+            <line x="24" y="6"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="2" y="2"/>
+            <line x="2" y="6"/>
+            <line x="22" y="6"/>
+            <line x="22" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="server-bare-metal-3" strokewidth="inherit" w="24">
+    <connections/>
+    <foreground>
+        <ellipse h="2" w="2" x="4" y="3"/>
+        <fill/>
+        <path>
+            <move x="22" y="8"/>
+            <line x="2" y="8"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="6"/>
+            <line x="0" y="2"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0"/>
+            <line x="22" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="2"/>
+            <line x="24" y="6"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="2" y="2"/>
+            <line x="2" y="6"/>
+            <line x="22" y="6"/>
+            <line x="22" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="13"/>
+        <fill/>
+        <path>
+            <move x="22" y="18"/>
+            <line x="2" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="16"/>
+            <line x="0" y="12"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="10"/>
+            <line x="22" y="10"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="12"/>
+            <line x="24" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="18"/>
+            <close/>
+            <move x="2" y="12"/>
+            <line x="2" y="16"/>
+            <line x="22" y="16"/>
+            <line x="22" y="12"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="23"/>
+        <fill/>
+        <path>
+            <move x="22" y="28"/>
+            <line x="2" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="26"/>
+            <line x="0" y="22"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="20"/>
+            <line x="22" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="24" x-axis-rotation="0" y="22"/>
+            <line x="24" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="22" x-axis-rotation="0" y="28"/>
+            <close/>
+            <move x="2" y="22"/>
+            <line x="2" y="26"/>
+            <line x="22" y="26"/>
+            <line x="22" y="22"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28.001" name="bastion-host" strokewidth="inherit" w="24.141">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="23.597" y="0.71"/>
+            <arc large-arc-flag="0" rx="1.996" ry="1.996" sweep-flag="0" x="22.07" x-axis-rotation="0" y="0.001"/>
+            <line x="19.379" y="0.001"/>
+            <arc large-arc-flag="0" rx="1.5" ry="1.5" sweep-flag="0" x="18.037" x-axis-rotation="0" y="0.83"/>
+            <line x="17.451" y="2.001"/>
+            <line x="16.07" y="2.001"/>
+            <line x="16.07" y="1.501"/>
+            <arc large-arc-flag="0" rx="1.5" ry="1.5" sweep-flag="0" x="14.57" x-axis-rotation="0" y="0.001"/>
+            <line x="9.57" y="0.001"/>
+            <arc large-arc-flag="0" rx="1.5" ry="1.5" sweep-flag="0" x="8.07" x-axis-rotation="0" y="1.501"/>
+            <line x="8.07" y="2.001"/>
+            <line x="6.688" y="2.001"/>
+            <line x="6.103" y="0.831"/>
+            <arc large-arc-flag="0" rx="1.502" ry="1.502" sweep-flag="0" x="4.76" x-axis-rotation="0" y="0.001"/>
+            <line x="2.07" y="0.001"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="0.098" x-axis-rotation="0" y="2.334"/>
+            <line x="0.802" y="6.501"/>
+            <arc large-arc-flag="0" rx="3" ry="3" sweep-flag="0" x="3.76" x-axis-rotation="0" y="9.001"/>
+            <line x="4.07" y="9.001"/>
+            <line x="4.07" y="21.001"/>
+            <arc large-arc-flag="0" rx="3.003" ry="3.003" sweep-flag="0" x="1.07" x-axis-rotation="0" y="24.001"/>
+            <line x="1.07" y="28.001"/>
+            <line x="23.07" y="28.001"/>
+            <line x="23.07" y="24.001"/>
+            <arc large-arc-flag="0" rx="3.003" ry="3.003" sweep-flag="0" x="20.07" x-axis-rotation="0" y="21.001"/>
+            <line x="20.07" y="9.001"/>
+            <line x="20.38" y="9.001"/>
+            <arc large-arc-flag="0" rx="3" ry="3" sweep-flag="0" x="23.338" x-axis-rotation="0" y="6.501"/>
+            <line x="24.042" y="2.334"/>
+            <arc large-arc-flag="0" rx="1.994" ry="1.994" sweep-flag="0" x="23.597" x-axis-rotation="0" y="0.71"/>
+            <close/>
+            <move x="21.07" y="24.001"/>
+            <line x="21.07" y="26.001"/>
+            <line x="3.07" y="26.001"/>
+            <line x="3.07" y="24.001"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="4.07" x-axis-rotation="0" y="23.001"/>
+            <line x="20.07" y="23.001"/>
+            <arc large-arc-flag="0" rx="1.001" ry="1.001" sweep-flag="1" x="21.07" x-axis-rotation="0" y="24.001"/>
+            <close/>
+            <move x="18.07" y="21.001"/>
+            <line x="6.07" y="21.001"/>
+            <line x="6.07" y="9.001"/>
+            <line x="18.07" y="9.001"/>
+            <close/>
+            <move x="21.366" y="6.168"/>
+            <arc large-arc-flag="0" rx="0.998" ry="0.998" sweep-flag="1" x="20.38" x-axis-rotation="0" y="7.001"/>
+            <line x="3.76" y="7.001"/>
+            <arc large-arc-flag="0" rx="0.998" ry="0.998" sweep-flag="1" x="2.773" x-axis-rotation="0" y="6.167"/>
+            <line x="2.07" y="2.001"/>
+            <line x="4.451" y="2.001"/>
+            <line x="5.451" y="4.001"/>
+            <line x="10.07" y="4.001"/>
+            <line x="10.07" y="2.001"/>
+            <line x="14.07" y="2.001"/>
+            <line x="14.07" y="4.001"/>
+            <line x="18.687" y="4.001"/>
+            <line x="19.688" y="2.001"/>
+            <line x="22.07" y="2.001"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26" name="storage-block" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="16"/>
+            <line x="24" y="16"/>
+            <line x="24" y="18"/>
+            <line x="26" y="18"/>
+            <line x="26" y="24"/>
+            <line x="2" y="24"/>
+            <line x="2" y="18"/>
+            <line x="4" y="18"/>
+            <line x="4" y="16"/>
+            <line x="2" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="0" x-axis-rotation="0" y="18"/>
+            <line x="0" y="24"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="26"/>
+            <line x="26" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="28" x-axis-rotation="0" y="24"/>
+            <line x="28" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26" x-axis-rotation="0" y="16"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="20"/>
+        <fill/>
+        <path>
+            <move x="13" y="16"/>
+            <line x="6" y="16"/>
+            <line x="6" y="9"/>
+            <line x="13" y="9"/>
+            <close/>
+            <move x="8" y="14"/>
+            <line x="11" y="14"/>
+            <line x="11" y="11"/>
+            <line x="8" y="11"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="22" y="16"/>
+            <line x="15" y="16"/>
+            <line x="15" y="9"/>
+            <line x="22" y="9"/>
+            <close/>
+            <move x="17" y="14"/>
+            <line x="20" y="14"/>
+            <line x="20" y="11"/>
+            <line x="17" y="11"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="13" y="7"/>
+            <line x="6" y="7"/>
+            <line x="6" y="0"/>
+            <line x="13" y="0"/>
+            <close/>
+            <move x="8" y="5"/>
+            <line x="11" y="5"/>
+            <line x="11" y="2"/>
+            <line x="8" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="22" y="7"/>
+            <line x="15" y="7"/>
+            <line x="15" y="0"/>
+            <line x="22" y="0"/>
+            <close/>
+            <move x="17" y="5"/>
+            <line x="20" y="5"/>
+            <line x="20" y="2"/>
+            <line x="17" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="storage-file" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="18"/>
+            <line x="24" y="18"/>
+            <line x="24" y="20"/>
+            <line x="26" y="20"/>
+            <line x="26" y="26"/>
+            <line x="2" y="26"/>
+            <line x="2" y="20"/>
+            <line x="4" y="20"/>
+            <line x="4" y="18"/>
+            <line x="2" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="0" x-axis-rotation="0" y="20"/>
+            <line x="0" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="28"/>
+            <line x="26" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="28" x-axis-rotation="0" y="26"/>
+            <line x="28" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26" x-axis-rotation="0" y="18"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="22"/>
+        <fill/>
+        <path>
+            <move x="20.707" y="5.293"/>
+            <line x="15.707" y="0.293"/>
+            <arc large-arc-flag="0" rx="1" ry="1" sweep-flag="0" x="15" x-axis-rotation="0" y="0"/>
+            <line x="9" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="7" x-axis-rotation="0" y="2"/>
+            <line x="7" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="9" x-axis-rotation="0" y="20"/>
+            <line x="19" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="21" x-axis-rotation="0" y="18"/>
+            <line x="21" y="6"/>
+            <arc large-arc-flag="0" rx="1" ry="1" sweep-flag="0" x="20.707" x-axis-rotation="0" y="5.293"/>
+            <close/>
+            <move x="18.586" y="6"/>
+            <line x="15" y="6"/>
+            <line x="15" y="2.414"/>
+            <close/>
+            <move x="9" y="18"/>
+            <line x="9" y="2"/>
+            <line x="13" y="2"/>
+            <line x="13" y="6"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="15" x-axis-rotation="0" y="8"/>
+            <line x="19" y="8"/>
+            <line x="19" y="18"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="27" name="virtual-application" strokewidth="inherit" w="32.629">
+    <connections/>
+    <foreground>
+        <rect h="4" w="4" x="17.314" y="17"/>
+        <fill/>
+        <rect h="4" w="4" x="11.314" y="17"/>
+        <fill/>
+        <rect h="4" w="4" x="17.314" y="23"/>
+        <fill/>
+        <rect h="4" w="4" x="11.314" y="23"/>
+        <fill/>
+        <path>
+            <move x="24.814" y="23"/>
+            <line x="24.314" y="23"/>
+            <line x="24.314" y="21"/>
+            <line x="24.814" y="21"/>
+            <arc large-arc-flag="0" rx="5.496" ry="5.496" sweep-flag="0" x="25.191" x-axis-rotation="0" y="10.021"/>
+            <line x="24.355" y="9.964"/>
+            <line x="24.265" y="9.13"/>
+            <arc large-arc-flag="0" rx="7.998" ry="7.998" sweep-flag="0" x="8.364" x-axis-rotation="0" y="9.13"/>
+            <line x="8.274" y="9.964"/>
+            <line x="7.437" y="10.021"/>
+            <arc large-arc-flag="0" rx="5.496" ry="5.496" sweep-flag="0" x="7.814" x-axis-rotation="0" y="21"/>
+            <line x="8.314" y="21"/>
+            <line x="8.314" y="23"/>
+            <line x="7.814" y="23"/>
+            <arc large-arc-flag="0" rx="7.496" ry="7.496" sweep-flag="1" x="6.493" x-axis-rotation="0" y="8.124"/>
+            <arc large-arc-flag="0" rx="9.999" ry="9.999" sweep-flag="1" x="26.137" x-axis-rotation="0" y="8.124"/>
+            <arc large-arc-flag="0" rx="7.496" ry="7.496" sweep-flag="1" x="24.814" x-axis-rotation="0" y="23"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="load-balancer" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="6" y="28"/>
+            <line x="0" y="28"/>
+            <line x="0" y="22"/>
+            <line x="6" y="22"/>
+            <close/>
+            <move x="2" y="26"/>
+            <line x="4" y="26"/>
+            <line x="4" y="24"/>
+            <line x="2" y="24"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="17" y="28"/>
+            <line x="11" y="28"/>
+            <line x="11" y="22"/>
+            <line x="17" y="22"/>
+            <close/>
+            <move x="13" y="26"/>
+            <line x="15" y="26"/>
+            <line x="15" y="24"/>
+            <line x="13" y="24"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="28" y="28"/>
+            <line x="22" y="28"/>
+            <line x="22" y="22"/>
+            <line x="28" y="22"/>
+            <close/>
+            <move x="24" y="26"/>
+            <line x="26" y="26"/>
+            <line x="26" y="24"/>
+            <line x="24" y="24"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="14" y="8"/>
+            <arc large-arc-flag="1" rx="4" ry="4" sweep-flag="1" x="18" x-axis-rotation="0" y="4"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="14" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="14" y="2"/>
+            <arc large-arc-flag="1" rx="2" ry="2" sweep-flag="0" x="16" x-axis-rotation="0" y="4"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="14" x-axis-rotation="0" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="24" y="14"/>
+            <line x="19" y="14"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="15" x-axis-rotation="0" y="10"/>
+            <line x="13" y="10"/>
+            <arc large-arc-flag="0" rx="4.004" ry="4.004" sweep-flag="1" x="9" x-axis-rotation="0" y="14"/>
+            <line x="4" y="14"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="16"/>
+            <line x="2" y="20"/>
+            <line x="4" y="20"/>
+            <line x="4" y="16"/>
+            <line x="9" y="16"/>
+            <arc large-arc-flag="0" rx="5.969" ry="5.969" sweep-flag="0" x="13" x-axis-rotation="0" y="14.46"/>
+            <line x="13" y="20"/>
+            <line x="15" y="20"/>
+            <line x="15" y="14.46"/>
+            <arc large-arc-flag="0" rx="5.969" ry="5.969" sweep-flag="0" x="19" x-axis-rotation="0" y="16"/>
+            <line x="24" y="16"/>
+            <line x="24" y="20"/>
+            <line x="26" y="20"/>
+            <line x="26" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="24" x-axis-rotation="0" y="14"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="server-container" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="18"/>
+            <line x="24" y="18"/>
+            <line x="24" y="20"/>
+            <line x="26" y="20"/>
+            <line x="26" y="26"/>
+            <line x="2" y="26"/>
+            <line x="2" y="20"/>
+            <line x="12" y="20"/>
+            <line x="12" y="18"/>
+            <line x="2" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="0" x-axis-rotation="0" y="20"/>
+            <line x="0" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="28"/>
+            <line x="26" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="28" x-axis-rotation="0" y="26"/>
+            <line x="28" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26" x-axis-rotation="0" y="18"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="22"/>
+        <fill/>
+        <path>
+            <move x="28" y="6"/>
+            <line x="20" y="6"/>
+            <line x="20" y="12"/>
+            <line x="14" y="12"/>
+            <line x="14" y="20"/>
+            <line x="22" y="20"/>
+            <line x="22" y="14"/>
+            <line x="28" y="14"/>
+            <close/>
+            <move x="20" y="18"/>
+            <line x="16" y="18"/>
+            <line x="16" y="14"/>
+            <line x="20" y="14"/>
+            <close/>
+            <move x="26" y="12"/>
+            <line x="22" y="12"/>
+            <line x="22" y="8"/>
+            <line x="26" y="8"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="16" y="8"/>
+            <line x="8" y="8"/>
+            <line x="8" y="0"/>
+            <line x="16" y="0"/>
+            <close/>
+            <move x="10" y="6"/>
+            <line x="14" y="6"/>
+            <line x="14" y="2"/>
+            <line x="10" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26" name="server-repository" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="26" y="16"/>
+            <line x="24" y="16"/>
+            <line x="24" y="18"/>
+            <line x="26" y="18"/>
+            <line x="26" y="24"/>
+            <line x="2" y="24"/>
+            <line x="2" y="18"/>
+            <line x="4" y="18"/>
+            <line x="4" y="16"/>
+            <line x="2" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="0" x-axis-rotation="0" y="18"/>
+            <line x="0" y="24"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2" x-axis-rotation="0" y="26"/>
+            <line x="26" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="28" x-axis-rotation="0" y="24"/>
+            <line x="28" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26" x-axis-rotation="0" y="16"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="20"/>
+        <fill/>
+        <rect h="8" w="2" x="11" y="0"/>
+        <fill/>
+        <rect h="8" w="2" x="7" y="0"/>
+        <fill/>
+        <path>
+            <move x="19" y="8"/>
+            <line x="17" y="8"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="15" x-axis-rotation="0" y="6"/>
+            <line x="15" y="2"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="17" x-axis-rotation="0" y="0"/>
+            <line x="19" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="21" x-axis-rotation="0" y="2"/>
+            <line x="21" y="6"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="19" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="17" y="2"/>
+            <line x="17" y="6"/>
+            <line x="19" y="6"/>
+            <line x="19" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+        <rect h="8" w="2" x="19" y="10"/>
+        <fill/>
+        <rect h="8" w="2" x="7" y="10"/>
+        <fill/>
+        <path>
+            <move x="15" y="18"/>
+            <line x="13" y="18"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="11" x-axis-rotation="0" y="16"/>
+            <line x="11" y="12"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="13" x-axis-rotation="0" y="10"/>
+            <line x="15" y="10"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="17" x-axis-rotation="0" y="12"/>
+            <line x="17" y="16"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="15" x-axis-rotation="0" y="18"/>
+            <close/>
+            <move x="13" y="12"/>
+            <line x="13" y="16"/>
+            <line x="15" y="16"/>
+            <line x="15" y="12"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+
+<shape aspect="variable" h="16" name="application-alt" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="29.714" y="0"/>
+            <line x="22.857" y="0"/>
+            <line x="22.857" y="16"/>
+            <line x="25.143" y="16"/>
+            <line x="25.143" y="11.429"/>
+            <line x="29.714" y="11.429"/>
+            <arc large-arc-flag="0" rx="2.289" ry="2.289" sweep-flag="0" x="32" x-axis-rotation="0" y="9.143"/>
+            <line x="32" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.288" ry="2.288" sweep-flag="0" x="29.714" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="25.143" y="9.143"/>
+            <line x="25.143" y="2.286"/>
+            <line x="29.714" y="2.286"/>
+            <line x="29.714" y="9.143"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="18.286" y="0"/>
+            <line x="11.429" y="0"/>
+            <line x="11.429" y="16"/>
+            <line x="13.714" y="16"/>
+            <line x="13.714" y="11.429"/>
+            <line x="18.286" y="11.429"/>
+            <arc large-arc-flag="0" rx="2.289" ry="2.289" sweep-flag="0" x="20.571" x-axis-rotation="0" y="9.143"/>
+            <line x="20.571" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.288" ry="2.288" sweep-flag="0" x="18.286" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="13.714" y="9.143"/>
+            <line x="13.714" y="2.286"/>
+            <line x="18.286" y="2.286"/>
+            <line x="18.286" y="9.143"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="6.857" y="0"/>
+            <line x="1.143" y="0"/>
+            <line x="1.143" y="2.286"/>
+            <line x="6.857" y="2.286"/>
+            <line x="6.857" y="4.571"/>
+            <line x="2.286" y="4.571"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="0" x-axis-rotation="0" y="6.857"/>
+            <line x="0" y="9.143"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="2.286" x-axis-rotation="0" y="11.429"/>
+            <line x="9.143" y="11.429"/>
+            <line x="9.143" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.288" ry="2.288" sweep-flag="0" x="6.857" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="6.857" y="9.143"/>
+            <line x="2.286" y="9.143"/>
+            <line x="2.286" y="6.857"/>
+            <line x="6.857" y="6.857"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="application" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="10.667" y="0"/>
+            <line x="2.667" y="0"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="0" x-axis-rotation="0" y="2.667"/>
+            <line x="0" y="10.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="2.667" x-axis-rotation="0" y="13.334"/>
+            <line x="10.667" y="13.334"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="13.333" x-axis-rotation="0" y="10.667"/>
+            <line x="13.333" y="2.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="10.667" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="10.667" y="10.667"/>
+            <line x="2.667" y="10.667"/>
+            <line x="2.667" y="2.667"/>
+            <line x="10.667" y="2.667"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="29.333" y="0"/>
+            <line x="21.333" y="0"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="18.667" x-axis-rotation="0" y="2.667"/>
+            <line x="18.667" y="10.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="21.333" x-axis-rotation="0" y="13.333"/>
+            <line x="29.333" y="13.333"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="32" x-axis-rotation="0" y="10.667"/>
+            <line x="32" y="2.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="29.333" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="29.333" y="10.667"/>
+            <line x="21.333" y="10.667"/>
+            <line x="21.333" y="2.667"/>
+            <line x="29.333" y="2.667"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="10.667" y="18.667"/>
+            <line x="2.667" y="18.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="0" x-axis-rotation="0" y="21.333"/>
+            <line x="0" y="29.333"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="2.667" x-axis-rotation="0" y="32"/>
+            <line x="10.667" y="32"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="13.333" x-axis-rotation="0" y="29.333"/>
+            <line x="13.333" y="21.333"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="10.667" x-axis-rotation="0" y="18.667"/>
+            <close/>
+            <move x="10.667" y="29.333"/>
+            <line x="2.667" y="29.333"/>
+            <line x="2.667" y="21.333"/>
+            <line x="10.667" y="21.333"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="29.333" y="18.667"/>
+            <line x="21.333" y="18.667"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="18.667" x-axis-rotation="0" y="21.333"/>
+            <line x="18.667" y="29.333"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="21.333" x-axis-rotation="0" y="32"/>
+            <line x="29.333" y="32"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="32" x-axis-rotation="0" y="29.333"/>
+            <line x="32" y="21.333"/>
+            <arc large-arc-flag="0" rx="2.667" ry="2.667" sweep-flag="0" x="29.333" x-axis-rotation="0" y="18.667"/>
+            <close/>
+            <move x="29.333" y="29.333"/>
+            <line x="21.333" y="29.333"/>
+            <line x="21.333" y="21.333"/>
+            <line x="29.333" y="21.333"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+
+<shape aspect="variable" h="25.143" name="message-queue" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="29.714" y="25.143"/>
+            <line x="2.286" y="25.143"/>
+            <arc large-arc-flag="0" rx="2.288" ry="2.288" sweep-flag="1" x="0" x-axis-rotation="0" y="22.857"/>
+            <line x="0" y="17.143"/>
+            <line x="2.286" y="17.143"/>
+            <line x="2.286" y="22.857"/>
+            <line x="29.714" y="22.857"/>
+            <line x="29.714" y="17.143"/>
+            <line x="32" y="17.143"/>
+            <line x="32" y="22.857"/>
+            <arc large-arc-flag="0" rx="2.288" ry="2.288" sweep-flag="1" x="29.714" x-axis-rotation="0" y="25.143"/>
+            <close/>
+        </path>
+        <fill/>
+        <rect h="2.286" w="20.571" x="5.714" y="17.143"/>
+        <fill/>
+        <rect h="2.286" w="20.571" x="5.714" y="11.429"/>
+        <fill/>
+        <rect h="2.286" w="20.571" x="5.714" y="5.714"/>
+        <fill/>
+        <rect h="2.286" w="20.571" x="5.714" y="0"/>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="29.4" name="database" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="28.27" y="21.485"/>
+            <arc large-arc-flag="0" rx="3.371" ry="3.371" sweep-flag="0" x="25.966" x-axis-rotation="0" y="22.402"/>
+            <line x="21.438" y="19.685"/>
+            <arc large-arc-flag="0" rx="2.31" ry="2.31" sweep-flag="0" x="21.438" x-axis-rotation="0" y="18.761"/>
+            <line x="25.966" y="16.045"/>
+            <arc large-arc-flag="1" rx="3.382" ry="3.382" sweep-flag="0" x="24.877" x-axis-rotation="0" y="13.569"/>
+            <arc large-arc-flag="0" rx="3.318" ry="3.318" sweep-flag="0" x="24.924" x-axis-rotation="0" y="14.032"/>
+            <line x="20.396" y="16.748"/>
+            <arc large-arc-flag="1" rx="3.392" ry="3.392" sweep-flag="0" x="20.396" x-axis-rotation="0" y="21.698"/>
+            <line x="24.924" y="24.414"/>
+            <arc large-arc-flag="0" rx="3.318" ry="3.318" sweep-flag="0" x="24.877" x-axis-rotation="0" y="24.877"/>
+            <arc large-arc-flag="1" rx="3.392" ry="3.392" sweep-flag="0" x="28.269" x-axis-rotation="0" y="21.485"/>
+            <close/>
+            <move x="28.27" y="12.439"/>
+            <arc large-arc-flag="1" rx="1.131" ry="1.131" sweep-flag="1" x="27.139" x-axis-rotation="0" y="13.569"/>
+            <arc large-arc-flag="0" rx="1.132" ry="1.132" sweep-flag="1" x="28.27" x-axis-rotation="0" y="12.439"/>
+            <close/>
+            <move x="18.093" y="20.354"/>
+            <arc large-arc-flag="1" rx="1.131" ry="1.131" sweep-flag="1" x="19.223" x-axis-rotation="0" y="19.223"/>
+            <arc large-arc-flag="0" rx="1.132" ry="1.132" sweep-flag="1" x="18.093" x-axis-rotation="0" y="20.354"/>
+            <close/>
+            <move x="28.27" y="26.008"/>
+            <arc large-arc-flag="1" rx="1.131" ry="1.131" sweep-flag="1" x="29.4" x-axis-rotation="0" y="24.877"/>
+            <arc large-arc-flag="0" rx="1.132" ry="1.132" sweep-flag="1" x="28.27" x-axis-rotation="0" y="26.008"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2.262" w="2.262" x="4.523" y="4.523"/>
+        <fill/>
+        <ellipse h="2.262" w="2.262" x="4.523" y="13.569"/>
+        <fill/>
+        <ellipse h="2.262" w="2.262" x="4.523" y="22.616"/>
+        <fill/>
+        <path>
+            <move x="22.616" y="11.308"/>
+            <line x="22.616" y="2.262"/>
+            <arc large-arc-flag="0" rx="2.264" ry="2.264" sweep-flag="0" x="20.354" x-axis-rotation="0" y="0"/>
+            <line x="2.262" y="0"/>
+            <arc large-arc-flag="0" rx="2.264" ry="2.264" sweep-flag="0" x="0" x-axis-rotation="0" y="2.262"/>
+            <line x="0" y="27.139"/>
+            <arc large-arc-flag="0" rx="2.264" ry="2.264" sweep-flag="0" x="2.262" x-axis-rotation="0" y="29.4"/>
+            <line x="20.354" y="29.4"/>
+            <line x="20.354" y="27.139"/>
+            <line x="2.262" y="27.139"/>
+            <line x="2.262" y="20.354"/>
+            <line x="11.308" y="20.354"/>
+            <line x="11.308" y="18.093"/>
+            <line x="2.262" y="18.093"/>
+            <line x="2.262" y="11.308"/>
+            <close/>
+            <move x="2.262" y="2.262"/>
+            <line x="20.354" y="2.262"/>
+            <line x="20.354" y="9.046"/>
+            <line x="2.262" y="9.046"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="backup" strokewidth="inherit" w="31.998">
+    <connections/>
+    <foreground>
+        <ellipse h="2.286" w="2.286" x="4.571" y="4.571"/>
+        <fill/>
+        <ellipse h="2.286" w="2.286" x="4.571" y="13.713"/>
+        <fill/>
+        <ellipse h="2.286" w="2.286" x="4.571" y="22.856"/>
+        <fill/>
+        <path>
+            <move x="11.428" y="27.427"/>
+            <line x="2.286" y="27.427"/>
+            <line x="2.286" y="20.57"/>
+            <line x="11.428" y="20.57"/>
+            <line x="11.428" y="18.284"/>
+            <line x="2.286" y="18.284"/>
+            <line x="2.286" y="11.428"/>
+            <line x="22.856" y="11.428"/>
+            <line x="22.856" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="20.57" x-axis-rotation="0" y="0"/>
+            <line x="2.286" y="0"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="0" x-axis-rotation="0" y="2.286"/>
+            <line x="0" y="27.427"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="2.286" x-axis-rotation="0" y="29.712"/>
+            <line x="11.428" y="29.712"/>
+            <close/>
+            <move x="2.286" y="2.286"/>
+            <line x="20.57" y="2.286"/>
+            <line x="20.57" y="9.142"/>
+            <line x="2.286" y="9.142"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="29.712" y="17.142"/>
+            <line x="29.712" y="19.899"/>
+            <arc large-arc-flag="1" rx="7.995" ry="7.995" sweep-flag="0" x="22.856" x-axis-rotation="0" y="31.998"/>
+            <line x="22.856" y="29.712"/>
+            <arc large-arc-flag="1" rx="5.714" ry="5.714" sweep-flag="1" x="28.085" x-axis-rotation="0" y="21.713"/>
+            <line x="25.141" y="21.713"/>
+            <line x="25.141" y="23.998"/>
+            <line x="31.998" y="23.998"/>
+            <line x="31.998" y="17.142"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="26" name="application-process" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="25" y="21"/>
+            <line x="25" y="24"/>
+            <line x="7" y="24"/>
+            <line x="7" y="14.83"/>
+            <line x="10.59" y="18.41"/>
+            <line x="12" y="17"/>
+            <line x="6" y="11"/>
+            <line x="0" y="17"/>
+            <line x="1.41" y="18.41"/>
+            <line x="5" y="14.83"/>
+            <line x="5" y="24"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="7" x-axis-rotation="0" y="26"/>
+            <line x="25" y="26"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="27" x-axis-rotation="0" y="24"/>
+            <line x="27" y="21"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="27" y="5"/>
+            <line x="27" y="14.17"/>
+            <line x="30.59" y="10.59"/>
+            <line x="32" y="12"/>
+            <line x="26" y="18"/>
+            <line x="20" y="12"/>
+            <line x="21.41" y="10.59"/>
+            <line x="25" y="14.17"/>
+            <line x="25" y="5"/>
+            <line x="13" y="5"/>
+            <line x="13" y="3"/>
+            <line x="25" y="3"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="27" x-axis-rotation="0" y="5"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="8" y="8"/>
+            <line x="4" y="8"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="2" x-axis-rotation="0" y="6"/>
+            <line x="2" y="2"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="4" x-axis-rotation="0" y="0"/>
+            <line x="8" y="0"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="10" x-axis-rotation="0" y="2"/>
+            <line x="10" y="6"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="1" x="8" x-axis-rotation="0" y="8"/>
+            <close/>
+            <move x="4" y="2"/>
+            <line x="4" y="6"/>
+            <line x="8" y="6"/>
+            <line x="8" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="hyper-converged-infrastructure" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <rect h="4" w="4" x="20" y="4"/>
+        <fill/>
+        <ellipse h="2" w="2" x="4" y="4"/>
+        <fill/>
+        <ellipse h="2" w="2" x="22" y="22"/>
+        <fill/>
+        <ellipse h="2" w="2" x="22" y="18"/>
+        <fill/>
+        <ellipse h="2" w="2" x="22" y="14"/>
+        <fill/>
+        <path>
+            <move x="20" y="15"/>
+            <line x="20" y="13"/>
+            <line x="18" y="13"/>
+            <line x="18" y="12"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="16" x-axis-rotation="0" y="10"/>
+            <line x="15" y="10"/>
+            <line x="15" y="8"/>
+            <line x="13" y="8"/>
+            <line x="13" y="10"/>
+            <line x="11" y="10"/>
+            <line x="11" y="8"/>
+            <line x="9" y="8"/>
+            <line x="9" y="10"/>
+            <line x="8" y="10"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="6" x-axis-rotation="0" y="12"/>
+            <line x="6" y="13"/>
+            <line x="4" y="13"/>
+            <line x="4" y="15"/>
+            <line x="6" y="15"/>
+            <line x="6" y="17"/>
+            <line x="4" y="17"/>
+            <line x="4" y="19"/>
+            <line x="6" y="19"/>
+            <line x="6" y="20"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="8" x-axis-rotation="0" y="22"/>
+            <line x="9" y="22"/>
+            <line x="9" y="24"/>
+            <line x="11" y="24"/>
+            <line x="11" y="22"/>
+            <line x="13" y="22"/>
+            <line x="13" y="24"/>
+            <line x="15" y="24"/>
+            <line x="15" y="22"/>
+            <line x="16" y="22"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="18" x-axis-rotation="0" y="20"/>
+            <line x="18" y="19"/>
+            <line x="20" y="19"/>
+            <line x="20" y="17"/>
+            <line x="18" y="17"/>
+            <line x="18" y="15"/>
+            <close/>
+            <move x="16" y="20"/>
+            <line x="8" y="20"/>
+            <line x="8" y="12"/>
+            <line x="16" y="12"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="26" y="28"/>
+            <line x="2" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="0" x-axis-rotation="0" y="26"/>
+            <line x="0" y="2"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="2" x-axis-rotation="0" y="0"/>
+            <line x="26" y="0"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="28" x-axis-rotation="0" y="2"/>
+            <line x="28" y="26"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="1" x="26" x-axis-rotation="0" y="28"/>
+            <close/>
+            <move x="2" y="2"/>
+            <line x="2" y="26"/>
+            <line x="26" y="26"/>
+            <line x="26" y="2"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="28" name="chip" strokewidth="inherit" w="28">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="9" y="9"/>
+            <line x="9" y="19"/>
+            <line x="19" y="19"/>
+            <line x="19" y="9"/>
+            <close/>
+            <move x="17" y="17"/>
+            <line x="11" y="17"/>
+            <line x="11" y="11"/>
+            <line x="17" y="11"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="28" y="11"/>
+            <line x="28" y="9"/>
+            <line x="24" y="9"/>
+            <line x="24" y="6"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="22" x-axis-rotation="0" y="4"/>
+            <line x="19" y="4"/>
+            <line x="19" y="0"/>
+            <line x="17" y="0"/>
+            <line x="17" y="4"/>
+            <line x="11" y="4"/>
+            <line x="11" y="0"/>
+            <line x="9" y="0"/>
+            <line x="9" y="4"/>
+            <line x="6" y="4"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="4" x-axis-rotation="0" y="6"/>
+            <line x="4" y="9"/>
+            <line x="0" y="9"/>
+            <line x="0" y="11"/>
+            <line x="4" y="11"/>
+            <line x="4" y="17"/>
+            <line x="0" y="17"/>
+            <line x="0" y="19"/>
+            <line x="4" y="19"/>
+            <line x="4" y="22"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="6" x-axis-rotation="0" y="24"/>
+            <line x="9" y="24"/>
+            <line x="9" y="28"/>
+            <line x="11" y="28"/>
+            <line x="11" y="24"/>
+            <line x="17" y="24"/>
+            <line x="17" y="28"/>
+            <line x="19" y="28"/>
+            <line x="19" y="24"/>
+            <line x="22" y="24"/>
+            <arc large-arc-flag="0" rx="2" ry="2" sweep-flag="0" x="24" x-axis-rotation="0" y="22"/>
+            <line x="24" y="19"/>
+            <line x="28" y="19"/>
+            <line x="28" y="17"/>
+            <line x="24" y="17"/>
+            <line x="24" y="11"/>
+            <close/>
+            <move x="22" y="22"/>
+            <line x="6" y="22"/>
+            <line x="6" y="6"/>
+            <line x="22" y="6"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="30" name="virtualization" strokewidth="inherit" w="28.605">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="21.803" y="20"/>
+            <line x="21.303" y="20"/>
+            <line x="21.303" y="18"/>
+            <line x="21.803" y="18"/>
+            <arc large-arc-flag="0" rx="4.498" ry="4.498" sweep-flag="0" x="22.159" x-axis-rotation="0" y="9.019"/>
+            <line x="21.344" y="8.955"/>
+            <line x="21.245" y="8.143"/>
+            <arc large-arc-flag="0" rx="6.994" ry="6.994" sweep-flag="0" x="7.361" x-axis-rotation="0" y="8.143"/>
+            <line x="7.262" y="8.955"/>
+            <line x="6.447" y="9.019"/>
+            <arc large-arc-flag="0" rx="4.498" ry="4.498" sweep-flag="0" x="6.803" x-axis-rotation="0" y="18"/>
+            <line x="7.303" y="18"/>
+            <line x="7.303" y="20"/>
+            <line x="6.803" y="20"/>
+            <arc large-arc-flag="0" rx="6.497" ry="6.497" sweep-flag="1" x="5.503" x-axis-rotation="0" y="7.136"/>
+            <arc large-arc-flag="0" rx="8.994" ry="8.994" sweep-flag="1" x="23.104" x-axis-rotation="0" y="7.136"/>
+            <arc large-arc-flag="0" rx="6.497" ry="6.497" sweep-flag="1" x="21.803" x-axis-rotation="0" y="20"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="2" w="2" x="6.303" y="25"/>
+        <fill/>
+        <path>
+            <move x="24.303" y="22"/>
+            <line x="15.303" y="22"/>
+            <line x="15.303" y="14.83"/>
+            <line x="17.893" y="17.41"/>
+            <line x="19.303" y="16"/>
+            <line x="14.303" y="11"/>
+            <line x="9.303" y="16"/>
+            <line x="10.713" y="17.41"/>
+            <line x="13.303" y="14.83"/>
+            <line x="13.303" y="22"/>
+            <line x="4.303" y="22"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="2.303" x-axis-rotation="0" y="24"/>
+            <line x="2.303" y="28"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="4.303" x-axis-rotation="0" y="30"/>
+            <line x="24.303" y="30"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="26.303" x-axis-rotation="0" y="28"/>
+            <line x="26.303" y="24"/>
+            <arc large-arc-flag="0" rx="2.002" ry="2.002" sweep-flag="0" x="24.303" x-axis-rotation="0" y="22"/>
+            <close/>
+            <move x="24.303" y="28"/>
+            <line x="4.303" y="28"/>
+            <line x="4.303" y="24"/>
+            <line x="24.303" y="24"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="22.857" name="virtual-server-alt" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="2.286" y="17.143"/>
+            <line x="0" y="17.143"/>
+            <line x="0" y="20.571"/>
+            <arc large-arc-flag="0" rx="2.292" ry="2.292" sweep-flag="0" x="2.286" x-axis-rotation="0" y="22.857"/>
+            <line x="5.714" y="22.857"/>
+            <line x="5.714" y="20.571"/>
+            <line x="2.286" y="20.571"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="2.286" y="2.286"/>
+            <line x="5.714" y="2.286"/>
+            <line x="5.714" y="0"/>
+            <line x="2.286" y="0"/>
+            <arc large-arc-flag="0" rx="2.292" ry="2.292" sweep-flag="0" x="0" x-axis-rotation="0" y="2.286"/>
+            <line x="0" y="5.715"/>
+            <line x="2.286" y="5.714"/>
+            <close/>
+        </path>
+        <fill/>
+        <rect h="2.286" w="6.857" x="17.143" y="0"/>
+        <fill/>
+        <rect h="2.286" w="6.857" x="8" y="0"/>
+        <fill/>
+        <rect h="2.286" w="6.857" x="17.143" y="20.571"/>
+        <fill/>
+        <path>
+            <move x="29.714" y="10.286"/>
+            <line x="2.286" y="10.286"/>
+            <line x="2.286" y="8"/>
+            <line x="0" y="8"/>
+            <line x="0" y="14.857"/>
+            <line x="2.286" y="14.857"/>
+            <line x="2.286" y="12.571"/>
+            <line x="29.714" y="12.571"/>
+            <line x="29.714" y="14.857"/>
+            <line x="32" y="14.857"/>
+            <line x="32" y="8"/>
+            <line x="29.714" y="8"/>
+            <line x="29.714" y="10.286"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="29.714" y="20.571"/>
+            <line x="26.286" y="20.571"/>
+            <line x="26.286" y="22.857"/>
+            <line x="29.714" y="22.857"/>
+            <arc large-arc-flag="0" rx="2.292" ry="2.292" sweep-flag="0" x="32" x-axis-rotation="0" y="20.571"/>
+            <line x="32" y="17.143"/>
+            <line x="29.714" y="17.143"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="29.714" y="0"/>
+            <line x="26.286" y="0"/>
+            <line x="26.286" y="2.286"/>
+            <line x="29.714" y="2.286"/>
+            <line x="29.714" y="5.714"/>
+            <line x="32" y="5.714"/>
+            <line x="32" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.292" ry="2.292" sweep-flag="0" x="29.714" x-axis-rotation="0" y="0"/>
+            <close/>
+        </path>
+        <fill/>
+        <rect h="2.286" w="6.857" x="8" y="20.571"/>
+        <fill/>
+        <ellipse h="2.286" w="2.286" x="4.571" y="5.714"/>
+        <fill/>
+        <ellipse h="2.286" w="2.286" x="4.571" y="14.857"/>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="16" name="api-alt" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="6.857" y="0"/>
+            <line x="2.286" y="0"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="0" x-axis-rotation="0" y="2.286"/>
+            <line x="0" y="16"/>
+            <line x="2.286" y="16"/>
+            <line x="2.286" y="10.286"/>
+            <line x="6.857" y="10.286"/>
+            <line x="6.857" y="16"/>
+            <line x="9.143" y="16"/>
+            <line x="9.143" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="6.857" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="2.286" y="8"/>
+            <line x="2.286" y="2.286"/>
+            <line x="6.857" y="2.286"/>
+            <line x="6.857" y="8"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="22.857" y="2.286"/>
+            <line x="26.286" y="2.286"/>
+            <line x="26.286" y="13.714"/>
+            <line x="22.857" y="13.714"/>
+            <line x="22.857" y="16"/>
+            <line x="32" y="16"/>
+            <line x="32" y="13.714"/>
+            <line x="28.571" y="13.714"/>
+            <line x="28.571" y="2.286"/>
+            <line x="32" y="2.286"/>
+            <line x="32" y="0"/>
+            <line x="22.857" y="0"/>
+            <line x="22.857" y="2.286"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="13.714" y="16"/>
+            <line x="11.429" y="16"/>
+            <line x="11.429" y="0"/>
+            <line x="18.286" y="0"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="20.571" x-axis-rotation="0" y="2.286"/>
+            <line x="20.571" y="8"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="18.286" x-axis-rotation="0" y="10.286"/>
+            <line x="13.714" y="10.286"/>
+            <close/>
+            <move x="13.714" y="8"/>
+            <line x="18.286" y="8"/>
+            <line x="18.286" y="2.286"/>
+            <line x="13.714" y="2.286"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="api" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="27.429" y="22.857"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="25.143" x-axis-rotation="0" y="23.509"/>
+            <line x="21.611" y="19.966"/>
+            <arc large-arc-flag="0" rx="6.857" ry="6.857" sweep-flag="0" x="21.611" x-axis-rotation="0" y="12.034"/>
+            <line x="25.143" y="8.491"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="27.429" x-axis-rotation="0" y="9.143"/>
+            <arc large-arc-flag="1" rx="4.571" ry="4.571" sweep-flag="0" x="22.858" x-axis-rotation="0" y="4.572"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="23.509" x-axis-rotation="0" y="6.857"/>
+            <line x="19.966" y="10.389"/>
+            <arc large-arc-flag="0" rx="6.857" ry="6.857" sweep-flag="0" x="12.035" x-axis-rotation="0" y="10.389"/>
+            <line x="8.491" y="6.857"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="9.143" x-axis-rotation="0" y="4.571"/>
+            <arc large-arc-flag="1" rx="4.571" ry="4.571" sweep-flag="0" x="4.572" x-axis-rotation="0" y="9.142"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="6.857" x-axis-rotation="0" y="8.491"/>
+            <line x="10.389" y="12.034"/>
+            <arc large-arc-flag="0" rx="6.857" ry="6.857" sweep-flag="0" x="10.389" x-axis-rotation="0" y="19.965"/>
+            <line x="6.857" y="23.509"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="4.571" x-axis-rotation="0" y="22.857"/>
+            <arc large-arc-flag="1" rx="4.571" ry="4.571" sweep-flag="0" x="9.142" x-axis-rotation="0" y="27.428"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="8.491" x-axis-rotation="0" y="25.143"/>
+            <line x="12.034" y="21.611"/>
+            <arc large-arc-flag="0" rx="6.857" ry="6.857" sweep-flag="0" x="19.965" x-axis-rotation="0" y="21.611"/>
+            <line x="23.509" y="25.143"/>
+            <arc large-arc-flag="0" rx="4.411" ry="4.411" sweep-flag="0" x="22.857" x-axis-rotation="0" y="27.429"/>
+            <arc large-arc-flag="1" rx="4.571" ry="4.571" sweep-flag="0" x="27.428" x-axis-rotation="0" y="22.858"/>
+            <close/>
+            <move x="27.429" y="2.286"/>
+            <arc large-arc-flag="1" rx="2.286" ry="2.286" sweep-flag="1" x="25.143" x-axis-rotation="0" y="4.571"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="27.429" x-axis-rotation="0" y="2.286"/>
+            <close/>
+            <move x="2.286" y="4.571"/>
+            <arc large-arc-flag="1" rx="2.286" ry="2.286" sweep-flag="1" x="4.571" x-axis-rotation="0" y="6.857"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="2.286" x-axis-rotation="0" y="4.571"/>
+            <close/>
+            <move x="4.571" y="29.714"/>
+            <arc large-arc-flag="1" rx="2.286" ry="2.286" sweep-flag="1" x="6.857" x-axis-rotation="0" y="27.429"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="4.571" x-axis-rotation="0" y="29.714"/>
+            <close/>
+            <move x="16" y="20.571"/>
+            <arc large-arc-flag="1" rx="4.571" ry="4.571" sweep-flag="1" x="20.571" x-axis-rotation="0" y="16"/>
+            <arc large-arc-flag="0" rx="4.571" ry="4.571" sweep-flag="1" x="16" x-axis-rotation="0" y="20.571"/>
+            <close/>
+            <move x="27.429" y="29.714"/>
+            <arc large-arc-flag="1" rx="2.286" ry="2.286" sweep-flag="1" x="29.714" x-axis-rotation="0" y="27.429"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="1" x="27.429" x-axis-rotation="0" y="29.714"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="archive" strokewidth="inherit" w="22.857">
+    <connections/>
+    <foreground>
+        <rect h="2.286" w="4.571" x="9.143" y="19.429"/>
+        <fill/>
+        <path>
+            <move x="0" y="0"/>
+            <line x="0" y="29.714"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="2.286" x-axis-rotation="0" y="32"/>
+            <line x="20.571" y="32"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="22.857" x-axis-rotation="0" y="29.714"/>
+            <line x="22.857" y="0"/>
+            <close/>
+            <move x="20.571" y="29.714"/>
+            <line x="2.286" y="29.714"/>
+            <line x="2.286" y="16"/>
+            <line x="20.571" y="16"/>
+            <close/>
+            <move x="20.571" y="13.714"/>
+            <line x="2.286" y="13.714"/>
+            <line x="2.286" y="9.143"/>
+            <line x="20.571" y="9.143"/>
+            <close/>
+            <move x="2.286" y="6.857"/>
+            <line x="2.286" y="2.286"/>
+            <line x="20.571" y="2.286"/>
+            <line x="20.571" y="6.857"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="22.584" name="cloud" strokewidth="inherit" w="32">
+    <connections/>
+    <foreground>
+        <path>
+            <move x="16.01" y="1.967"/>
+            <line x="16.01" y="1.967"/>
+            <arc large-arc-flag="0" rx="7.52" ry="7.52" sweep-flag="1" x="17.492" x-axis-rotation="0" y="2.115"/>
+            <arc large-arc-flag="0" rx="7.854" ry="7.854" sweep-flag="1" x="23.726" x-axis-rotation="0" y="8.339"/>
+            <line x="23.981" y="9.664"/>
+            <line x="25.307" y="9.9"/>
+            <arc large-arc-flag="0" rx="5.4" ry="5.4" sweep-flag="1" x="24.325" x-axis-rotation="0" y="20.621"/>
+            <line x="7.665" y="20.621"/>
+            <arc large-arc-flag="0" rx="5.4" ry="5.4" sweep-flag="1" x="6.683" x-axis-rotation="0" y="9.9"/>
+            <line x="7.999" y="9.664"/>
+            <line x="8.254" y="8.339"/>
+            <arc large-arc-flag="0" rx="7.854" ry="7.854" sweep-flag="1" x="16.01" x-axis-rotation="0" y="1.967"/>
+            <move x="16.01" y="0.004"/>
+            <arc large-arc-flag="0" rx="9.817" ry="9.817" sweep-flag="0" x="6.359" x-axis-rotation="0" y="7.976"/>
+            <arc large-arc-flag="0" rx="7.363" ry="7.363" sweep-flag="0" x="7.655" x-axis-rotation="0" y="22.584"/>
+            <line x="24.345" y="22.584"/>
+            <arc large-arc-flag="0" rx="7.363" ry="7.363" sweep-flag="0" x="25.641" x-axis-rotation="0" y="7.976"/>
+            <arc large-arc-flag="0" rx="9.817" ry="9.817" sweep-flag="0" x="17.846" x-axis-rotation="0" y="0.181"/>
+            <arc large-arc-flag="0" rx="10.083" ry="10.083" sweep-flag="0" x="16.01" x-axis-rotation="0" y="0.004"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+<shape aspect="variable" h="32" name="disk" strokewidth="inherit" w="27.429">
+    <connections/>
+    <foreground>
+        <ellipse h="3.429" w="3.429" x="5.714" y="24"/>
+        <fill/>
+        <path>
+            <move x="15.5" y="12.964"/>
+            <line x="15.5" y="18.036"/>
+            <line x="17.5" y="18.036"/>
+            <line x="17.5" y="12.964"/>
+            <line x="15.5" y="12.964"/>
+            <close/>
+        </path>
+        <fill/>
+        <ellipse h="4.571" w="4.571" x="11.429" y="10.286"/>
+        <fill/>
+        <path>
+            <move x="13.714" y="4.571"/>
+            <arc large-arc-flag="0" rx="8" ry="8" sweep-flag="0" x="13.714" x-axis-rotation="0" y="20.571"/>
+            <line x="13.714" y="18.286"/>
+            <arc large-arc-flag="1" rx="5.714" ry="5.714" sweep-flag="1" x="19.429" x-axis-rotation="0" y="12.571"/>
+            <line x="21.714" y="12.571"/>
+            <arc large-arc-flag="0" rx="8" ry="8" sweep-flag="0" x="13.714" x-axis-rotation="0" y="4.571"/>
+            <close/>
+        </path>
+        <fill/>
+        <path>
+            <move x="25.143" y="0"/>
+            <line x="2.286" y="0"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="0" x-axis-rotation="0" y="2.286"/>
+            <line x="0" y="29.714"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="2.286" x-axis-rotation="0" y="32"/>
+            <line x="25.143" y="32"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="27.429" x-axis-rotation="0" y="29.714"/>
+            <line x="27.429" y="2.286"/>
+            <arc large-arc-flag="0" rx="2.286" ry="2.286" sweep-flag="0" x="25.143" x-axis-rotation="0" y="0"/>
+            <close/>
+            <move x="25.143" y="29.714"/>
+            <line x="2.286" y="29.714"/>
+            <line x="2.286" y="2.286"/>
+            <line x="25.143" y="2.286"/>
+            <close/>
+        </path>
+        <fill/>
+    </foreground>
+</shape>
+</shapes>

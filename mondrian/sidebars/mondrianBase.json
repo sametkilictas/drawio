@@ -1,0 +1,98 @@
+{
+    "Sidebars":{
+        "Base":{
+            "Collapsed": {
+                "Actor": {"$DEFAULT_PROPERTIES": null, "format": "$ACTOR_FORMAT"},
+                "Target System": {"$DEFAULT_PROPERTIES": null, "format": "$TS_FORMAT_COLLAPSED"},
+                "Logical Node": {"$DEFAULT_PROPERTIES": null, "format": "$LN_FORMAT_COLLAPSED"},
+                "Logical Component": {"$DEFAULT_PROPERTIES": null, "format": "$LC_FORMAT_COLLAPSED"},
+                "Prescribed Node": {"$DEFAULT_PROPERTIES": null, "format": "$PN_FORMAT_COLLAPSED"},
+                "Prescribed Component": {"$DEFAULT_PROPERTIES": null, "format": "$PC_FORMAT_COLLAPSED"}
+            },
+            "Expanded": {
+                "Target System": {"$DEFAULT_PROPERTIES": null, "format": "$TS_FORMAT_EXPANDED"},
+                "Logical Node": {"$DEFAULT_PROPERTIES": null, "format": "$LN_FORMAT_EXPANDED"},
+                "Logical Component": {"$DEFAULT_PROPERTIES": null, "format": "$LC_FORMAT_EXPANDED"},
+                "Prescribed Node": {"$DEFAULT_PROPERTIES": null, "format": "$PN_FORMAT_EXPANDED"},
+                "Prescribed Component": {"$DEFAULT_PROPERTIES": null, "format": "$PC_FORMAT_EXPANDED"}
+            },
+            "Groups": {
+                "Logical Group (Container)": {"$DEFAULT_PROPERTIES": null, "format": "$LG_CONTAINER"},
+                "Logical Group (No Container)": {"$DEFAULT_PROPERTIES": null, "format": "$LG_NO_CONTAINER"},
+                "Prescribed Group (Container)": {"$DEFAULT_PROPERTIES": null, "format": "$PG_CONTAINER"},
+                "Prescribed Group (No Container)": {"$DEFAULT_PROPERTIES": null, "format": "$PG_NO_CONTAINER"}
+            },
+            "Deployment Units": {
+                "Data": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_D"},
+                "Execution": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_E"},
+                "Installation": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_I"},
+                "Presentation": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_P"},
+                "Technical Data": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_TD"},
+                "Technical Execution": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_TE"},
+                "Technical Installation": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_TI"},
+                "Technical Presentation": {"$DU_DEFAULT_PROPERTIES": null, "format": "$DU_TP"}
+            },
+            "Legend": {
+                "Horizontal Legend": {"$LEGEND_DEFAULT_PROPERTIES": null, "extra": ";legendColor=black:black:white","format": "$LEGEND_HORIZONTAL"},
+                "Vertical Legend": {"$LEGEND_DEFAULT_PROPERTIES": null, "extra": ";legendColor=black:black:white", "format": "$LEGEND_VERTICAL"},
+                "Horizontal Legend (Title)": {"$LEGEND_DEFAULT_PROPERTIES": null, "extra": ";legendColor=black:black:white","format": "$LEGEND_HORIZONTAL_TB"},
+                "Vertical Legend (Title)": {"$LEGEND_DEFAULT_PROPERTIES": null, "extra": ";legendColor=black:black:white", "format": "$LEGEND_VERTICAL_TB"}
+            }
+        }
+    },
+    
+    "Variables":{
+        "$DEFAULT_PROPERTIES": {"id": "", "icon": "", "color": "$DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL", "extra": "", "multiplicity": false},
+        "$DEFAULT_COLOR": {"family": "blue", "fillIcon": null, "fillText": null, "fillContainer": null},
+        "$DEFAULT_TEXT_DETAIL": {"font": "", "position": null},
+
+        "$ACTOR_FORMAT": {"type": "actor", "layout": "collapsed", "container": "no_container_transparent"},
+        "$TS_FORMAT_COLLAPSED": {"type": "ts", "layout": "collapsed", "container": "no_container_transparent"},
+        "$TS_FORMAT_EXPANDED": {"type": "ts", "layout": "expanded", "container": "container_transparent"},
+        "$LN_FORMAT_COLLAPSED": {"type": "ln", "layout": "collapsed", "container": "no_container_transparent"},
+        "$LN_FORMAT_EXPANDED": {"type": "ln", "layout": "expanded", "container": "container_transparent"},
+        "$LC_FORMAT_COLLAPSED": {"type": "lc", "layout": "collapsed", "container": "no_container_transparent"},
+        "$LC_FORMAT_EXPANDED": {"type": "lc", "layout": "expanded", "container": "container_transparent"},
+        "$LG_CONTAINER": {"type": "lg", "layout": "expanded", "container": "container_transparent"},
+        "$LG_NO_CONTAINER": {"type": "lg", "layout": "expanded", "container": "no_container_transparent"},
+        "$PN_FORMAT_COLLAPSED": {"type": "pn", "layout": "collapsed", "container": "no_container_transparent"},
+        "$PN_FORMAT_EXPANDED": {"type": "pn", "layout": "expanded", "container": "container_transparent"},
+        "$PC_FORMAT_COLLAPSED": {"type": "pc", "layout": "collapsed", "container": "no_container_transparent"},
+        "$PC_FORMAT_EXPANDED": {"type": "pc", "layout": "expanded", "container": "container_transparent"},
+        "$PG_CONTAINER": {"type": "pg", "layout": "expanded", "container": "container_transparent"},
+        "$PG_NO_CONTAINER": {"type": "pg", "layout": "expanded", "container": "no_container_transparent"},
+
+        "$LEGEND_DEFAULT_PROPERTIES": {"color": "$DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL"},        
+        "$LEGEND_HORIZONTAL": {"type": "legend", "layout": "horizontal", "container": "container_transparent"},
+        "$LEGEND_VERTICAL": {"type": "legend", "layout": "vertical", "container": "container_transparent"},
+        "$LEGEND_HORIZONTAL_TB": {"type": "legend", "layout": "horizontalTB", "container": "container_transparent"},
+        "$LEGEND_VERTICAL_TB": {"type": "legend", "layout": "verticalTB", "container": "container_transparent"},
+
+        "$LEGEND_ITEM_DEFAULT_PROPERTIES": {"id": "", "icon": "default", "color": "$LEGEND_ITEM_DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL", "extra": ";colorFillIcon=light;"},
+        "$LEGEND_ITEM_TAG_DEFAULT_PROPERTIES": {"id": "", "icon": "default", "color": "$LEGEND_ITEM_DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL"},
+        "$LEGEND_ITEM_ICON_DEFAULT_PROPERTIES": {"id": "", "color": "$LEGEND_ITEM_DEFAULT_COLOR", "text": "$DEFAULT_TEXT_DETAIL"},
+
+        "$LEGEND_ITEM_DEFAULT_COLOR": {"family": "blue", "fillIcon": null, "fillText": null, "fillContainer": null},
+        "$LEGEND_ITEM_ACTOR": {"type": "actor", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_TS": {"type": "ts", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_LN": {"type": "ln", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_LC": {"type": "lc", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_PN": {"type": "pn", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_PC": {"type": "pc", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_LG": {"type": "lg", "layout": "legend:shape", "container": "no_container_transparent"},
+        "$LEGEND_ITEM_PG": {"type": "pg", "layout": "legend:shape", "container": "no_container_transparent"},
+
+        "$LEGEND_ITEM_TAG": {"type": "ln", "layout": "legend:tag", "container": "no_container_transparent"},
+        "$LEGEND_ICON_TAG": {"type": "ln", "layout": "legend:icon", "container": "no_container_transparent"},
+
+        "$DU_DEFAULT_PROPERTIES": {"id": "", "extra":"", "color": "$DEFAULT_COLOR", "text": {"font": ";fontColor=#000000;fontSize=12"}},
+        "$DU_D": {"type": "du", "layout": "d"},
+        "$DU_E": {"type": "du", "layout": "e"},
+        "$DU_I": {"type": "du", "layout": "i"},
+        "$DU_P": {"type": "du", "layout": "p"},
+        "$DU_TD": {"type": "du", "layout": "td"},
+        "$DU_TE": {"type": "du", "layout": "te"},
+        "$DU_TI": {"type": "du", "layout": "ti"},
+        "$DU_TP": {"type": "du", "layout": "tp"}
+    }
+}

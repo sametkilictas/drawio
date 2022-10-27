@@ -1,0 +1,14 @@
+{
+    "mondrianicons.generic.data-center" : {"alias": ["az", "availability-zone"]},
+    "mondrianicons.generic.idea" : {"alias": ["innovation"]},
+    "mondrianicons.generic.building-block-architecture" : {"alias": ["abb"]},
+    "mondrianicons.generic.building-block-solution" : {"alias": ["sbb"]},
+    "mondrianicons.network.network-public" : {"alias": ["internet"]},
+    "mondrianicons.user.floppy" : {"alias": ["legacy-it"]},
+    "mondrianicons.user.headset" : {"alias": ["contact-center"]},
+    "mondrianicons.security.microscope" : {"alias": ["forensic-research"]},
+    "mondrianicons.platform.virtual-private-cloud" : {"alias": ["coloured-cloud"]},
+    "mondrianicons.operations.metrics" : {"alias": ["events"]},
+    "mondrianicons.operations.platform-metrics" : {"alias": ["platform-events"]},
+    "mondrianicons.operations.management-element" : {"alias": ["element-manager"]}
+}
