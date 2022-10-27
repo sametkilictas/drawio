@@ -247,7 +247,8 @@
 		{
 			this.addMenuItems(menu, ['points', 'inches', 'millimeters', 'meters'], parent);
 
-			if (Editor.currentTheme == 'simple' || Editor.currentTheme == 'min')
+			if (Editor.currentTheme == 'simple' || Editor.currentTheme == 'sketch' ||
+				Editor.currentTheme == 'min')
 			{
 				this.addMenuItems(menu, ['-', 'ruler', '-', 'pageScale'], parent);
 			}
@@ -307,16 +308,7 @@
 
         var toggleDarkModeAction = editorUi.actions.put('toggleDarkMode', new Action(mxResources.get('dark'), function(e)
         {
-			editorUi.setDarkMode(!Editor.isDarkMode());
-			mxSettings.settings.darkMode = Editor.isDarkMode();
-			mxSettings.save();
-			
-			var theme = mxSettings.getUi();
-			
-			if (theme != 'atlas' && theme != 'min' && theme != 'sketch' && theme != 'simple')
-			{
-				editorUi.setCurrentTheme((!Editor.isDarkMode()) ? 'kennedy' : 'dark', true);
-			}
+			editorUi.setAndPersistDarkMode(!Editor.isDarkMode());
         }));
 
 		toggleDarkModeAction.setToggleAction(true);
@@ -701,6 +693,12 @@
 			}
 		});
 		
+		editorUi.actions.addAction('preferences...', function()
+		{
+			var dlg = new PreferencesDialog(editorUi);
+			editorUi.showDialog(dlg.container, 320, 360, true, true);
+		});
+
 		editorUi.actions.addAction('createRevision', function()
 		{
 			editorUi.actions.get('save').funct();
@@ -1082,7 +1080,8 @@
 				splashCb.checked = mxSettings.getShowStartScreen();
 				splashCb.defaultChecked = splashCb.checked;
 
-				if (editorUi.isSettingsEnabled() && urlParams['sketch'] == '1')
+				if (editorUi.isSettingsEnabled() && (Editor.currentTheme == 'sketch' ||
+					Editor.currentTheme == 'simple'))
 				{
 					var showSplash = document.createElement('span');
 					showSplash.style['float'] = 'right';
@@ -1133,7 +1132,8 @@
 
 				var pluginsAction = editorUi.actions.get('plugins');
 
-				if (pluginsAction != null && urlParams['sketch'] == '1')
+				if (pluginsAction != null && (Editor.currentTheme == 'sketch' ||
+					Editor.currentTheme == 'simple'))
 				{
 					// TODO: Show change message only when plugins have changed
 					buttons.push([mxResources.get('plugins'), pluginsAction.funct]);
@@ -1232,14 +1232,7 @@
 					{
 						item = menu.addItem(lang, null, mxUtils.bind(this, function()
 						{
-							mxSettings.setLanguage(id);
-							mxSettings.save();
-							
-							// Shows dialog in new language
-							mxClient.language = id;
-							mxResources.loadDefaultBundle = false;
-							mxResources.add(RESOURCE_BASE);
-							
+							editorUi.setAndPersistLanguage(id);
 							editorUi.alert(mxResources.get('restartForChangeRequired'));
 						}), parent);
 						
@@ -1268,8 +1261,9 @@
 			{
 				var menubar = menusCreateMenuBar.apply(this, arguments);
 				
-				if (menubar != null && urlParams['embed'] != '1' &&
-					uiTheme != 'atlas' && urlParams['live-ui'] == '1')
+				if (menubar != null && Editor.enableSimpleTheme &&
+					editorUi.getServiceName() != 'atlassian' &&
+					urlParams['embed'] != '1')
 				{
 					var themeMenu = this.get('appearance');
 					
@@ -1282,7 +1276,6 @@
 						elt.style.backgroundRepeat = 'no-repeat';
 						elt.style.backgroundSize = '100% 100%';
 						elt.style.display = 'inline-block';
-						elt.style.verticalAlign = 'top';
 						elt.style.marginLeft = '2px';
 						elt.style.cursor = 'pointer';
 						elt.style.zIndex = '1';
@@ -1316,14 +1309,17 @@
 
 						var updateThemeElement = mxUtils.bind(this, function()
 						{
+							elt.style.display = (Editor.currentTheme == 'atlas' ||
+								Editor.currentTheme == 'min' ||
+								Editor.currentTheme == 'sketch')
+								? 'none' : '';
 							elt.style.backgroundImage = 'url(' + ((Editor.isDarkMode()) ?
 								Editor.darkModeImage : Editor.lightModeImage) + ')';
 						});
-			
+						
+						this.editorUi.addListener('currentThemeChanged', updateThemeElement);
 						this.editorUi.addListener('darkModeChanged', updateThemeElement);
 						updateThemeElement();
-						
-						this.editorUi.switchThemeElt = elt;
 					}
 				}
 
@@ -2923,7 +2919,12 @@
 				this.addMenuItems(menu, ['toggleDarkMode'], parent);
 			}
 
-			this.addMenuItems(menu, ['toggleSimpleMode', 'toggleSketchMode'], parent);
+			this.addMenuItems(menu, ['toggleSimpleMode'], parent);
+
+			if (urlParams['test-prefs'] == '1')
+			{
+				this.addMenuItems(menu, ['-', 'preferences'], parent);
+			}
 		})));
 
 		this.put('theme', new Menu(mxUtils.bind(this, function(menu, parent)
@@ -3316,8 +3317,8 @@
 			{
     			graph.startEditingAtCell(insertVertex('Text', 40, 20, 'text;html=1;resizable=0;autosize=1;' +
     				'align=center;verticalAlign=middle;points=[];fillColor=none;strokeColor=none;rounded=0;',
-					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null));
+					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null));
 			}
 		}, null, null, Editor.ctrlKey + '+Shift+X/A')).isEnabled = isGraphEnabled;
 		
@@ -3326,8 +3327,8 @@
 			if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 			{
     	    	insertVertex('', 120, 60, 'whiteSpace=wrap;html=1;', (evt != null &&
-					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null);
+					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null);
 			}
 		}, null, null, 'D')).isEnabled = isGraphEnabled;
 		
@@ -3338,8 +3339,8 @@
     	    	insertVertex('', 140, 160, 'shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;' +
 					'fontColor=#000000;darkOpacity=0.05;fillColor=#FFF9B2;strokeColor=none;fillStyle=solid;' +
 					'direction=west;gradientDirection=north;gradientColor=#FFF2A1;shadow=1;size=20;pointerEvents=1;',
-					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null);
+					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null);
 			}
 		}, null, null, 'S')).isEnabled = isGraphEnabled;
 
@@ -3348,8 +3349,8 @@
 			if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 			{
     	    	insertVertex('', 80, 80, 'ellipse;whiteSpace=wrap;html=1;', (evt != null &&
-					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null);
+					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null);
 			}
 		}, null, null, 'F')).isEnabled = isGraphEnabled;
 		
@@ -3358,8 +3359,8 @@
 			if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 			{
     	    	insertVertex('', 80, 80, 'rhombus;whiteSpace=wrap;html=1;', (evt != null &&
-					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null);
+					!mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null);
 			}
 		})).isEnabled = isGraphEnabled;
 
@@ -3368,8 +3369,8 @@
 			if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 			{
     	    	insertEdge('', graph.defaultEdgeLength, 'edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;',
-					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt)) ?
-						graph.getInsertPoint() : null);
+					(evt != null && !mxEvent.isControlDown(evt) && !mxEvent.isMetaDown(evt) &&
+					graph.isMouseInsertPoint()) ? graph.getInsertPoint() : null);
 			}
 		}, null, null, 'C')).isEnabled = isGraphEnabled;
 
@@ -3474,7 +3475,7 @@
 				editorUi.showImportCsvDialog();
 			}, parent, null, isGraphEnabled());
 			
-			if (uiTheme == 'min')
+			if (Editor.currentTheme == 'simple' || Editor.currentTheme == 'min')
 			{
 				this.addMenuItems(menu, ['-', 'createShape',
 					'editDiagram'], parent);
@@ -4277,6 +4278,28 @@
 			}
 		})));
 
+		this.put('movePage', new Menu(mxUtils.bind(this, function(menu, parent)
+		{
+			var current = editorUi.getSelectedPageIndex();
+
+			if (editorUi.pages != null)
+			{
+				for (var i = 0; i < editorUi.pages.length; i++)
+				{
+					if (i != current)
+					{
+						(function(index)
+						{
+							menu.addItem(editorUi.getShortPageName(editorUi.pages[index]), null, function()
+							{
+								editorUi.movePage(current, index);
+							}, parent);
+						})(i);
+					}
+				}
+			}
+		})));
+
 		this.put('diagram', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
 			var file = editorUi.getCurrentFile();
@@ -4284,7 +4307,8 @@
 			menu.addSeparator(parent);
 
 			// Compatiblity code for live UI switch and static UI
-			var sketchTheme = Editor.currentTheme == 'simple' || urlParams['sketch'] == '1';
+			var sketchTheme = Editor.currentTheme == 'simple' ||
+				Editor.currentTheme == 'sketch';
 			
 			if (mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
 			{
@@ -4372,7 +4396,12 @@
 				editorUi.menus.addMenuItems(menu, ['comments', '-'], parent);
 			}
 	
-			editorUi.menus.addMenuItems(menu, ['format', 'layers', 'tags', '-', 'pageSetup'], parent);
+			editorUi.menus.addMenuItems(menu, ['format', 'layers', 'tags', '-'], parent);
+
+			if (Editor.currentTheme == 'sketch')
+			{
+				editorUi.menus.addMenuItems(menu, ['pageSetup'], parent);
+			}
 	
 			// Cannot use print in standalone mode on iOS as we cannot open new windows
 			if (urlParams['noFileMenu'] != '1' && (!mxClient.IS_IOS || !navigator.standalone))
@@ -4447,7 +4476,8 @@
 		this.put('file', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
 			// Compatiblity code for live UI switch and static UI
-			var minTheme = Editor.currentTheme == 'simple' || uiTheme == 'min' ||
+			var minTheme = Editor.currentTheme == 'simple' ||
+				Editor.currentTheme == 'sketch' ||
 				Editor.currentTheme == 'min';
 
 			if (urlParams['embed'] == '1')

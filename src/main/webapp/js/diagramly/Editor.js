@@ -19,34 +19,6 @@
 	}
 
 	/**
-	 * Specifies the app name. Default is document.title.
-	 */
-	Editor.prototype.appName = 'diagrams.net';
-		
-	/**
-	 * Known file types.
-	 */
-	Editor.prototype.diagramFileTypes = [
-		{description: 'diagramXmlDesc', extension: 'drawio', mimeType: 'text/xml'},
-		{description: 'diagramPngDesc', extension: 'png', mimeType: 'image/png'},
-		{description: 'diagramSvgDesc', extension: 'svg', mimeType: 'image/svg'},
-		{description: 'diagramHtmlDesc', extension: 'html', mimeType: 'text/html'},
-		{description: 'diagramXmlDesc', extension: 'xml', mimeType: 'text/xml'}];
-
-	/**
-	 * Known file types.
-	 */
-	Editor.prototype.libraryFileTypes = [{description: 'Library (.drawiolib, .xml)', extensions: ['drawiolib', 'xml']}];
-
-	/**
-	 * Additional help text for special file extensions.
-	 */
-	Editor.prototype.fileExtensions = [
-		{ext: 'html', title: 'filetypeHtml'},
-		{ext: 'png', title: 'filetypePng'},
-		{ext: 'svg', title: 'filetypeSvg'}];
-	
-	/**
 	 * Definitions for sketch font styles.
 	 */
 	Editor.sketchFontFamily = 'Architects Daughter';
@@ -142,10 +114,6 @@
 	/**
 	 * Error image for not found images
 	 */	
-
-	/**
-	 * Error image for not found images
-	 */	
 	Editor.configurationKey = '.configuration';
 		
 	/**
@@ -167,6 +135,17 @@
 	 * Specifies if custom properties should be enabled.
 	 */
 	Editor.enableCustomProperties = true;
+		
+	/**
+	 * Specifies if the simple theme should be enabled. This theme can be used
+	 * at runtime in the kennedy theme.
+	 */
+	Editor.enableSimpleTheme = true;
+			
+	/**
+	 * Specifies if the simple theme background should be used for the sketch theme.
+	 */
+	Editor.useSimpleBackgroundForSketch = false;
 	
 	/**
 	 * Sets the default value for including a copy of the diagram.
@@ -504,6 +483,29 @@
         	return state.vertices.length > 0 && format.editorUi.editor.graph.isContainer(state.vertices[0]);
         }}
 	].concat(Editor.commonProperties);
+
+	/**
+	 * CSS for adaptive SVG dark mode.
+	 */
+	Editor.svgDarkModeCss = '@media (prefers-color-scheme: dark) {' +
+		':root {--light-color: #c9d1d9; --dark-color: #0d1117; }' +
+		'svg[style^="background-color:"] { background-color: var(--dark-color) !important; }' +
+		'g[filter="url(#dropShadow)"] { filter: none !important; }' +
+		'[stroke="rgb(0, 0, 0)"] { stroke: var(--light-color); }' +
+		'[stroke="rgb(255, 255, 255)"] { stroke: var(--dark-color); }' +
+		'[fill="rgb(0, 0, 0)"] { fill: var(--light-color); }' +
+		'[fill="rgb(255, 255, 255)"] { fill: var(--dark-color); }' +
+		'g[fill="rgb(0, 0, 0)"] text { fill: var(--light-color); }' +
+		'div[data-drawio-colors*="color: rgb(0, 0, 0)"]' +
+		'	div { color: var(--light-color) !important; }' +
+		'div[data-drawio-colors*="border-color: rgb(0, 0, 0)"]' +
+		'	{ border-color: var(--light-color) !important; }' +
+		'div[data-drawio-colors*="border-color: rgb(0, 0, 0)"]' +
+		'	div { border-color: var(--light-color) !important; }' +
+		'div[data-drawio-colors*="background-color: rgb(255, 255, 255)"]' +
+		'	{ background-color: var(--dark-color) !important; }' +
+		'div[data-drawio-colors*="background-color: rgb(255, 255, 255)"]' +
+		'	div { background-color: var(--dark-color) !important; }}';
 	
 	/**
 	 * Default value for the CSV import dialog.
@@ -2104,6 +2106,39 @@
 		return rtn.join('');
 	};
 
+	/**
+	 * Interval for updating the file status.
+	 */
+	Editor.updateStatusInterval = 10000;
+
+	/**
+	 * Specifies the app name. Default is document.title.
+	 */
+	Editor.prototype.appName = 'diagrams.net';
+		
+	 /**
+	  * Known file types.
+	  */
+	Editor.prototype.diagramFileTypes = [
+		{description: 'diagramXmlDesc', extension: 'drawio', mimeType: 'text/xml'},
+		{description: 'diagramPngDesc', extension: 'png', mimeType: 'image/png'},
+		{description: 'diagramSvgDesc', extension: 'svg', mimeType: 'image/svg'},
+		{description: 'diagramHtmlDesc', extension: 'html', mimeType: 'text/html'},
+		{description: 'diagramXmlDesc', extension: 'xml', mimeType: 'text/xml'}];
+
+	 /**
+	  * Known file types.
+	  */
+	Editor.prototype.libraryFileTypes = [{description: 'Library (.drawiolib, .xml)', extensions: ['drawiolib', 'xml']}];
+ 
+	 /**
+	  * Additional help text for special file extensions.
+	  */
+	Editor.prototype.fileExtensions = [
+		{ext: 'html', title: 'filetypeHtml'},
+		{ext: 'png', title: 'filetypePng'},
+		{ext: 'svg', title: 'filetypeSvg'}];
+	
 	/**
 	 * General timeout is 25 seconds.
 	 */
@@ -3993,7 +4028,9 @@
 		 */
 	    DiagramFormatPanel.prototype.isMathOptionVisible = function(div)
 	    {
-	        return false;
+			return (Editor.currentTheme == 'simple' ||
+				Editor.currentTheme == 'sketch' ||
+				Editor.currentTheme == 'min');
 	    };
 	    
 		/**
@@ -6409,7 +6446,18 @@
 		var temp = null;
 		var tempFg = null;
 		var tempBg = null;
-		
+
+		if (false)
+		{
+			var svgDoc = result.ownerDocument;
+			var style = (svgDoc.createElementNS != null) ?
+		    	svgDoc.createElementNS(mxConstants.NS_SVG, 'style') : svgDoc.createElement('style');
+			svgDoc.setAttributeNS != null? style.setAttributeNS('type', 'text/css') :
+				style.setAttribute('type', 'text/css');
+			style.appendChild(svgDoc.createTextNode(Editor.svgDarkModeCss));
+			result.getElementsByTagName('defs')[0].appendChild(style);
+		}
+
 		if (!keepTheme && this.themes != null && this.defaultThemeName == 'darkTheme')
 		{
 			temp = this.stylesheet;
@@ -6420,8 +6468,6 @@
 			this.shapeBackgroundColor = (this.defaultThemeName == 'darkTheme') ?
 				'#ffffff' : Editor.darkColor;
 			this.stylesheet = this.getDefaultStylesheet();
-			// LATER: Fix math export in dark mode by fetching text nodes before
-			// calling refresh and changing the font color in-place
 			this.refresh();
 		}
 		

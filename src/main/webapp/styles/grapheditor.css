@@ -94,7 +94,13 @@
 	font-size:12px;
 }
 a.geStatus {
-	margin-right:8px;
+	white-space:nowrap;
+}
+.geStatus *[data-action] {
+	cursor:pointer;
+}
+.geStatus *[data-action]:not([class]) {
+	text-decoration:underline;
 }
 .geStatus img {
 	max-width:16px;
@@ -1930,4 +1936,8 @@ table.geProperties tr td {
 
 .geMaximized #max-button {
   display: none;
+}
+[draggable="true"] {
+    transform: translate(0, 0);
+    z-index: 0;
 }
