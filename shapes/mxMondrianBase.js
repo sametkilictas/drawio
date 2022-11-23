@@ -2604,9 +2604,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 
 					if(styleAttribute[0] === 'colorFamilyLine')
 					{
-						console.log(styleAttribute[0]);
 						let mondrianColor = mxMondrianBase.prototype.getColor(mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, styleAttribute[1], 'medium');
-						console.log(mondrianColor);
 						graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
 					}	
 				}
