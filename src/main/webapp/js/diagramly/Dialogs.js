@@ -228,10 +228,10 @@ var StorageDialog = function(editorUi, fn, rowLimit)
 			addLogo(IMAGE_PATH + '/osa_database.png', mxResources.get('browser'), App.MODE_BROWSER);
 		}
 		
-		if (typeof window.DropboxClient === 'function')
-		{
-			addLogo(IMAGE_PATH + '/dropbox-logo.svg', mxResources.get('dropbox'), App.MODE_DROPBOX, 'dropbox');
-		}
+		//if (typeof window.DropboxClient === 'function')
+		//{
+		//	addLogo(IMAGE_PATH + '/dropbox-logo.svg', mxResources.get('dropbox'), App.MODE_DROPBOX, 'dropbox');
+		//}
 
 		if (editorUi.gitHub != null)
 		{

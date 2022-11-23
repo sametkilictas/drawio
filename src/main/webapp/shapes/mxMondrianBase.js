@@ -2587,7 +2587,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 			}
 		}
 	},
-	{name:'formatConnector', dispName: 'Connector (Format)', type:'dynamicEnum', enumSource:'connectorFormats', defValue:'Default',
+	{name:'formatConnector', dispName: 'Connector (Format)', type:'dynamicEnum', enumSource:'connectorFormats', defVal:'Default',
 		enumList:[],
 		onChange: function(graph, newValue)
 		{
@@ -2659,13 +2659,6 @@ mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts, rounded)
 	
 	mxMondrianBaseConnector.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
 };
-
-mxMondrianBaseConnector.prototype.getConnectorFormats = function()
-{
-	let connectorFormats = [{val:'format1', dispName:'Format 1'}];
-	return connectorFormats;
-};
-
 
 /**
  * Mondrian Design Method shape registration

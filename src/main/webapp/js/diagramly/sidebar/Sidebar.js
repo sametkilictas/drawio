@@ -26,7 +26,7 @@
 	/**
 	 * 
 	 */
-	Sidebar.prototype.defaultEntries = 'general;uml;er;bpmn;flowchart;basic;arrows2';
+	Sidebar.prototype.defaultEntries = 'MondrianShapes;MondrianIcons (All)';//'general;uml;er;bpmn;flowchart;basic;arrows2';
 	
 	/**
 	 * Library definitions 
@@ -408,9 +408,10 @@
 	Sidebar.prototype.showEntries = function(entries, remember, force)
 	{
 		var all = [];
-		
+		console.log();
 		if (remember)
 		{
+			console.log(entries);
 			mxSettings.setLibraries(entries);
 			mxSettings.save();
 		}
@@ -536,7 +537,7 @@
 				{title: mxResources.get('scratchpad'), id: '.scratchpad'}].
 				concat(stdEntries);
 		}
-
+		
 		this.entries = [{title: mxResources.get('standard'), entries: stdEntries},
             			{title: mxResources.get('software'),
             			entries: [{title: 'Active Directory', id: 'active_directory', image: IMAGE_PATH + '/sidebar-active_directory.png'},
