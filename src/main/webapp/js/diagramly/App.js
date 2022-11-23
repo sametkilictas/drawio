@@ -1413,7 +1413,16 @@ App.prototype.init = function()
 			this.restoreLibraries();
 		}));
 	}
-	
+
+	// 
+	this.addListener('currentThemeChanged', mxUtils.bind(this, function()
+	{
+		if (this.compactMode && this.isDefaultTheme())
+		{
+			this.toggleCompactMode(true);
+		}
+	}));
+
 	/**
 	 * Creates gitlab client.
 	 */
@@ -1617,12 +1626,7 @@ App.prototype.init = function()
 		this.formatContainer.style.visibility = 'hidden';
 		this.hsplit.style.display = 'none';
 		this.sidebarContainer.style.display = 'none';
-
-		if (this.sidebarFooterContainer != null)
-		{
-			this.sidebarFooterContainer.style.display = 'none';
-		}
-
+		
 		// Sets the initial mode
 		if (urlParams['local'] == '1')
 		{
@@ -1663,7 +1667,6 @@ App.prototype.init = function()
 					}
 				}
 				else if (urlParams['embed'] != '1' && this.getServiceName() == 'draw.io')
-
 				{
 					// just app.diagrams.net users
 					// this.showNameConfBanner();
@@ -1676,12 +1679,8 @@ App.prototype.init = function()
 			(!this.editor.chromeless || this.editor.editable))
 		{
 			// Checks if the cache is alive
-			var acceptResponse = true;
-			
 			var timeoutThread = window.setTimeout(mxUtils.bind(this, function()
 			{
-				acceptResponse = false;
-				
 				// Switches to manual sync if cache cannot be reached
 				DrawioFile.SYNC = 'manual';
 				
@@ -2666,7 +2665,8 @@ App.prototype.appIconClicked = function(evt)
 		{
 			if (file != null && file.stat != null && file.stat.path_display != null)
 			{
-				var url = 'https://www.dropbox.com/home/Apps/drawio' + file.stat.path_display;
+				
+				var url = 'https://www.dropbox.com/home/Apps' + this.dropbox.appPath + file.stat.path_display;
 				
 				if (!mxEvent.isShiftDown(evt))
 				{
@@ -3438,7 +3438,6 @@ App.prototype.start = function()
 					// Removes open URL parameter. Hash is also updated in Init to load client.
 					if (urlParams['open'] != null && window.history && window.history.replaceState)
 					{
-						
 						window.history.replaceState(null, null, window.location.pathname +
 							this.getSearch(['open', 'sketch']));
 						window.location.hash = urlParams['open'];
@@ -6966,38 +6965,6 @@ App.prototype.updateHeader = function()
 			this.fullscreenMode = !visible;
 			mxEvent.consume(evt);
 		}));
-		
-		if (!Editor.enableSimpleTheme && Editor.currentTheme != 'atlas' && urlParams['embed'] != '1')
-		{
-			this.darkModeElement = this.toggleFormatElement.cloneNode(true);
-			this.darkModeElement.setAttribute('title', mxResources.get('theme'));
-			this.darkModeElement.style.right = right + 'px';
-			this.toolbarContainer.appendChild(this.darkModeElement);
-			right += 20;
-
-			var updateDarkModeElement = mxUtils.bind(this, function()
-			{
-				this.darkModeElement.style.backgroundImage = 'url(\'' +
-					((Editor.isDarkMode()) ? Editor.lightModeImage :
-					Editor.darkModeImage) + '\')';
-			});
-
-			this.addListener('darkModeChanged', updateDarkModeElement);
-			updateDarkModeElement();
-			
-			// Prevents focus
-			mxEvent.addListener(this.darkModeElement, (mxClient.IS_POINTER) ? 'pointerdown' : 'mousedown',
-				mxUtils.bind(this, function(evt)
-			{
-				evt.preventDefault();
-			}));
-			
-			mxEvent.addListener(this.darkModeElement, 'click', mxUtils.bind(this, function(evt)
-			{
-				this.actions.get('toggleDarkMode').funct();
-				mxEvent.consume(evt);
-			}));
-		}
 		
 		// Some style changes in Atlas theme
 		if (Editor.currentTheme == 'atlas')
