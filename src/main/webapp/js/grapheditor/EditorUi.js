@@ -373,6 +373,20 @@ EditorUi = function(editor, container, lightbox)
 				// Mouse down is needed for drag and drop
 				this.tabContainer.onselectstart = textEditing;
 			}
+
+			if (mxClient.IS_IOS)
+			{
+				mxUtils.setPrefixedStyle(this.menubarContainer.style, 'userSelect', 'none');
+				mxUtils.setPrefixedStyle(this.diagramContainer.style, 'userSelect', 'none');
+				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'userSelect', 'none');
+				mxUtils.setPrefixedStyle(this.formatContainer.style, 'userSelect', 'none');
+				mxUtils.setPrefixedStyle(this.footerContainer.style, 'userSelect', 'none');
+
+				if (this.tabContainer != null)
+				{
+					mxUtils.setPrefixedStyle(this.tabContainer.style, 'userSelect', 'none');
+				}
+			}
 		}
 		
 		// And uses built-in context menu while editing
@@ -1132,11 +1146,6 @@ EditorUi.prototype.toolbarHeight = 38;
 EditorUi.prototype.footerHeight = 28;
 
 /**
- * Specifies the height of the optional sidebarFooterContainer. Default is 34.
- */
-EditorUi.prototype.sidebarFooterHeight = 34;
-
-/**
  * Specifies the position of the horizontal split bar. Default is 240 or 118 for
  * screen widths <= 640px.
  */
@@ -1317,52 +1326,56 @@ EditorUi.prototype.updateSelectionStateForTableCells = function(result)
 		var model = this.editor.graph.model;
 		var parent = model.getParent(cells[0]);
 		var table = model.getParent(parent);
-		var col = parent.getIndex(cells[0]);
-		var row = table.getIndex(parent);
-		var lastspan = null;
-		var colspan = 1;
-		var rowspan = 1;
-		var index = 0;
 
-		var nextRowCell = (row < table.getChildCount() - 1) ?
-			model.getChildAt(model.getChildAt(
-				table, row + 1), col) : null;
-		
-		while (index < cells.length - 1)
+		if (parent != null && table != null)
 		{
-			var next = cells[++index];
+			var col = parent.getIndex(cells[0]);
+			var row = table.getIndex(parent);
+			var lastspan = null;
+			var colspan = 1;
+			var rowspan = 1;
+			var index = 0;
+
+			var nextRowCell = (row < table.getChildCount() - 1) ?
+				model.getChildAt(model.getChildAt(
+					table, row + 1), col) : null;
 			
-			if (nextRowCell != null && nextRowCell == next &&
-				(lastspan == null || colspan == lastspan))
+			while (index < cells.length - 1)
 			{
-				lastspan = colspan;
-				colspan = 0;
-				rowspan++;
-				parent = model.getParent(nextRowCell);
-				nextRowCell = (row + rowspan < table.getChildCount()) ?
-					model.getChildAt(model.getChildAt(
-						table, row + rowspan), col) : null;
+				var next = cells[++index];
+				
+				if (nextRowCell != null && nextRowCell == next &&
+					(lastspan == null || colspan == lastspan))
+				{
+					lastspan = colspan;
+					colspan = 0;
+					rowspan++;
+					parent = model.getParent(nextRowCell);
+					nextRowCell = (row + rowspan < table.getChildCount()) ?
+						model.getChildAt(model.getChildAt(
+							table, row + rowspan), col) : null;
+				}
+
+				var state = this.editor.graph.view.getState(next);
+
+				if (next == model.getChildAt(parent, col + colspan) && state != null &&
+					mxUtils.getValue(state.style, 'colspan', 1) == 1 &&
+					mxUtils.getValue(state.style, 'rowspan', 1) == 1)
+				{
+					colspan++;
+				}
+				else
+				{
+					break;
+				}
 			}
 
-			var state = this.editor.graph.view.getState(next);
-
-			if (next == model.getChildAt(parent, col + colspan) && state != null &&
-				mxUtils.getValue(state.style, 'colspan', 1) == 1 &&
-				mxUtils.getValue(state.style, 'rowspan', 1) == 1)
+			if (index == rowspan * colspan - 1)
 			{
-				colspan++;
+				result.mergeCell = cells[0];
+				result.colspan = colspan;
+				result.rowspan = rowspan;
 			}
-			else
-			{
-				break;
-			}
-		}
-
-		if (index == rowspan * colspan - 1)
-		{
-			result.mergeCell = cells[0];
-			result.colspan = colspan;
-			result.rowspan = rowspan;
 		}
 	}
 };
@@ -1635,7 +1648,7 @@ EditorUi.prototype.installShapePicker = function()
 				{
 					if (cell != null)
 					{
-						graph.connectVertex(temp, dir, graph.defaultEdgeLength, mouseEvent, true, true, function(x, y, execute)
+						graph.connectVertex(temp, dir, graph.defaultEdgeLength, mouseEvent, true, false, function(x, y, execute)
 						{
 							execute(cell);
 								
@@ -1753,11 +1766,17 @@ EditorUi.prototype.createShapePicker = function(x, y, source, callback, directio
 	getInsertLocationFn = (getInsertLocationFn != null) ? getInsertLocationFn : function(cells)
 	{
 		var cell = cells[0];
+		var w = 0;
+		var h = 0;
 
-		return new mxPoint(graph.snap(Math.round(x / graph.view.scale) -
-			graph.view.translate.x - cell.geometry.width / 2),
-			graph.snap(Math.round(y / graph.view.scale) -
-			graph.view.translate.y - cell.geometry.height / 2));
+		if (cell.geometry != null)
+		{
+			w = cell.geometry.width / 2;
+			h = cell.geometry.height / 2;
+		}
+
+		return new mxPoint(graph.snap(Math.round(x / graph.view.scale) - graph.view.translate.x - w),
+			graph.snap(Math.round(y / graph.view.scale) - graph.view.translate.y - h));
 	};
 	
 	if (cells != null && cells.length > 0)
@@ -4381,17 +4400,6 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		tmp += 1;
 	}
 	
-	var sidebarFooterHeight = 0;
-	
-	if (this.sidebarFooterContainer != null)
-	{
-		var bottom = this.footerHeight + off;
-		sidebarFooterHeight = Math.max(0, Math.min(h - tmp - bottom, this.sidebarFooterHeight));
-		this.sidebarFooterContainer.style.width = effHsplitPosition + 'px';
-		this.sidebarFooterContainer.style.height = sidebarFooterHeight + 'px';
-		this.sidebarFooterContainer.style.bottom = bottom + 'px';
-	}
-	
 	var fw = (this.format != null) ? this.formatWidth : 0;
 	this.sidebarContainer.style.top = tmp + 'px';
 	this.sidebarContainer.style.width = effHsplitPosition + 'px';
@@ -4426,7 +4434,7 @@ EditorUi.prototype.refresh = function(sizeDidChange)
 		th = this.tabContainer.clientHeight;
 	}
 	
-	this.sidebarContainer.style.bottom = (this.footerHeight + sidebarFooterHeight + off) + 'px';
+	this.sidebarContainer.style.bottom = (this.footerHeight + off) + 'px';
 	this.formatContainer.style.bottom = (this.footerHeight + off) + 'px';
 
 	this.diagramContainer.style.left =  (contLeft + diagContOffset.x) + 'px';
@@ -4460,7 +4468,6 @@ EditorUi.prototype.createDivs = function()
 	this.diagramContainer = this.createDiv('geDiagramContainer');
 	this.footerContainer = this.createDiv('geFooterContainer');
 	this.hsplit = this.createDiv('geHsplit');
-	this.hsplit.setAttribute('title', mxResources.get('collapseExpand'));
 
 	// Sets static style for containers
 	this.menubarContainer.style.top = '0px';
@@ -4477,12 +4484,6 @@ EditorUi.prototype.createDivs = function()
 	this.footerContainer.style.bottom = '0px';
 	this.footerContainer.style.zIndex = mxPopupMenu.prototype.zIndex - 3;
 	this.hsplit.style.width = this.splitSize + 'px';
-	this.sidebarFooterContainer = this.createSidebarFooterContainer();
-	
-	if (this.sidebarFooterContainer != null)
-	{
-		this.sidebarFooterContainer.style.left = '0px';
-	}
 	
 	if (!this.editor.chromeless)
 	{
@@ -4509,14 +4510,6 @@ EditorUi.prototype.createSidebarContainer = function()
 	div.style.overflowY = 'auto';
 
 	return div;
-};
-
-/**
- * Hook for sidebar footer container. This implementation returns null.
- */
-EditorUi.prototype.createSidebarFooterContainer = function()
-{
-	return null;
 };
 
 /**
@@ -4575,11 +4568,6 @@ EditorUi.prototype.createUi = function()
 		this.container.appendChild(this.footerContainer);
 	}
 
-	if (this.sidebar != null && this.sidebarFooterContainer != null)
-	{
-		this.container.appendChild(this.sidebarFooterContainer);		
-	}
-
 	this.container.appendChild(this.diagramContainer);
 
 	if (this.container != null && this.tabContainer != null)
@@ -4616,48 +4604,54 @@ EditorUi.prototype.createStatusContainer = function()
 {
 	var container = document.createElement('a');
 	container.className = 'geItem geStatus';
+	container.style.display = 'inline-flex';
+	container.style.alignItems = 'center';
 
 	// Handles data-action attribute
 	mxEvent.addListener(container, 'click', mxUtils.bind(this, function(evt)
 	{
 		var elt = mxEvent.getSource(evt);
-		var name = elt.getAttribute('data-action');
-
-		// Make generic
-		if (name == 'statusFunction' && this.editor.statusFunction != null)
+		
+		if (elt.nodeName != 'A')
 		{
-			this.editor.statusFunction();
-		}
-		else if (name != null)
-		{
-			var action = this.actions.get(name);
+			var name = elt.getAttribute('data-action');
 
-			if (action != null)
+			// Make generic
+			if (name == 'statusFunction' && this.editor.statusFunction != null)
 			{
-				action.funct();
+				this.editor.statusFunction();
 			}
-		}
-		else
-		{
-			var title = elt.getAttribute('data-title');
-			var msg = elt.getAttribute('data-message');
-
-			if (title != null && msg != null)
+			else if (name != null)
 			{
-				this.showError(title, msg);
+				var action = this.actions.get(name);
+
+				if (action != null)
+				{
+					action.funct();
+				}
 			}
 			else
 			{
-				var link = elt.getAttribute('data-link');
+				var title = elt.getAttribute('data-title');
+				var msg = elt.getAttribute('data-message');
 
-				if (link != null)
+				if (title != null && msg != null)
 				{
-					this.editor.graph.openLink(link);
+					this.showError(title, msg);
+				}
+				else
+				{
+					var link = elt.getAttribute('data-link');
+
+					if (link != null)
+					{
+						this.editor.graph.openLink(link);
+					}
 				}
 			}
-		}
 
-		mxEvent.consume(evt);
+			mxEvent.consume(evt);
+		}
 	}));
 
 	return container;
@@ -4668,7 +4662,7 @@ EditorUi.prototype.createStatusContainer = function()
  */
 EditorUi.prototype.setStatusText = function(value)
 {
-	this.statusContainer.innerHTML = value;
+	this.statusContainer.innerHTML = Graph.sanitizeHtml(value);
 
 	// Wraps simple status messages in a div for styling
 	if (this.statusContainer.getElementsByTagName('div').length == 0 &&
@@ -4724,7 +4718,7 @@ EditorUi.prototype.createStatusDiv = function(value)
 {
 	var div = document.createElement('div');
 	div.setAttribute('title', value);
-	div.innerHTML = value;
+	div.innerHTML = Graph.sanitizeHtml(value);
 
 	return div;
 };
@@ -5223,7 +5217,7 @@ EditorUi.prototype.parseHtmlData = function(data)
 		var hasMeta = data.substring(0, 6) == '<meta ';
 		elt = document.createElement('div');
 		elt.innerHTML = ((hasMeta) ? '<meta charset="utf-8">' : '') +
-			this.editor.graph.sanitizeHtml(data);
+			Graph.sanitizeHtml(data);
 		asHtml = true;
 		
 		// Workaround for innerText not ignoring style elements in Chrome
@@ -5577,7 +5571,7 @@ EditorUi.prototype.showLinkDialog = function(value, btnLabel, fn)
  */
 EditorUi.prototype.showDataDialog = function(cell)
 {
-	if (cell != null)
+	if (cell != null && typeof window.EditDataDialog !== 'undefined')
 	{
 		var dlg = new EditDataDialog(this, cell);
 		this.showDialog(dlg.container, 480, 420, true, false, null, false);
@@ -6153,8 +6147,7 @@ EditorUi.prototype.destroy = function()
 	
 	var c = [this.menubarContainer, this.toolbarContainer, this.sidebarContainer,
 	         this.formatContainer, this.diagramContainer, this.footerContainer,
-	         this.chromelessToolbar, this.hsplit, this.sidebarFooterContainer,
-	         this.layersDialog];
+	         this.chromelessToolbar, this.hsplit, this.layersDialog];
 	
 	for (var i = 0; i < c.length; i++)
 	{

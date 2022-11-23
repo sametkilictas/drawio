@@ -132,6 +132,11 @@
 	Editor.enableCustomLibraries = true;
 	
 	/**
+	 * Not yet implemented. Reading uncompressed supported.
+	 */
+	Editor.enableUncompressedLibraries = false;
+	
+	/**
 	 * Specifies if custom properties should be enabled.
 	 */
 	Editor.enableCustomProperties = true;
@@ -1723,18 +1728,46 @@
 		{
 			Editor.config = config;
 			Editor.configVersion = config.version;
-			Menus.prototype.defaultFonts = config.defaultFonts || Menus.prototype.defaultFonts;
-			ColorDialog.prototype.presetColors = config.presetColors || ColorDialog.prototype.presetColors;
-			ColorDialog.prototype.defaultColors = config.defaultColors || ColorDialog.prototype.defaultColors;
-			ColorDialog.prototype.colorNames = config.colorNames || ColorDialog.prototype.colorNames;
-			StyleFormatPanel.prototype.defaultColorSchemes = config.defaultColorSchemes || StyleFormatPanel.prototype.defaultColorSchemes;
-			Graph.prototype.defaultEdgeLength = config.defaultEdgeLength || Graph.prototype.defaultEdgeLength;
-			DrawioFile.prototype.autosaveDelay = config.autosaveDelay || DrawioFile.prototype.autosaveDelay;
 
 			// Enables debug output
 			if (config.debug)
 			{
 				urlParams['test'] = '1'
+			}
+			
+			if (config.defaultFonts != null)
+			{
+				Menus.prototype.defaultFonts = config.defaultFonts
+			}
+
+			if (config.presetColors != null)
+			{
+				ColorDialog.prototype.presetColors = config.presetColors
+			}
+
+			if (config.defaultColors != null)
+			{
+				ColorDialog.prototype.defaultColors = config.defaultColors
+			}
+
+			if (config.colorNames != null)
+			{
+				ColorDialog.prototype.colorNames = config.colorNames
+			}
+
+			if (config.defaultColorSchemes != null)
+			{
+				StyleFormatPanel.prototype.defaultColorSchemes = config.defaultColorSchemes
+			}
+
+			if (config.defaultEdgeLength != null)
+			{
+				Graph.prototype.defaultEdgeLength = config.defaultEdgeLength
+			}
+
+			if (config.autosaveDelay != null)
+			{
+				DrawioFile.prototype.autosaveDelay = config.autosaveDelay
 			}
 			
 			if (config.templateFile != null)
@@ -3766,7 +3799,7 @@
 	}
 	
 	// Overrides ID for pages
-	if (window.EditDataDialog)
+	if (typeof window.EditDataDialog !== 'undefined')
 	{
 		EditDataDialog.getDisplayIdForCell = function(ui, cell)
 		{
@@ -4014,16 +4047,6 @@
 		};
 
 		/**
-		 * Hook for subclassers.
-		 */
-		DiagramFormatPanel.prototype.isShadowOptionVisible = function()
-		{
-			var file = this.editorUi.getCurrentFile();
-			
-			return urlParams['embed'] == '1' || (file != null && file.isEditable());
-		};
-
-		/**
 		 * Option is not visible in default theme.
 		 */
 	    DiagramFormatPanel.prototype.isMathOptionVisible = function(div)
@@ -4034,15 +4057,20 @@
 	    };
 	    
 		/**
-		 * Add global shadow option.
+		 * Hook for subclassers.
 		 */
-		var diagramFormatPanelAddView = DiagramFormatPanel.prototype.addView;
-
-		DiagramFormatPanel.prototype.addView = function(div)
+		DiagramStylePanel.prototype.isShadowOptionVisible = function()
 		{
-			var div = diagramFormatPanelAddView.apply(this, arguments);
 			var file = this.editorUi.getCurrentFile();
 			
+			return urlParams['embed'] == '1' || (file != null && file.isEditable());
+		};
+
+		/**
+		 * Adds the label menu items to the given menu and parent.
+		 */
+		DiagramStylePanel.prototype.addResetButton = function(td)
+		{
 			if (mxClient.IS_SVG && this.isShadowOptionVisible())
 			{
 				var ui = this.editorUi;
@@ -4082,11 +4110,11 @@
 					option.getElementsByTagName('input')[0].setAttribute('disabled', 'disabled');
 					mxUtils.setOpacity(option, 60);
 				}
+
+				option.style.width = '';
 				
-				div.appendChild(option);
+				td.appendChild(option);
 			}
-			
-			return div;
 		};
 
 		/**
@@ -4522,8 +4550,9 @@
 		{
 			var sstate = this.editorUi.getSelectionState();
 
-			/* MONDRIAN: Hide Style Color Palette Panel */
-			if (sstate.style.shape != 'image' && !sstate.containsLabel && sstate.cells.length > 0 && sstate.style.shape != mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE && sstate.style.shape != mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+			if (this.defaultColorSchemes != null && this.defaultColorSchemes.length > 0 &&
+				sstate.style.shape != 'image' && !sstate.containsLabel &&
+				sstate.cells.length > 0)
 			{
 				this.container.appendChild(this.addStyles(this.createPanel()));
 			}
@@ -4762,7 +4791,7 @@
 				return btn;
 			};
 			
-			function createStaticArrList(pName, pValue, subType, defVal, size, myRow, flipBkg, enumList, onChange)
+			function createStaticArrList(pName, pValue, subType, defVal, size, myRow, flipBkg)
 			{
 				if (size > 0)
 				{
@@ -4774,8 +4803,8 @@
 					{
 						vals[i] = curVals[i] != null? curVals[i] : (defVal != null? defVal : '');
 					}
-					/* MONDRIAN: Extend staticArr type */
-					secondLevel.push({name: pName, values: vals, type: subType, defVal: defVal, parentRow: myRow, flipBkg: flipBkg, size: size, enumList: enumList, onChange: onChange});
+					
+					secondLevel.push({name: pName, values: vals, type: subType, defVal: defVal, parentRow: myRow, flipBkg: flipBkg, size: size});
 				}
 				
 				return document.createElement('div'); //empty cell
@@ -4834,52 +4863,10 @@
 				{
 					td.appendChild(createCheckbox(pName, pValue, prop));
 				}
-				else if (pType == 'enum' || pType == 'dynamicEnum')
+				else if (pType == 'enum')
 				{
 					var pEnumList = prop.enumList;
-					/* MONDRIAN: Added dynamicEnum property */
-					if(pType == 'dynamicEnum')
-					{
-						let enumSource = prop.enumSource;
-						let dynamicAttributes = [];
-						pEnumList = pEnumList.filter(function (value, index, arr) { return !value.isDynamic;});
-						
-						if(enumSource == undefined)
-						{
-							let selectedCells = graph.getSelectionCells();
-							let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes'];
-	
-							for (let selectedCellIdx in selectedCells)
-							{
-								let selectedCell = selectedCells[selectedCellIdx];
-	
-								for (let attribute in selectedCell.value.attributes)
-								{
-									let attributeName = selectedCell.value.attributes[attribute].nodeName;
-									
-									if(!excludedAttributes.includes(attributeName) && !dynamicAttributes.includes(attributeName))
-										dynamicAttributes.push(attributeName);
-								}
-							}
-	
-							dynamicAttributes.sort();	
-						}
-						else
-						{
-							Object.entries(Sidebar.prototype.mondrianRepo.getElement('default',enumSource).formats).forEach((entry) => {
-								const [key, value] = entry;
-								dynamicAttributes.push(key);
-							  });
-						}
-
-						for (let i = 0; i < dynamicAttributes.length; i++)
-						{
-							let enumItem = {val: dynamicAttributes[i], dispName: dynamicAttributes[i], isDynamic: true};
 					
-							pEnumList.push(enumItem);
-						}
-					}
-
 					for (var i = 0; i < pEnumList.length; i++)
 					{
 						var op = pEnumList[i];
@@ -4931,7 +4918,7 @@
 				}
 				else if (pType == 'staticArr')
 				{
-					td.appendChild(createStaticArrList(pName, pValue, prop.subType, prop.subDefVal, prop.size, row, flipBkg, prop.enumList, prop.onChange));
+					td.appendChild(createStaticArrList(pName, pValue, prop.subType, prop.subDefVal, prop.size, row, flipBkg));
 				}
 				else if (pType == 'readOnly')
 				{
@@ -5151,8 +5138,7 @@
 				}
 				else if (prop.type == 'staticArr') //if dynamic values are needed, a more elegant technique is needed to replace such values
 				{
-					/* MONDRIAN: Extend staticArr type */
-					prop.size = parseInt(prop.size || state.style[prop.sizeProperty] || properties[prop.sizeProperty].defVal) || 0;
+					prop.size = parseInt(state.style[prop.sizeProperty] || properties[prop.sizeProperty].defVal) || 0;
 				}
 				else if (prop.dependentProps != null)
 				{
@@ -5184,8 +5170,7 @@
 				for (var j = 0; j < prop.values.length; j++)
 				{
 					//mxUtils.clone failed because of the HTM element, so manual cloning is used
-					/* MONDRIAN: Extend staticArr type */
-					var iProp = {type: prop.type, parentRow: prop.parentRow, isDeletable: prop.isDeletable, index: j, defVal: prop.defVal, countProperty: prop.countProperty, size: prop.size, enumList: prop.enumList, onChange: prop.onChange};
+					var iProp = {type: prop.type, parentRow: prop.parentRow, isDeletable: prop.isDeletable, index: j, defVal: prop.defVal, countProperty: prop.countProperty, size: prop.size};
 					var arrItem = createPropertyRow(prop.name, prop.values[j], iProp, j % 2 == 0, prop.flipBkg);
 					insertAfter(arrItem, insertElem);
 					insertElem = arrItem;
@@ -5447,7 +5432,8 @@
 
 			if (this.format.currentScheme == null)
 			{
-				setScheme(Editor.isDarkMode() ? 1 : (urlParams['sketch'] == '1' ? 5 : 0));
+				setScheme(Math.min(dots.length - 1, Editor.isDarkMode()
+					? 1 : (urlParams['sketch'] == '1' ? 5 : 0)));
 			}
 			else
 			{
@@ -5501,78 +5487,6 @@
 			if (this.defaultColorSchemes.length <= maxEntries)
 			{
 				div.appendChild(switcher);
-			}
-			
-			return div;
-		};
-		
-		StyleFormatPanel.prototype.addEditOps = function(div)
-		{
-			var ss = this.editorUi.getSelectionState();
-			var graph = this.editorUi.editor.graph;
-			var btn = null;
-			
-			if (ss.cells.length == 1)
-			{
-				btn = mxUtils.button(mxResources.get('editStyle'), mxUtils.bind(this, function(evt)
-				{
-					this.editorUi.actions.get('editStyle').funct();
-				}));
-				
-				btn.setAttribute('title', mxResources.get('editStyle') + ' (' + this.editorUi.actions.get('editStyle').shortcut + ')');
-				btn.style.width = '210px';
-				btn.style.marginBottom = '2px';
-				
-				div.appendChild(btn);
-			}
-			
-			var state = (ss.cells.length == 1) ? graph.view.getState(ss.cells[0]) : null;
-			
-			if (state != null && state.shape != null && state.shape.stencil != null)
-			{
-				var btn2 = mxUtils.button(mxResources.get('editShape'), mxUtils.bind(this, function(evt)
-				{
-					this.editorUi.actions.get('editShape').funct();
-				}));
-				
-				btn2.setAttribute('title', mxResources.get('editShape'));
-				btn2.style.marginBottom = '2px';
-				
-				if (btn == null)
-				{
-					btn2.style.width = '210px';
-				}
-				else
-				{
-					btn.style.width = '104px';
-					btn2.style.width = '104px';
-					btn2.style.marginLeft = '2px';
-				}
-				
-				div.appendChild(btn2);
-			}
-			else if (ss.image && ss.cells.length > 0)
-			{
-				var btn2 = mxUtils.button(mxResources.get('editImage'), mxUtils.bind(this, function(evt)
-				{
-					this.editorUi.actions.get('image').funct();
-				}));
-				
-				btn2.setAttribute('title', mxResources.get('editImage'));
-				btn2.style.marginBottom = '2px';
-				
-				if (btn == null)
-				{
-					btn2.style.width = '210px';
-				}
-				else
-				{
-					btn.style.width = '104px';
-					btn2.style.width = '104px';
-					btn2.style.marginLeft = '2px';
-				}
-				
-				div.appendChild(btn2);
 			}
 			
 			return div;
@@ -7057,7 +6971,7 @@
 		if (this.isHtmlLabel(cell))
 		{
 			var temp = document.createElement('div');
-			temp.innerHTML = this.sanitizeHtml(this.getLabel(cell));
+			temp.innerHTML = Graph.sanitizeHtml(this.getLabel(cell));
 			var links = temp.getElementsByTagName('a');
 			var changed = false;
 			

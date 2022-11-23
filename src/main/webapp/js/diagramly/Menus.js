@@ -306,13 +306,29 @@
 				document.fullscreenElement != null;
 		});
 
-        var toggleDarkModeAction = editorUi.actions.put('toggleDarkMode', new Action(mxResources.get('dark'), function(e)
+        var lightModeAction = editorUi.actions.put('lightMode', new Action(mxResources.get('light'), function(e)
         {
-			editorUi.setAndPersistDarkMode(!Editor.isDarkMode());
+			editorUi.setAndPersistDarkMode(false);
         }));
 
-		toggleDarkModeAction.setToggleAction(true);
-		toggleDarkModeAction.setSelectedCallback(function() { return Editor.isDarkMode(); });
+		lightModeAction.setToggleAction(true);
+		lightModeAction.setSelectedCallback(function() { return !editorUi.isAutoDarkMode(true) && !Editor.isDarkMode(); });
+		
+        var darkModeAction = editorUi.actions.put('darkMode', new Action(mxResources.get('dark'), function(e)
+        {
+			editorUi.setAndPersistDarkMode(true);
+        }));
+
+		darkModeAction.setToggleAction(true);
+		darkModeAction.setSelectedCallback(function() { return !editorUi.isAutoDarkMode(true) && Editor.isDarkMode(); });
+		
+        var autoModeAction = editorUi.actions.put('autoMode', new Action(mxResources.get('automatic'), function(e)
+        {
+			editorUi.setAndPersistDarkMode('auto');
+        }));
+
+		autoModeAction.setToggleAction(true);
+		autoModeAction.setSelectedCallback(function() { return editorUi.isAutoDarkMode(true); });
 		
         var toggleSimpleModeAction = editorUi.actions.put('toggleSimpleMode', new Action(mxResources.get('simple'), function(e)
         {
@@ -810,21 +826,6 @@
 			}
 		}, null, null, Editor.ctrlKey + '+Shift+V');
 		
-		editorUi.actions.put('pageBackgroundImage', new Action(mxResources.get('backgroundImage') + '...', function()
-		{
-			if (!editorUi.isOffline())
-			{
-				var apply = function(image)
-				{
-					editorUi.setBackgroundImage(image);
-				};
-	
-				var dlg = new BackgroundImageDialog(editorUi, apply);
-				editorUi.showDialog(dlg.container, 400, 170, true, true);
-				dlg.init();
-			}
-		}));
-
 		editorUi.actions.put('exportSvg', new Action(mxResources.get('formatSvg') + '...', function()
 		{
 			editorUi.showExportDialog(mxResources.get('formatSvg'), true, mxResources.get('export'),
@@ -1011,8 +1012,11 @@
 			
 			if (this[name] == null)
 			{
-				var w = (findReplace) ? ((uiTheme == 'min') ? 330 : 300) : 240;
-				var h = (findReplace) ? ((uiTheme == 'min') ? 304 : 288) : 170;
+				var modern = (Editor.currentTheme == 'min' ||
+					Editor.currentTheme == 'simple' ||	
+					Editor.currentTheme == 'sketch');
+				var w = (findReplace) ? ((modern) ? 330 : 300) : 240;
+				var h = (findReplace) ? ((modern) ? 304 : 288) : 170;
 				this[name] = new FindWindow(editorUi,
 					document.body.offsetWidth - (w + 20),
 					100, w, h, findReplace);
@@ -1265,7 +1269,7 @@
 					editorUi.getServiceName() != 'atlassian' &&
 					urlParams['embed'] != '1')
 				{
-					var themeMenu = this.get('appearance');
+					var themeMenu = this.get('uiSwitches');
 					
 					if (themeMenu != null)
 					{
@@ -2651,20 +2655,17 @@
 				this.addMenuItem(menu, 'export', parent).firstChild.nextSibling.innerHTML = mxResources.get('advanced') + '...';
 			}
 
-			if (Editor.currentTheme == 'simple' || Editor.currentTheme == 'min')
+			if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && Editor.currentTheme == 'min')
 			{
-				if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp)
-				{
-					// Publish menu contains only one element by default...
-					//ui.menus.addSubmenu('publish', menu, parent); 
-					this.addMenuItems(menu, ['publishLink'], parent);
-				}
-				
-				if (editorUi.mode != App.MODE_ATLAS && urlParams['extAuth'] != '1')
-				{
-					menu.addSeparator(parent);
-					editorUi.menus.addSubmenu('embed', menu, parent);
-				}
+				this.addMenuItems(menu, ['publishLink'], parent);
+			}	
+
+			if (editorUi.mode != App.MODE_ATLAS && urlParams['extAuth'] != '1' &&
+				(Editor.currentTheme == 'simple' || Editor.currentTheme == 'sketch' ||
+				Editor.currentTheme == 'min'))
+			{
+				menu.addSeparator(parent);
+				editorUi.menus.addSubmenu('embed', menu, parent);
 			}
 		})));
 
@@ -2912,32 +2913,25 @@
 			}
 		}))).isEnabled = isGraphEnabled;
 
-		this.put('appearance', new Menu(mxUtils.bind(this, function(menu, parent)
+		this.put('uiSwitches', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
-			if (Editor.isDarkMode() || (!mxClient.IS_IE && !mxClient.IS_IE11))
-			{
-				this.addMenuItems(menu, ['toggleDarkMode'], parent);
-			}
-
 			this.addMenuItems(menu, ['toggleSimpleMode'], parent);
 
-			if (urlParams['test-prefs'] == '1')
+			if (Editor.isDarkMode() || (!mxClient.IS_IE && !mxClient.IS_IE11))
 			{
-				this.addMenuItems(menu, ['-', 'preferences'], parent);
+				this.addMenuItems(menu, ['-', 'lightMode', 'darkMode', 'autoMode'], parent);
 			}
+
+		})));
+
+		this.put('appearance', new Menu(mxUtils.bind(this, function(menu, parent)
+		{
+			this.addMenuItems(menu, ['lightMode', 'darkMode', 'autoMode'], parent);
 		})));
 
 		this.put('theme', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
 			var theme = (urlParams['sketch'] == '1') ? 'sketch' : mxSettings.getUi();
-			
-			if (urlParams['embedInline'] != '1' && Editor.isDarkMode() ||
-				(!mxClient.IS_IE && !mxClient.IS_IE11))
-			{
-				this.addMenuItems(menu, ['toggleDarkMode'], parent);
-			}
-			
-			menu.addSeparator(parent);
 			
 			var item = menu.addItem(mxResources.get('automatic'), null, function()
 			{
@@ -3251,6 +3245,11 @@
     	    {
     			cell = graph.addCell(cell);
     	    	graph.fireEvent(new mxEventObject('cellsInserted', 'cells', [cell]));
+
+				if (graph.model.isVertex(cell) && graph.isAutoSizeCell(cell))
+				{
+					graph.updateCellSize(cell);
+				}
     	    }
     		finally
     		{
@@ -4089,6 +4088,12 @@
 				if (urlParams['embed'] != '1' && urlParams['extAuth'] != '1' && editorUi.mode != App.MODE_ATLAS)
 				{
 					editorUi.menus.addSubmenu('theme', menu, parent);
+					
+					if (urlParams['embedInline'] != '1' && Editor.isDarkMode() ||
+						(!mxClient.IS_IE && !mxClient.IS_IE11))
+					{
+						editorUi.menus.addSubmenu('appearance', menu, parent);
+					}
 				}
 				
 				editorUi.menus.addSubmenu('units', menu, parent);
@@ -4160,6 +4165,11 @@
 				if (urlParams['embed'] != '1')
 				{
 					this.addSubmenu('theme', menu, parent);
+
+					if (Editor.isDarkMode() || (!mxClient.IS_IE && !mxClient.IS_IE11))
+					{
+						editorUi.menus.addSubmenu('appearance', menu, parent);
+					}
 				}
 
 				menu.addSeparator(parent);
@@ -4357,7 +4367,7 @@
 	
 					if (file != null)
 					{		
-						if (file.constructor == DriveFile)
+						if (file.constructor == DriveFile || file.constructor == GitHubFile)
 						{
 							editorUi.menus.addMenuItems(menu, ['share'], parent);
 						}
@@ -4594,7 +4604,16 @@
 						}
 					}
 					
-					if (file.constructor == DriveFile)
+
+					if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp &&
+						(Editor.currentTheme == 'simple' ||
+						Editor.currentTheme == 'sketch'))
+					{
+						menu.addSeparator(parent);
+						this.addMenuItem(menu, 'publishLink', parent, null, null, mxResources.get('publish') + '...');
+					}
+
+					if (file.constructor == DriveFile || file.constructor == GitHubFile)
 					{
 						editorUi.menus.addMenuItems(menu, ['share'], parent);
 					}
