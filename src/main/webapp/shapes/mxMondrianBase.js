@@ -24,6 +24,7 @@ function mxMondrianBase(bounds, fill, stroke, strokewidth)
 	this.fill = fill;
 	this.stroke = stroke;
 	this.strokewidth = (strokewidth != null) ? strokewidth : 1;
+	this.defaultStyleString = undefined;
 };
 
 /**
@@ -66,7 +67,7 @@ mxMondrianBase.prototype.cst = {
 	TAG : 'tag',
 	TAG_DEFAULT : 'noTag',
 	TAG_TEXT : 'tagText',
-	TAG_TEXT_DEFAULT : 'Tag-Text',
+	TAG_TEXT_DEFAULT : 'noText',
 	TAG_COLOR_FAMILY : 'tagColorFamily',
 	TAG_COLOR_FAMILY_DEFAULT : 'black',
 	TAG_COLOR_FILL : 'tagColorFill', 
@@ -571,7 +572,7 @@ mxMondrianBase.prototype.customProperties = [
 		enumList:[
 		{val:'noTag', dispName: 'None'}, {val:'circle', dispName: 'Circle'}, {val:'diamond', dispName: 'Diamond'}, 
 		{val:'square', dispName: 'Square'}, {val:'triangle', dispName: 'Triangle'}, {val:'hexagon', dispName: 'Hexagon'}, {val:'octagon', dispName: 'Octagon'}]},
-	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'Tag-Text',
+	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'noText',
 		enumList:[{val:'noText', dispName: 'None'}]
 	},
 	{name:'tagColorFamily', dispName:'Tag (Color)', type:'enum', defVal:'black',
@@ -608,7 +609,7 @@ mxMondrianBase.prototype.init = function(container)
 		this.state.cell.value = obj;
 	}
 
-	let mondrianAttributes = ['Element-ID', 'Element-Name','Icon-Name','Tag-Text'];
+	let mondrianAttributes = ['Element-ID', 'Element-Name','Icon-Name'];
 	for (attributeIndex = 0; attributeIndex < mondrianAttributes.length; attributeIndex++ ) {
 		if(!this.state.cell.hasAttribute(mondrianAttributes[attributeIndex]))
 		{
@@ -616,7 +617,9 @@ mxMondrianBase.prototype.init = function(container)
 		}
 	}
 
-	mxMondrianBase.prototype.setAttributesFromRepo(this.state);
+	let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Element-ID');
+	mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
+
 	this.state.cell.setAttribute('label',
 		mxMondrianBase.prototype.defineLabel(
 			mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
@@ -668,9 +671,65 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
 }
 
+mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defaultStyles) {
+	let currentStyles = thisState.cell.style;
+	let newStyles = thisState.cell.style;
+
+	// check if a formatConnector template is specified and if so apply this first
+	let formatConnector = mxMondrianBase.prototype.getStyleValue(newStyles, 'formatConnector', undefined);
+	if(formatConnector != undefined && formatConnector != 'undefined')
+	{
+		let connectFormatString = Sidebar.prototype.mondrianRepo.getElement('default','connectorFormats').formats[formatConnector];
+		let connectFormat = connectFormatString.toString().split(';');
+		for (let j = 0; j< connectFormat.length; j++)
+		{
+			let styleAttribute = connectFormat[j].toString().split('=');
+			newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
+			//thisState.style[styleAttribute[0]] = styleAttribute[1];
+		}
+	}
+
+	// apply the MANDATORY styles that have been given to this function
+	let newStylePartials = (mandatoryStyles != undefined) ? mandatoryStyles.split(';') : [];
+	for (let j = 0; j< newStylePartials.length; j++)
+	{
+		let styleAttribute = newStylePartials[j].toString().split('=');
+		newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
+		//thisState.style[styleAttribute[0]] = styleAttribute[1];
+	}
+
+	// apply the DEFAULT styles that have been given to this function
+	newStylePartials = (defaultStyles != undefined) ? defaultStyles.split(';') : [];
+	for (let j = 0; j< newStylePartials.length; j++)
+	{
+		let styleAttribute = newStylePartials[j].toString().split('=');
+		let propValue = mxMondrianBase.prototype.getStyleValue(newStyles, styleAttribute[0]);
+
+		if(propValue == 'undefined')
+		{
+			newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
+			//thisState.style[styleAttribute[0]] = styleAttribute[1];
+		}	
+	}
+
+	// strokeColor is based on the colorFamily and intensity and the #HEX value must be re-established after the update
+	let strokeColor = mxMondrianBase.prototype.getStrokeColor(newStyles);
+	newStyles = mxUtils.setStyle(newStyles, 'strokeColor', strokeColor);
+	thisState.style['strokeColor'] = strokeColor;
+
+	if(newStyles != currentStyles)
+	{
+		thisState.view.graph.model.beginUpdate();
+		thisState.view.graph.model.setStyle(thisState.cell, newStyles);
+		thisState.view.graph.model.endUpdate();	
+	}
+}
+
 mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedID)
 {
 	let predefinedElements = ['undefined'];
+	let formatSettings = undefined;
+	let newRepoAttributes = [];
 
 	if(thisState != null)
 	{
@@ -685,12 +744,28 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedI
 	if(Sidebar.prototype.mondrianRepo.hasElement(predefinedElements, elementID))
 	{
 		let element = Sidebar.prototype.mondrianRepo.getElement(predefinedElements, elementID);
-		let newRepoAttributes = [];
 
-		for (let attributeInRepo in element)
+		for (let attributeInRepo in element) // set data attribute
 		{
-			thisState.cell.setAttribute(attributeInRepo, element[attributeInRepo]);
-			newRepoAttributes.push(attributeInRepo);
+			if(attributeInRepo === 'format')
+			{
+				formatSettings = element[attributeInRepo].mandatorySettings;
+			}
+			else
+			{
+				let attributeValue = element[attributeInRepo];
+
+				if(attributeValue != '')
+				{
+					thisState.cell.setAttribute(attributeInRepo, element[attributeInRepo]);
+					newRepoAttributes.push(attributeInRepo);	
+				}
+				else
+				{
+					if(!thisState.cell.hasAttribute(attributeInRepo))
+						thisState.cell.setAttribute(attributeInRepo, '');
+				}
+			}
 		}
 
 		thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());
@@ -699,6 +774,8 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedI
 	{
 		thisState.cell.setAttribute('repoAttributes', '');
 	}
+
+	return {repoAttributes: newRepoAttributes.join(), repoFormatSettings: formatSettings}
 }
 
 /* temporary function to support coversion of old diagrams  */
@@ -854,7 +931,8 @@ mxMondrianBase.prototype.installListeners = function()
 			{
 				if(evt.properties.change.constructor.name === 'mxValueChange' && (evt.properties.change.cell.id === this.cellID))
 				{
-					mxMondrianBase.prototype.setAttributesFromRepo(this.state);
+					let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Element-ID');
+					mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
 
 					const currentIconAttribute = evt.properties.change.value.attributes.getNamedItem('Icon-Name');
 					const previousIconAttribute = evt.properties.change.previous.attributes.getNamedItem('Icon-Name');
@@ -862,13 +940,13 @@ mxMondrianBase.prototype.installListeners = function()
 					const currentIconName = (currentIconAttribute != null) ? currentIconAttribute.value : null;
 					const previousIconName = (previousIconAttribute != null) ?  previousIconAttribute.value : null;
 					
-					const currentCMTextAttribute = evt.properties.change.value.attributes.getNamedItem('Tag-Text');
-					const previousCMTextAttribute = evt.properties.change.previous.attributes.getNamedItem('Tag-Text');
+					//const currentCMTextAttribute = evt.properties.change.value.attributes.getNamedItem('Tag-Text');
+					//const previousCMTextAttribute = evt.properties.change.previous.attributes.getNamedItem('Tag-Text');
 	
 					const currentCMText = (currentCMTextAttribute != null) ? currentCMTextAttribute.value : null;
 					const previousCMText = (previousCMTextAttribute != null) ?  previousCMTextAttribute.value : null;
 
-					if(currentIconName != previousIconName || currentCMText != previousCMText)
+					//if(currentIconName != previousIconName || currentCMText != previousCMText)
 						this.redraw();
 				}
 				else if(evt.properties.change.constructor.name === 'mxStyleChange' && (evt.properties.change.cell.id === this.cellID))
@@ -973,6 +1051,21 @@ mxMondrianBase.prototype.getStyleValue = function(style, key, defaultValue)
 	}
 
 	return (value === 'undefined' &&  defaultValue != undefined) ? defaultValue : value;
+}
+
+mxMondrianBase.prototype.getStrokeColor = function (currentStyle) {
+		let colorFamilyLine = mxMondrianBase.prototype.getStyleValue(
+			currentStyle, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE_DEFAULT);
+
+		let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(
+			currentStyle, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE, 
+			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE_DEFAULT);
+		
+		return mxMondrianBase.prototype.getColor(
+			mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, colorFamilyLine, colorIntensityLine);
 }
 
 /**
@@ -2465,6 +2558,7 @@ mxMondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (this
 function mxMondrianBaseConnector()
 {
 	mxArrowConnector.call(this);
+	this.defaultStyleString = 'jumpStyle=line;jumpSize=8;endArrow=none;startArrow=none;metaEdit=1';
 };
 
 mxUtils.extend(mxMondrianBaseConnector, mxConnector);
@@ -2482,6 +2576,7 @@ mxMondrianBaseConnector.prototype.init = function(container)
 {
 	if(this.state != null)
 	{
+		// DATA ATTRIBUTES
 		if (!mxUtils.isNode(this.state.cell.value)) 
 			this.state.cell.value = mxUtils.createXmlDocument().createElement('UserObject');;
 
@@ -2491,7 +2586,6 @@ mxMondrianBaseConnector.prototype.init = function(container)
 				this.state.cell.setAttribute(mondrianAttributes[attributeIndex],'')
 		}
 
-		mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
 		this.state.cell.setAttribute('label',
 			mxMondrianBase.prototype.defineLabel(
 				mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
@@ -2499,54 +2593,60 @@ mxMondrianBaseConnector.prototype.init = function(container)
 				this.state.cell, 'defaultSettingsConnector'));
 
 		this.state.cell.setAttribute('placeholders','1')
-
-		let defaultStyles = [{prop: 'jumpStyle', value: 'line'}, {prop: 'jumpSize', value: '8'}, {prop: 'endArrow', value: 'none'}, {prop: 'startArrow', value: 'none'}, {prop: 'metaEdit', value: '1'}];
-		let currentStyle = this.state.cell.style;
-		let newStyle = currentStyle;
-		let styleChanged = false;
-
-		for (styleIndex = 0; styleIndex < defaultStyles.length; styleIndex++ ) {
-			let propValue = mxMondrianBase.prototype.getStyleValue(currentStyle, defaultStyles[styleIndex].prop);
-
-			if(propValue == 'undefined')
-			{
-				newStyle = mxUtils.setStyle(newStyle, defaultStyles[styleIndex].prop, defaultStyles[styleIndex].value);
-				this.state.style[defaultStyles[styleIndex].prop] = defaultStyles[styleIndex].value;
-				styleChanged = true;	
-			}	
-		}
-
-		// set the stroke color
-		let colorFamilyLine = mxMondrianBase.prototype.getStyleValue(
-			currentStyle, 
-			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE, 
-			mxMondrianBaseConnector.prototype.cst.COLOR_FAMILY_LINE_DEFAULT);
-
-		let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(
-			currentStyle, 
-			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE, 
-			mxMondrianBaseConnector.prototype.cst.COLOR_INTENSITY_LINE_DEFAULT);
-
-		let mondrianColor = mxMondrianBase.prototype.getColor(
-			mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, colorFamilyLine, colorIntensityLine);
-
-		if(mondrianColor != mxMondrianBase.prototype.getStyleValue(currentStyle, 'strokeColor'))
-		{
-			newStyle = mxUtils.setStyle(newStyle, 'strokeColor', mondrianColor);
-			this.state.style['strokeColor'] = mondrianColor;
-			styleChanged = true;
-		}
-
-		if(styleChanged)
-		{
-			this.state.view.graph.model.beginUpdate();
-			this.state.view.graph.model.setStyle(this.state.cell, newStyle);
-			this.state.view.graph.model.endUpdate();
-		}
 	}
 
-	mxConnector.prototype.init.apply(this, arguments); 
+	mxConnector.prototype.init.apply(this, arguments);
+
+	if(this.state != null)
+	{
+		this.cellID = this.state.cell.id;
+		this.installListeners();	
+	}
 };
+
+mxMondrianBaseConnector.prototype.installListeners = function()
+{
+	if (this.changeListener == null)
+	{
+		this.changeListener = mxUtils.bind(this, function(sender, evt)
+		{
+			try
+			{
+				if(	(evt.properties.change.constructor.name === 'mxValueChange' || evt.properties.change.constructor.name === 'mxStyleChange')
+					&& (evt.properties.change.cell.id === this.cellID))
+				{
+					if(this.state != null)
+					{
+						let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
+						mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);	
+					}				
+				}
+			}
+			catch(err)
+			{
+				// do nothing
+			}
+		});
+
+		this.state.view.graph.model.addListener(mxEvent.EXECUTED, this.changeListener);
+	}
+}
+
+mxMondrianBaseConnector.prototype.paintLine = function(c, pts)
+{
+	if(this.state != null)
+	{
+		let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
+		mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);	
+	}
+
+	mxConnector.prototype.paintLine.apply(this, arguments);
+}
+
+mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts)
+{
+	mxConnector.prototype.paintEdgeShape.apply(this, arguments);
+}
 
 mxMondrianBaseConnector.prototype.customProperties = [
 	{name:'colorFamilyLine', dispName:'Color', type:'enum', defVal:'black',
@@ -2601,13 +2701,11 @@ mxMondrianBaseConnector.prototype.customProperties = [
 				{
 					let styleAttribute = connectFormat[j].toString().split('=');
 					graph.setCellStyles(styleAttribute[0], styleAttribute[1], [selectedCells[i]]);
-
-					if(styleAttribute[0] === 'colorFamilyLine')
-					{
-						let mondrianColor = mxMondrianBase.prototype.getColor(mxMondrianBase.prototype.CONFIG.COLOR_PALETTE, styleAttribute[1], 'medium');
-						graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
-					}	
 				}
+
+				graph.setCellStyles('strokeColor', 
+					mxMondrianBase.prototype.getStrokeColor([selectedCells[i]][0].style),
+					[selectedCells[i]]);
 			}
 		}
 	},
@@ -2645,20 +2743,6 @@ mxMondrianBaseConnector.prototype.customProperties = [
 		}
 	}
 ];
-
-mxMondrianBaseConnector.prototype.origPaintEdgeShape = mxMondrianBaseConnector.prototype.paintEdgeShape;
-mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts, rounded)
-{
-	// Markers modify incoming points array
-	var temp = [];
-	
-	for (var i = 0; i < pts.length; i++)
-	{
-		temp.push(mxUtils.clone(pts[i]));
-	}
-	
-	mxMondrianBaseConnector.prototype.origPaintEdgeShape.apply(this, [c, temp, rounded]);
-};
 
 /**
  * Mondrian Design Method shape registration
