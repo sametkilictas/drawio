@@ -68,6 +68,9 @@
 
 		hasElement: function(predefinedElements, id)
 		{
+			if(id === undefined)
+				return false;
+
 			id = id.toLowerCase();
 
 			if((predefinedElements != 'undefined' && predefinedElements != 'default' && predefinedElements != ''))
@@ -559,7 +562,6 @@
 			bg.setAttribute('Element-ID', elementID);
 			bg.setAttribute('Element-Name', elementName);
 			bg.setAttribute('Icon-Name', iconName);
-			bg.setAttribute('Tag-Text', tagText);
 		}
 		
 		return bg;
