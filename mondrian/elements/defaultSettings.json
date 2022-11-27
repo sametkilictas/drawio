@@ -26,10 +26,10 @@
     "connectorFormats":
     {
         "formats": {
-            "Default":              "dashed=0;strokeWidth=1;colorFamilyLine=black;",
-            "Network: Coper-1G":    "dashed=0;strokeWidth=1;colorFamilyLine=yellow;",
-            "Network: Fiber-1G":    "dashed=1;strokeWidth=3;colorFamilyLine=purple;",
-            "Network: Fiber-10G":   "dashed=1;strokeWidth=5;colorFamilyLine=green;"
+            "Default":              "dashed=0;strokeWidth=1;colorFamilyLine=black",
+            "Network: Coper-1G":    "dashed=0;strokeWidth=1;colorFamilyLine=yellow",
+            "Network: Fiber-1G":    "dashed=1;strokeWidth=3;colorFamilyLine=purple",
+            "Network: Fiber-10G":   "dashed=1;strokeWidth=5;colorFamilyLine=green"
         }
     }
 }
