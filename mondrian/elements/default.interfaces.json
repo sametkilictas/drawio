@@ -10,5 +10,17 @@
         "Interface-Name": "Hypertext Transfer Protocol Secure",
         "Port": "443",
         "Protocol": "HTTPS"
+    },
+    "NW-F-10G":
+    {
+        "Interface-Name": "Fiber-10G",
+        "Speed": "10G",
+        "Type": "Fiber",
+        "Port-A": "",
+        "Port-B": "",
+
+        "format": {
+            "mandatorySettings": "formatConnector=Network: Fiber-10G"
+        }
     }
 }
