@@ -2,7 +2,11 @@
     "DC":
     {
         "Element-Name": "Data Center",
-        "Icon-Name": "data-center"
+        "Icon-Name": "data-center",
+        "format" :
+        {
+            "mandatorySettings": "shapeType=lg;shapeLayout=expanded;colorFamily=gray"    
+        }
     },
     "DC-1":
     {
