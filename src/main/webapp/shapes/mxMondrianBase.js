@@ -618,8 +618,6 @@ mxMondrianBase.prototype.init = function(container)
 	}
 
 	let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Element-ID');
-	mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
-
 	this.state.cell.setAttribute('label',
 		mxMondrianBase.prototype.defineLabel(
 			mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
@@ -627,6 +625,7 @@ mxMondrianBase.prototype.init = function(container)
 			this.state.cell));
 
 	mxShape.prototype.init.apply(this, arguments);
+	mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
 
 	this.templateConversion();
 
@@ -672,56 +671,53 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 }
 
 mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defaultStyles) {
-	let currentStyles = thisState.cell.style;
-	let newStyles = thisState.cell.style;
-
-	// check if a formatConnector template is specified and if so apply this first
-	let formatConnector = mxMondrianBase.prototype.getStyleValue(newStyles, 'formatConnector', undefined);
-	if(formatConnector != undefined && formatConnector != 'undefined')
+	if (thisState != null)
 	{
-		let connectFormatString = Sidebar.prototype.mondrianRepo.getElement('default','connectorFormats').formats[formatConnector];
-		let connectFormat = connectFormatString.toString().split(';');
-		for (let j = 0; j< connectFormat.length; j++)
+		let newStyles = (thisState != null) ? thisState.cell.style : undefined;
+		let currentStyles = (thisState != null) ? thisState.cell.style : undefined;
+
+		// check if a formatConnector template is specified and if so apply this first
+		let formatConnector = mxMondrianBase.prototype.getStyleValue(newStyles, 'formatConnector', undefined);
+		if(formatConnector != undefined && formatConnector != 'undefined')
 		{
-			let styleAttribute = connectFormat[j].toString().split('=');
-			newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
-			//thisState.style[styleAttribute[0]] = styleAttribute[1];
+			let connectFormatString = Sidebar.prototype.mondrianRepo.getElement('default','connectorFormats').formats[formatConnector];
+			let connectFormat = connectFormatString.toString().split(';');
+			for (let j = 0; j< connectFormat.length; j++)
+			{
+				let styleAttribute = connectFormat[j].toString().split('=');
+				newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
+			}
 		}
-	}
 
-	// apply the MANDATORY styles that have been given to this function
-	let newStylePartials = (mandatoryStyles != undefined) ? mandatoryStyles.split(';') : [];
-	for (let j = 0; j< newStylePartials.length; j++)
-	{
-		let styleAttribute = newStylePartials[j].toString().split('=');
-		newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
-		//thisState.style[styleAttribute[0]] = styleAttribute[1];
-	}
-
-	// apply the DEFAULT styles that have been given to this function
-	newStylePartials = (defaultStyles != undefined) ? defaultStyles.split(';') : [];
-	for (let j = 0; j< newStylePartials.length; j++)
-	{
-		let styleAttribute = newStylePartials[j].toString().split('=');
-		let propValue = mxMondrianBase.prototype.getStyleValue(newStyles, styleAttribute[0]);
-
-		if(propValue == 'undefined')
+		// apply the MANDATORY styles that have been given to this function
+		let newStylePartials = (mandatoryStyles != undefined) ? mandatoryStyles.split(';') : [];
+		for (let j = 0; j< newStylePartials.length; j++)
 		{
+			let styleAttribute = newStylePartials[j].toString().split('=');
 			newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
-			//thisState.style[styleAttribute[0]] = styleAttribute[1];
-		}	
-	}
+		}
 
-	// strokeColor is based on the colorFamily and intensity and the #HEX value must be re-established after the update
-	let strokeColor = mxMondrianBase.prototype.getStrokeColor(newStyles);
-	newStyles = mxUtils.setStyle(newStyles, 'strokeColor', strokeColor);
-	thisState.style['strokeColor'] = strokeColor;
+		// apply the DEFAULT styles that have been given to this function
+		newStylePartials = (defaultStyles != undefined) ? defaultStyles.split(';') : [];
+		for (let j = 0; j< newStylePartials.length; j++)
+		{
+			let styleAttribute = newStylePartials[j].toString().split('=');
+			let propValue = mxMondrianBase.prototype.getStyleValue(newStyles, styleAttribute[0]);
 
-	if(newStyles != currentStyles)
-	{
-		thisState.view.graph.model.beginUpdate();
-		thisState.view.graph.model.setStyle(thisState.cell, newStyles);
-		thisState.view.graph.model.endUpdate();	
+			if(propValue == 'undefined')
+				newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
+		}
+
+		// strokeColor is based on the colorFamily and intensity and the #HEX value must be re-established after the update
+		let strokeColor = mxMondrianBase.prototype.getStrokeColor(newStyles);
+		newStyles = mxUtils.setStyle(newStyles, 'strokeColor', strokeColor);
+
+		if(newStyles != currentStyles)
+		{
+			thisState.view.graph.model.beginUpdate();
+			thisState.view.graph.model.setStyle(thisState.cell, newStyles);	
+			thisState.view.graph.model.endUpdate();	
+		}
 	}
 }
 
@@ -934,7 +930,7 @@ mxMondrianBase.prototype.installListeners = function()
 					let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Element-ID');
 					mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
 
-					const currentIconAttribute = evt.properties.change.value.attributes.getNamedItem('Icon-Name');
+					/*const currentIconAttribute = evt.properties.change.value.attributes.getNamedItem('Icon-Name');
 					const previousIconAttribute = evt.properties.change.previous.attributes.getNamedItem('Icon-Name');
 	
 					const currentIconName = (currentIconAttribute != null) ? currentIconAttribute.value : null;
@@ -946,7 +942,7 @@ mxMondrianBase.prototype.installListeners = function()
 					const currentCMText = (currentCMTextAttribute != null) ? currentCMTextAttribute.value : null;
 					const previousCMText = (previousCMTextAttribute != null) ?  previousCMTextAttribute.value : null;
 
-					//if(currentIconName != previousIconName || currentCMText != previousCMText)
+					if(currentIconName != previousIconName || currentCMText != previousCMText)*/
 						this.redraw();
 				}
 				else if(evt.properties.change.constructor.name === 'mxStyleChange' && (evt.properties.change.cell.id === this.cellID))
@@ -1092,7 +1088,7 @@ mxMondrianBase.prototype.redraw = function()
 	this.colorFillContainer = colorFillBackground[1];
 
 	this.positionText = mxUtils.getValue(this.style, mxMondrianBase.prototype.cst.POSITION_TEXT, mxMondrianBase.prototype.cst.POSITION_TEXT_DEFAULT);
-
+	
 	mxShape.prototype.redraw.apply(this, arguments);
 };
 
