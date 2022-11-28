@@ -132,8 +132,6 @@
 <shape aspect="variable" h="91.889" name="git" strokewidth="inherit" w="91.887">
     <connections/>
     <foreground>
-        <fillcolor color="#100f0d"/>
-        <fillalpha alpha="1"/>
         <path>
             <move x="90.156" y="41.852"/>
             <line x="50.036" y="1.735"/>
