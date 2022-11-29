@@ -678,6 +678,7 @@ mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defa
 
 		// check if a formatConnector template is specified and if so apply this first
 		let formatConnector = mxMondrianBase.prototype.getStyleValue(newStyles, 'formatConnector', undefined);
+		
 		if(formatConnector != undefined && formatConnector != 'undefined')
 		{
 			let connectFormatString = Sidebar.prototype.mondrianRepo.getElement('default','connectorFormats').formats[formatConnector];
@@ -2698,10 +2699,13 @@ mxMondrianBaseConnector.prototype.customProperties = [
 					let styleAttribute = connectFormat[j].toString().split('=');
 					graph.setCellStyles(styleAttribute[0], styleAttribute[1], [selectedCells[i]]);
 				}
-
+				
 				graph.setCellStyles('strokeColor', 
 					mxMondrianBase.prototype.getStrokeColor([selectedCells[i]][0].style),
 					[selectedCells[i]]);
+
+				if(newValue === 'Default')
+					graph.setCellStyles('formatConnector', null, [selectedCells[i]]);
 			}
 		}
 	},
