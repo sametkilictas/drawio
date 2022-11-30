@@ -67,7 +67,7 @@ mxMondrianBase.prototype.cst = {
 	TAG : 'tag',
 	TAG_DEFAULT : 'noTag',
 	TAG_TEXT : 'tagText',
-	TAG_TEXT_DEFAULT : 'noText',
+	TAG_TEXT_DEFAULT : 'Tag-Text',
 	TAG_COLOR_FAMILY : 'tagColorFamily',
 	TAG_COLOR_FAMILY_DEFAULT : 'black',
 	TAG_COLOR_FILL : 'tagColorFill', 
@@ -572,7 +572,7 @@ mxMondrianBase.prototype.customProperties = [
 		enumList:[
 		{val:'noTag', dispName: 'None'}, {val:'circle', dispName: 'Circle'}, {val:'diamond', dispName: 'Diamond'}, 
 		{val:'square', dispName: 'Square'}, {val:'triangle', dispName: 'Triangle'}, {val:'hexagon', dispName: 'Hexagon'}, {val:'octagon', dispName: 'Octagon'}]},
-	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'noText',
+	{name:'tagText', dispName:'Tag (Text)', type:'dynamicEnum', defVal:'Tag-Text',
 		enumList:[{val:'noText', dispName: 'None'}]
 	},
 	{name:'tagColorFamily', dispName:'Tag (Color)', type:'enum', defVal:'black',
@@ -609,7 +609,7 @@ mxMondrianBase.prototype.init = function(container)
 		this.state.cell.value = obj;
 	}
 
-	let mondrianAttributes = ['Element-ID', 'Element-Name','Icon-Name'];
+	let mondrianAttributes = ['Element-ID', 'Element-Name','Icon-Name', 'Tag-Text'];
 	for (attributeIndex = 0; attributeIndex < mondrianAttributes.length; attributeIndex++ ) {
 		if(!this.state.cell.hasAttribute(mondrianAttributes[attributeIndex]))
 		{
@@ -672,7 +672,7 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 
 mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defaultStyles) {
 	if (thisState != null)
-	{
+	{ 
 		let newStyles = (thisState != null) ? thisState.cell.style : undefined;
 		let currentStyles = (thisState != null) ? thisState.cell.style : undefined;
 
@@ -717,7 +717,7 @@ mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defa
 		{
 			thisState.view.graph.model.beginUpdate();
 			thisState.view.graph.model.setStyle(thisState.cell, newStyles);	
-			thisState.view.graph.model.endUpdate();	
+			thisState.view.graph.model.endUpdate();
 		}
 	}
 }
@@ -953,6 +953,9 @@ mxMondrianBase.prototype.installListeners = function()
 					const isMondrianShape = (styleCurrent.indexOf(mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE) > 0);
 					if(isMondrianShape)
 					{
+						let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Element-ID');
+						mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
+
 						const stylePrevious = evt.properties.change.previous;
 	
 						const shapeTypeCurrent = mxMondrianBase.prototype.getStyleValue(styleCurrent, mxMondrianBase.prototype.cst.SHAPE_TYPE);
@@ -1014,6 +1017,7 @@ mxMondrianBase.prototype.installListeners = function()
 								this.state.view.graph.model.endUpdate();
 							}
 						}
+						this.redraw();
 					}
 				}
 				else
