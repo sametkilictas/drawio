@@ -131,16 +131,36 @@
 
 		// ELEMENTS
 		for (let elementsKey in mondrianConfig.Elements) {
-			let elements = JSON.parse(mxUtils.load(mondrianConfig.Elements[elementsKey].uri).getText())
 
-			let clients = mondrianConfig.Elements[elementsKey].client.split(',');
-
-			for (let client in clients)
+			let elementFiles = [];
+			if(mondrianConfig.Elements[elementsKey].uri != undefined)
 			{
-				for (let elementKey in elements)
+				elementFiles.push(mondrianConfig.Elements[elementsKey].uri);
+			}
+			else
+			{
+				for(let fileKey in mondrianConfig.Elements[elementsKey].files)
 				{
-					Sidebar.prototype.mondrianRepo.addElement(clients[client], elementKey, elements[elementKey]);
-				}	
+					elementFiles.push(mondrianConfig.Elements[elementsKey].basePath + mondrianConfig.Elements[elementsKey].files[fileKey]);
+				}
+			}
+				
+
+			for(let elementFileKey in elementFiles)
+			{
+				let elementFile = elementFiles[elementFileKey];
+				console.log(elementFile);
+
+				let elements = JSON.parse(mxUtils.load(elementFile).getText())	
+				let clients = mondrianConfig.Elements[elementsKey].client.split(',');
+	
+				for (let client in clients)
+				{
+					for (let elementKey in elements)
+					{
+						Sidebar.prototype.mondrianRepo.addElement(clients[client], elementKey, elements[elementKey]);
+					}	
+				}
 			}
 		}
 
