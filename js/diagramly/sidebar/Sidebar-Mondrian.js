@@ -149,7 +149,6 @@
 			for(let elementFileKey in elementFiles)
 			{
 				let elementFile = elementFiles[elementFileKey];
-				console.log(elementFile);
 
 				let elements = JSON.parse(mxUtils.load(elementFile).getText())	
 				let clients = mondrianConfig.Elements[elementsKey].client.split(',');
