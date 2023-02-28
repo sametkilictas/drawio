@@ -50,10 +50,13 @@
 	Editor.thinMenuImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTEzLjUgMjYuMTVxLjkgMCAxLjUyNS0uNjI1LjYyNS0uNjI1LjYyNS0xLjUyNSAwLS45LS42MjUtMS41MjUtLjYyNS0uNjI1LTEuNTI1LS42MjUtLjkgMC0xLjUyNS42MjUtLjYyNS42MjUtLjYyNSAxLjUyNSAwIC45LjYyNSAxLjUyNS42MjUuNjI1IDEuNTI1LjYyNVptMTAuNSAwcS45IDAgMS41MjUtLjYyNS42MjUtLjYyNS42MjUtMS41MjUgMC0uOS0uNjI1LTEuNTI1UTI0LjkgMjEuODUgMjQgMjEuODVxLS45IDAtMS41MjUuNjI1LS42MjUuNjI1LS42MjUgMS41MjUgMCAuOS42MjUgMS41MjUuNjI1LjYyNSAxLjUyNS42MjVabTEwLjUgMHEuODUgMCAxLjQ3NS0uNjI1UTM2LjYgMjQuOSAzNi42IDI0cTAtLjktLjYyNS0xLjUyNS0uNjI1LS42MjUtMS41MjUtLjYyNS0uODUgMC0xLjQ3NS42MjUtLjYyNS42MjUtLjYyNSAxLjUyNSAwIC45LjYyNSAxLjUyNS42MjUuNjI1IDEuNTI1LjYyNVpNMjQgNDNxLTMuOTUgMC03LjQtMS41dC02LjAyNS00LjA3NVE4IDM0Ljg1IDYuNSAzMS40VDUgMjRxMC0zLjk1IDEuNS03LjQyNVE4IDEzLjEgMTAuNTc1IDEwLjU1IDEzLjE1IDggMTYuNiA2LjVUMjQgNXEzLjk1IDAgNy40MjUgMS41UTM0LjkgOCAzNy40NSAxMC41NSA0MCAxMy4xIDQxLjUgMTYuNTc1IDQzIDIwLjA1IDQzIDI0cTAgMy45NS0xLjUgNy40dC00LjA1IDYuMDI1UTM0LjkgNDAgMzEuNDI1IDQxLjUgMjcuOTUgNDMgMjQgNDNabTAtMi4yNXE3IDAgMTEuODc1LTQuOVQ0MC43NSAyNHEwLTctNC44NzUtMTEuODc1VDI0IDcuMjVxLTYuOTUgMC0xMS44NSA0Ljg3NVE3LjI1IDE3IDcuMjUgMjRxMCA2Ljk1IDQuOSAxMS44NSA0LjkgNC45IDExLjg1IDQuOVpNMjQgMjRaIi8+PC9zdmc+';
 	Editor.thinViewImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTUgMzlWOWgzOHYzMFptMjguNTUtMjAuNmg3LjJ2LTcuMTVoLTcuMlptMCA4Ljk1aDcuMnYtNi43aC03LjJabS0yNi4zIDkuNEgzMS4zdi0yNS41SDcuMjVabTI2LjMgMGg3LjJWMjkuNmgtNy4yWiIvPjwvc3ZnPg==';
 	Editor.thinUserAddImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTM2LjYgMjcuNXYtNi4zNWgtNi4zNXYtMi4zaDYuMzVWMTIuNWgyLjN2Ni4zNWg2LjM1djIuM0gzOC45djYuMzVaTTE4IDIzLjM1cS0yLjkgMC00Ljc3NS0xLjg3NVExMS4zNSAxOS42IDExLjM1IDE2LjdxMC0yLjkgMS44NzUtNC43NVQxOCAxMC4xcTIuOSAwIDQuNzc1IDEuODUgMS44NzUgMS44NSAxLjg3NSA0Ljc1dC0xLjg3NSA0Ljc3NVEyMC45IDIzLjM1IDE4IDIzLjM1Wk0zIDM4LjZ2LTMuOHEwLTEuNS44LTIuNzV0Mi4yNS0xLjlxMy40NS0xLjUgNi4yNzUtMi4xNSAyLjgyNS0uNjUgNS42NzUtLjY1IDIuODUgMCA1LjY1LjY1IDIuOC42NSA2LjI1IDIuMTUgMS40NS43IDIuMjc1IDEuOTI1VDMzIDM0Ljh2My44Wm0yLjI1LTIuMjVoMjUuNVYzNC44cTAtLjc1LS41LTEuNDc1LS41LS43MjUtMS4zLTEuMTI1LTMuMi0xLjUtNS42NzUtMi4wNVEyMC44IDI5LjYgMTggMjkuNnEtMi44IDAtNS4zLjU1VDcgMzIuMnEtLjguNC0xLjI3NSAxLjEyNS0uNDc1LjcyNS0uNDc1IDEuNDc1Wk0xOCAyMS4xcTEuODUgMCAzLjEtMS4yNXQxLjI1LTMuMTVxMC0xLjg1LTEuMjUtMy4xVDE4IDEyLjM1cS0xLjg1IDAtMy4xIDEuMjV0LTEuMjUgMy4xcTAgMS45IDEuMjUgMy4xNVQxOCAyMS4xWm0wLTQuNFptMCAxOS42NVoiLz48L3N2Zz4=';
-	Editor.thinErrorImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI0IDMzLjQ1cS42IDAgLjk3NS0uMzc1dC4zNzUtLjk3NXEwLS42LS4zNzUtLjk3NVQyNCAzMC43NXEtLjYgMC0uOTc1LjM3NXQtLjM3NS45NzVxMCAuNi4zNzUuOTc1dC45NzUuMzc1Wm0uMS03LjA1cS41IDAgLjgyNS0uMzI1LjMyNS0uMzI1LjMyNS0uODI1di0xMC4ycTAtLjQ1LS4zMjUtLjc3NXQtLjgyNS0uMzI1cS0uNSAwLS44LjMyNS0uMy4zMjUtLjMuNzc1djEwLjJxMCAuNS4zMjUuODI1LjMyNS4zMjUuNzc1LjMyNVpNMjQgNDNxLTMuOTUgMC03LjQtMS41dC02LjAyNS00LjA3NVE4IDM0Ljg1IDYuNSAzMS40VDUgMjRxMC0zLjk1IDEuNS03LjQyNVE4IDEzLjEgMTAuNTc1IDEwLjU1IDEzLjE1IDggMTYuNiA2LjVUMjQgNXEzLjk1IDAgNy40MjUgMS41UTM0LjkgOCAzNy40NSAxMC41NSA0MCAxMy4xIDQxLjUgMTYuNTc1IDQzIDIwLjA1IDQzIDI0cTAgMy45NS0xLjUgNy40dC00LjA1IDYuMDI1UTM0LjkgNDAgMzEuNDI1IDQxLjUgMjcuOTUgNDMgMjQgNDNabS4wNS0yLjI1cTYuOTUgMCAxMS44MjUtNC45IDQuODc1LTQuOSA0Ljg3NS0xMS45IDAtNi45NS00Ljg3NS0xMS44MjVRMzEgNy4yNSAyNCA3LjI1cS02Ljk1IDAtMTEuODUgNC44NzVRNy4yNSAxNyA3LjI1IDI0cTAgNi45NSA0LjkgMTEuODUgNC45IDQuOSAxMS45IDQuOVpNMjQgMjRaIi8+PC9zdmc+';
+	Editor.thinUserFlashImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTkgMzguNnYtMy44cTAtMS42Ljg1LTIuOC44NS0xLjIgMi4yLTEuODUgMy4yLTEuNCA2LjEyNS0yLjEgMi45MjUtLjcgNS44MjUtLjcgMS40NSAwIDIuOS4xNzV0Mi45LjUyNXYyLjJxLTEuNDUtLjM1LTIuODc1LS41UTI1LjUgMjkuNiAyNCAyOS42cS0yLjc1IDAtNS40LjYtMi42NS42LTUuNiAyLS43NS40LTEuMjUgMS4xMjV0LS41IDEuNDc1djEuNTVIMjkuOHYyLjI1Wm0yLjI1LTIuMjVIMjkuOFptMTIuNzUtMTNxLTIuOSAwLTQuNzc1LTEuODc1UTE3LjM1IDE5LjYgMTcuMzUgMTYuN3EwLTIuOSAxLjg3NS00Ljc1VDI0IDEwLjFxMi45IDAgNC43NzUgMS44NSAxLjg3NSAxLjg1IDEuODc1IDQuNzV0LTEuODc1IDQuNzc1UTI2LjkgMjMuMzUgMjQgMjMuMzVabTAtMi4yNXExLjg1IDAgMy4xLTEuMjV0MS4yNS0zLjE1cTAtMS44NS0xLjI1LTMuMVQyNCAxMi4zNXEtMS44NSAwLTMuMSAxLjI1dC0xLjI1IDMuMXEwIDEuOSAxLjI1IDMuMTVUMjQgMjEuMVptMC00LjRabTEyLjg1IDI4LjA1di03LjhoLTMuNHYtMTAuMWg5LjE1bC0zLjggNy42NWgzLjdaIi8+PC9zdmc+';
+	Editor.thinShareImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTExLjkgNDVxLTEuMiAwLTIuMDUtLjg1UTkgNDMuMyA5IDQyLjFWMTguOHEwLTEuMTUuODUtMiAuODUtLjg1IDIuMDUtLjg1aDYuOXYyLjI1aC02LjlxLS4yNSAwLS40NS4ydC0uMi40djIzLjNxMCAuMjUuMi40NXQuNDUuMmgyNC4ycS4yNSAwIC40NS0uMnQuMi0uNDVWMTguOHEwLS4yLS4yLS40dC0uNDUtLjJoLTYuOTV2LTIuMjVoNi45NXExLjIgMCAyLjA1Ljg1Ljg1Ljg1Ljg1IDJ2MjMuM3EwIDEuMi0uODUgMi4wNS0uODUuODUtMi4wNS44NVptMTAuOTUtMTQuNVY4LjFsLTQuNiA0LjU1LTEuNjUtMS42IDcuMzUtNy4zNSA3LjM1IDcuMzUtMS42IDEuNi00LjYtNC41NXYyMi40WiIvPjwvc3ZnPg==';
 	Editor.thinTextImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTMuNCA0NC42di05LjI1aDMuNTV2LTIyLjdIMy40VjMuNGg5LjI1djMuNTVoMjIuN1YzLjRoOS4yNXY5LjI1aC0zLjU1djIyLjdoMy41NXY5LjI1aC05LjI1di0zLjU1aC0yMi43djMuNTVabTkuMjUtNS44NWgyMi43di0zLjRoMy40di0yMi43aC0zLjR2LTMuNGgtMjIuN3YzLjRoLTMuNHYyMi43aDMuNFptMy4xNS02LjI1IDcuMzUtMTkuMTVoMS42NWw3LjQ1IDE5LjE1aC0yLjFMMjggMjdoLTcuODVsLTIuMSA1LjVabTQuOTUtNy4zNWg2LjVMMjQuMSAxNi44aC0uM1ptLTE1LjEtMTQuOGg0Ljd2LTQuN2gtNC43Wm0zMiAwaDQuN3YtNC43aC00LjdabTAgMzJoNC43di00LjdoLTQuN1ptLTMyIDBoNC43di00LjdoLTQuN1ptMzItMzJabTAgMjcuM1ptLTI3LjMgMFptMC0yNy4zWiIvPjwvc3ZnPg==';
 	Editor.thinRectangleImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTUgMzlWOWgzOHYzMFptMi4yNS0yLjI1aDMzLjV2LTI1LjVINy4yNVptMCAwdi0yNS41IDI1LjVaIi8+PC9zdmc+';
 	Editor.thinDataImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI4Ljg1IDM5LjF2LTIuMjVIMzRxMS4yIDAgMi4wMjUtLjgyNVQzNi44NSAzNHYtNC45cTAtMS43NSAxLjA3NS0zLjEyNXQyLjcyNS0xLjgyNXYtLjNxLTEuNjUtLjQ1LTIuNzI1LTEuODI1UTM2Ljg1IDIwLjY1IDM2Ljg1IDE4LjlWMTRxMC0xLjItLjgyNS0yLjAyNVQzNCAxMS4xNWgtNS4xNVY4LjlIMzRxMi4xNSAwIDMuNjI1IDEuNVQzOS4xIDE0djQuOXEwIDEuMjUuODUgMi4wNzUuODUuODI1IDIuMS44MjVoLjg1djQuNGgtLjg1cS0xLjI1IDAtMi4xLjgyNS0uODUuODI1LS44NSAyLjA3NVYzNHEwIDIuMS0xLjUgMy42VDM0IDM5LjFaTTE0IDM5LjFxLTIuMTUgMC0zLjYyNS0xLjVUOC45IDM0di00LjlxMC0xLjI1LS44NS0yLjA3NS0uODUtLjgyNS0yLjEtLjgyNUg1LjF2LTQuNGguODVxMS4yNSAwIDIuMS0uODI1Ljg1LS44MjUuODUtMi4wNzVWMTRxMC0yLjEgMS41LTMuNlQxNCA4LjloNS4xNXYyLjI1SDE0cS0xLjIgMC0yLjAyNS44MjVUMTEuMTUgMTR2NC45cTAgMS43NS0xLjA3NSAzLjEyNVQ3LjM1IDIzLjg1di4zcTEuNjUuNDUgMi43MjUgMS44MjVRMTEuMTUgMjcuMzUgMTEuMTUgMjkuMVYzNHEwIDEuMi44MjUgMi4wMjVUMTQgMzYuODVoNS4xNXYyLjI1WiIvPjwvc3ZnPg==';
+	Editor.thinExpandImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTI0IDMwLjEgMTIuNyAxOC43NWwxLjYtMS42IDkuNyA5LjcgOS43LTkuNyAxLjYgMS42NVoiLz48L3N2Zz4=';
+	Editor.selectImage = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iNDgiIHdpZHRoPSI0OCI+PHBhdGggZD0iTTkgNDJxLTEuMjUgMC0yLjEyNS0uODc1VDYgMzlWOXEwLTEuMjUuODc1LTIuMTI1VDkgNmgzMHEuNyAwIDEuMjc1LjN0LjkyNS43TDM5IDkuMlY5SDl2MzBoMzBWMjEuODVsMy0zVjM5cTAgMS4yNS0uODc1IDIuMTI1VDM5IDQyWm0xNC4wNS04LjQtMTEuMS0xMS4xIDIuMS0yLjEgOSA5IDE5LjEtMTkuMSAyLjEgMi4xWiIvPjwvc3ZnPg==';
 	
 	/**
 	 * 
@@ -683,10 +686,10 @@
 		'#\n' +
 		'## ---- CSV below this line. First line are column names. ----\n' +
 		'name,position,id,location,manager,email,fill,stroke,refs,url,image\n' +
-		'Tessa Miller,CFO,emi,Office 1,,me@example.com,#dae8fc,#6c8ebf,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-3-128.png\n' +
-		'Edward Morrison,Brand Manager,emo,Office 2,Tessa Miller,me@example.com,#d5e8d4,#82b366,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-10-3-128.png\n' +
-		'Alison Donovan,System Admin,rdo,Office 3,Tessa Miller,me@example.com,#d5e8d4,#82b366,"emo,tva",https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-2-128.png\n' +
-		'Evan Valet,HR Director,tva,Office 4,Tessa Miller,me@example.com,#d5e8d4,#82b366,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-9-2-128.png\n';
+		'Tessa Miller,CFO,emi,Office 1,,me@example.com,default,#6c8ebf,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-3-128.png\n' +
+		'Edward Morrison,Brand Manager,emo,Office 2,Tessa Miller,me@example.com,default,#82b366,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-10-3-128.png\n' +
+		'Alison Donovan,System Admin,rdo,Office 3,Tessa Miller,me@example.com,default,#82b366,"emo,tva",https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-2-128.png\n' +
+		'Evan Valet,HR Director,tva,Office 4,Tessa Miller,me@example.com,default,#82b366,,https://www.draw.io,https://cdn3.iconfinder.com/data/icons/user-avatars-1/512/users-9-2-128.png\n';
 
 	/**
 	 * Compresses the given string.
@@ -1750,6 +1753,18 @@
 	};
 	
 	/**
+	 * 
+	 * Hook for mermaid to draw.io converter.
+	 */
+	Editor.mermaidToDrawio = function(graph, diagramtype)
+	{
+		if (typeof mxMermaidToDrawio === 'function')
+		{
+			return mxMermaidToDrawio(graph, diagramtype);
+		}
+	};
+    
+	/**
 	 * Global configuration of the Editor
 	 * see https://www.diagrams.net/doc/faq/configure-diagram-editor
 	 * 
@@ -1863,13 +1878,13 @@
 				mxSettings.key = Editor.settingsKey;
 			}
 			
-			if (config.customFonts)
+			if (config.customFonts != null)
 			{
 				Menus.prototype.defaultFonts = config.customFonts.
 					concat(Menus.prototype.defaultFonts);
 			}
 			
-			if (config.customPresetColors)
+			if (config.customPresetColors != null)
 			{
 				ColorDialog.prototype.presetColors = config.customPresetColors.
 					concat(ColorDialog.prototype.presetColors);
@@ -2005,37 +2020,42 @@
 				}
 			}
 			
-			if (config.thumbWidth)
+			if (config.thumbWidth != null)
 			{
 				Sidebar.prototype.thumbWidth = config.thumbWidth;
 			}
 			
-			if (config.thumbHeight)
+			if (config.thumbHeight != null)
 			{
 				Sidebar.prototype.thumbHeight = config.thumbHeight;
 			}
 			
-			if (config.emptyLibraryXml)
+			if (config.emptyLibraryXml != null)
 			{
 				EditorUi.prototype.emptyLibraryXml = config.emptyLibraryXml;
 			}
 
-			if (config.emptyDiagramXml)
+			if (config.emptyDiagramXml != null)
 			{
 				EditorUi.prototype.emptyDiagramXml = config.emptyDiagramXml;
 			}
 			
-			if (config.sidebarWidth)
+			if (config.sidebarWidth != null)
 			{
 				EditorUi.prototype.hsplitPosition = config.sidebarWidth;
 			}
+
+			if (config.updateDefaultStyle != null)
+			{
+				EditorUi.prototype.updateDefaultStyle = config.updateDefaultStyle;
+			}
 			
-			if (config.sidebarTitles)
+			if (config.sidebarTitles != null)
 			{
 				Sidebar.prototype.sidebarTitles = config.sidebarTitles;
 			}
 			
-			if (config.sidebarTitleSize)
+			if (config.sidebarTitleSize != null)
 			{
 				var val = parseInt(config.sidebarTitleSize);
 				
@@ -2049,7 +2069,7 @@
 				}
 			}
 			
-			if (config.fontCss)
+			if (config.fontCss != null)
 			{
 				if (typeof config.fontCss === 'string')
 				{
@@ -4588,6 +4608,10 @@
 			{
 				this.addActions(div, ['copyStyle', 'pasteStyle']);
 			}
+			else if (ss.cells.length >= 1)
+			{
+				this.addActions(div, ['pasteStyle', 'pasteData']);
+			}
 			
 			return styleFormatPanelAddStyleOps.apply(this, arguments);
 		};
@@ -5186,305 +5210,308 @@
 		 */
 		StyleFormatPanel.prototype.addStyles = function(div)
 		{
-			var ui = this.editorUi;
-			var graph = ui.editor.graph;
-			var picker = document.createElement('div');
-			picker.style.whiteSpace = 'nowrap';
-			picker.style.paddingLeft = '24px';
-			picker.style.paddingRight = '20px';
-			div.style.paddingLeft = '16px';
-			div.style.paddingBottom = '6px';
-			div.style.position = 'relative';
-			div.appendChild(picker);
+			if (this.defaultColorSchemes != null)
+			{
+				var ui = this.editorUi;
+				var graph = ui.editor.graph;
+				var picker = document.createElement('div');
+				picker.style.whiteSpace = 'nowrap';
+				picker.style.paddingLeft = '24px';
+				picker.style.paddingRight = '20px';
+				div.style.paddingLeft = '16px';
+				div.style.paddingBottom = '6px';
+				div.style.position = 'relative';
+				div.appendChild(picker);
 
-			var stylenames = ['plain-gray', 'plain-blue', 'plain-green', 'plain-turquoise',
-				'plain-orange', 'plain-yellow', 'plain-red', 'plain-pink', 'plain-purple', 'gray',
-				'blue', 'green', 'turquoise', 'orange', 'yellow', 'red', 'pink', 'purple'];
-			
-			// Maximum palettes to switch the switcher
-			var maxEntries = 10;
-						
-			// Selector
-			var switcher = document.createElement('div');
-			switcher.style.whiteSpace = 'nowrap';
-			switcher.style.position = 'relative';
-			switcher.style.textAlign = 'center';
-			switcher.style.width = '210px';
-			
-			var dots = [];
-			
-			for (var i = 0; i < this.defaultColorSchemes.length; i++)
-			{
-				var dot = document.createElement('div');
-				dot.style.display = 'inline-block';
-				dot.style.width = '6px';
-				dot.style.height = '6px';
-				dot.style.marginLeft = '4px';
-				dot.style.marginRight = '3px';
-				dot.style.borderRadius = '3px';
-				dot.style.cursor = 'pointer';
-				dot.style.background = 'transparent';
-				dot.style.border = '1px solid #b5b6b7';
+				var stylenames = ['plain-gray', 'plain-blue', 'plain-green', 'plain-turquoise',
+					'plain-orange', 'plain-yellow', 'plain-red', 'plain-pink', 'plain-purple', 'gray',
+					'blue', 'green', 'turquoise', 'orange', 'yellow', 'red', 'pink', 'purple'];
 				
-				(mxUtils.bind(this, function(index)
-				{
-					mxEvent.addListener(dot, 'click', mxUtils.bind(this, function()
-					{
-						setScheme(index);
-					}));
-				}))(i);
-				
-				dots.push(dot);
-				switcher.appendChild(dot);
-			}
-			
-			var setScheme = mxUtils.bind(this, function(index)
-			{
-				if (dots[index] != null)
-				{
-					if (this.format.currentScheme != null && dots[this.format.currentScheme] != null)
-					{
-						dots[this.format.currentScheme].style.background = 'transparent';
-					}
-					
-					this.format.currentScheme = index;
-					updateScheme(this.defaultColorSchemes[this.format.currentScheme]);
-					dots[this.format.currentScheme].style.background = '#84d7ff';
-				}
-			});
-			
-			var updateScheme = mxUtils.bind(this, function(colorsets)
-			{
-				var addButton = mxUtils.bind(this, function(colorset)
-				{
-					var btn = mxUtils.button('', mxUtils.bind(this, function(evt)
-					{
-						graph.getModel().beginUpdate();
-						try
-						{
-							var cells = ui.getSelectionState().cells;
+				// Maximum palettes to switch the switcher
+				var maxEntries = 10;
 							
-							for (var i = 0; i < cells.length; i++)
-							{
-								var style = graph.getModel().getStyle(cells[i]);
+				// Selector
+				var switcher = document.createElement('div');
+				switcher.style.whiteSpace = 'nowrap';
+				switcher.style.position = 'relative';
+				switcher.style.textAlign = 'center';
+				switcher.style.width = '210px';
 				
-								for (var j = 0; j < stylenames.length; j++)
-								{
-									style = mxUtils.removeStylename(style, stylenames[j]);
-								}
-
-								var defaults = (graph.getModel().isVertex(cells[i])) ? graph.defaultVertexStyle : graph.defaultEdgeStyle;
+				var dots = [];
+				
+				for (var i = 0; i < this.defaultColorSchemes.length; i++)
+				{
+					var dot = document.createElement('div');
+					dot.style.display = 'inline-block';
+					dot.style.width = '6px';
+					dot.style.height = '6px';
+					dot.style.marginLeft = '4px';
+					dot.style.marginRight = '3px';
+					dot.style.borderRadius = '3px';
+					dot.style.cursor = 'pointer';
+					dot.style.background = 'transparent';
+					dot.style.border = '1px solid #b5b6b7';
+					
+					(mxUtils.bind(this, function(index)
+					{
+						mxEvent.addListener(dot, 'click', mxUtils.bind(this, function()
+						{
+							setScheme(index);
+						}));
+					}))(i);
+					
+					dots.push(dot);
+					switcher.appendChild(dot);
+				}
+				
+				var setScheme = mxUtils.bind(this, function(index)
+				{
+					if (dots[index] != null)
+					{
+						if (this.format.currentScheme != null && dots[this.format.currentScheme] != null)
+						{
+							dots[this.format.currentScheme].style.background = 'transparent';
+						}
+						
+						this.format.currentScheme = index;
+						updateScheme(this.defaultColorSchemes[this.format.currentScheme]);
+						dots[this.format.currentScheme].style.background = '#84d7ff';
+					}
+				});
+				
+				var updateScheme = mxUtils.bind(this, function(colorsets)
+				{
+					var addButton = mxUtils.bind(this, function(colorset)
+					{
+						var btn = mxUtils.button('', mxUtils.bind(this, function(evt)
+						{
+							graph.getModel().beginUpdate();
+							try
+							{
+								var cells = ui.getSelectionState().cells;
 								
-								if (colorset != null)
+								for (var i = 0; i < cells.length; i++)
 								{
-									if (!mxEvent.isShiftDown(evt))
+									var style = graph.getModel().getStyle(cells[i]);
+					
+									for (var j = 0; j < stylenames.length; j++)
 									{
-										if (colorset['fill'] == '')
-										{
-											style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, null);
-										}
-										else
-										{
-											style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, colorset['fill'] ||
-												mxUtils.getValue(defaults, mxConstants.STYLE_FILLCOLOR, null));
-										}
+										style = mxUtils.removeStylename(style, stylenames[j]);
+									}
 
-										style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, colorset['gradient'] ||
-											mxUtils.getValue(defaults, mxConstants.STYLE_GRADIENTCOLOR, null));
+									var defaults = (graph.getModel().isVertex(cells[i])) ? graph.defaultVertexStyle : graph.defaultEdgeStyle;
 									
-										if (!mxEvent.isControlDown(evt) && (!mxClient.IS_MAC || !mxEvent.isMetaDown(evt)) &&
-											graph.getModel().isVertex(cells[i]))
+									if (colorset != null)
+									{
+										if (!mxEvent.isShiftDown(evt))
 										{
-											style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR, colorset['font'] ||
+											if (colorset['fill'] == '')
+											{
+												style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, null);
+											}
+											else
+											{
+												style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR, colorset['fill'] ||
+													mxUtils.getValue(defaults, mxConstants.STYLE_FILLCOLOR, null));
+											}
+
+											style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR, colorset['gradient'] ||
+												mxUtils.getValue(defaults, mxConstants.STYLE_GRADIENTCOLOR, null));
+										
+											if (!mxEvent.isControlDown(evt) && (!mxClient.IS_MAC || !mxEvent.isMetaDown(evt)) &&
+												graph.getModel().isVertex(cells[i]))
+											{
+												style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR, colorset['font'] ||
+													mxUtils.getValue(defaults, mxConstants.STYLE_FONTCOLOR, null));
+											}
+										}
+										
+										if (!mxEvent.isAltDown(evt))
+										{
+											if (colorset['stroke'] == '')
+											{
+												style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, null);
+											}
+											else
+											{
+												style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, colorset['stroke'] ||
+													mxUtils.getValue(defaults, mxConstants.STYLE_STROKECOLOR, null));
+											}
+										}
+									}
+									else
+									{
+										style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR,
+											mxUtils.getValue(defaults, mxConstants.STYLE_FILLCOLOR, '#ffffff'));
+										style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR,
+											mxUtils.getValue(defaults, mxConstants.STYLE_STROKECOLOR, '#000000'));
+										style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR,
+											mxUtils.getValue(defaults, mxConstants.STYLE_GRADIENTCOLOR, null));
+										
+										if (graph.getModel().isVertex(cells[i]))
+										{
+											style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR,
 												mxUtils.getValue(defaults, mxConstants.STYLE_FONTCOLOR, null));
 										}
 									}
-									
-									if (!mxEvent.isAltDown(evt))
-									{
-										if (colorset['stroke'] == '')
-										{
-											style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, null);
-										}
-										else
-										{
-											style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR, colorset['stroke'] ||
-												mxUtils.getValue(defaults, mxConstants.STYLE_STROKECOLOR, null));
-										}
-									}
+
+									graph.getModel().setStyle(cells[i], style);
+								}
+							}
+							finally
+							{
+								graph.getModel().endUpdate();
+							}
+						}));
+		
+						btn.className = 'geStyleButton';
+						btn.style.width = '36px';
+						btn.style.height = (this.defaultColorSchemes.length <= maxEntries) ? '24px' : '30px';
+						btn.style.margin = '0px 6px 6px 0px';
+						
+						if (colorset != null)
+						{
+							var b = (Editor.isDarkMode()) ? '2px solid' : '1px solid';
+							
+							if (colorset['border'] != null)
+							{
+								b = colorset['border'];
+							}
+							
+							if (colorset['gradient'] != null)
+							{
+								if (mxClient.IS_IE && (document.documentMode < 10))
+								{
+									btn.style.filter = 'progid:DXImageTransform.Microsoft.Gradient('+
+										'StartColorStr=\'' + colorset['fill'] +
+										'\', EndColorStr=\'' + colorset['gradient'] + '\', GradientType=0)';
 								}
 								else
 								{
-									style = mxUtils.setStyle(style, mxConstants.STYLE_FILLCOLOR,
-										mxUtils.getValue(defaults, mxConstants.STYLE_FILLCOLOR, '#ffffff'));
-									style = mxUtils.setStyle(style, mxConstants.STYLE_STROKECOLOR,
-										mxUtils.getValue(defaults, mxConstants.STYLE_STROKECOLOR, '#000000'));
-									style = mxUtils.setStyle(style, mxConstants.STYLE_GRADIENTCOLOR,
-										mxUtils.getValue(defaults, mxConstants.STYLE_GRADIENTCOLOR, null));
-									
-									if (graph.getModel().isVertex(cells[i]))
-									{
-										style = mxUtils.setStyle(style, mxConstants.STYLE_FONTCOLOR,
-											mxUtils.getValue(defaults, mxConstants.STYLE_FONTCOLOR, null));
-									}
+									btn.style.backgroundImage = 'linear-gradient(' + colorset['fill'] + ' 0px,' +
+										colorset['gradient'] + ' 100%)';
 								}
-
-								graph.getModel().setStyle(cells[i], style);
 							}
-						}
-						finally
-						{
-							graph.getModel().endUpdate();
-						}
-					}));
-	
-					btn.className = 'geStyleButton';
-					btn.style.width = '36px';
-					btn.style.height = (this.defaultColorSchemes.length <= maxEntries) ? '24px' : '30px';
-					btn.style.margin = '0px 6px 6px 0px';
-					
-					if (colorset != null)
-					{
-						var b = (urlParams['sketch'] == '1') ? '2px solid' : '1px solid';
-						
-						if (colorset['border'] != null)
-						{
-							b = colorset['border'];
-						}
-						
-						if (colorset['gradient'] != null)
-						{
-							if (mxClient.IS_IE && (document.documentMode < 10))
+							else if (colorset['fill'] == mxConstants.NONE)
 							{
-						    	btn.style.filter = 'progid:DXImageTransform.Microsoft.Gradient('+
-				                	'StartColorStr=\'' + colorset['fill'] +
-				                	'\', EndColorStr=\'' + colorset['gradient'] + '\', GradientType=0)';
+								btn.style.background = 'url(\'' + Dialog.prototype.noColorImage + '\')';
+							}
+							else if (colorset['fill'] == '')
+							{
+								btn.style.backgroundColor = mxUtils.getValue(graph.defaultVertexStyle,
+									mxConstants.STYLE_FILLCOLOR, (Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
 							}
 							else
 							{
-								btn.style.backgroundImage = 'linear-gradient(' + colorset['fill'] + ' 0px,' +
-									colorset['gradient'] + ' 100%)';
+								btn.style.backgroundColor = colorset['fill'] || mxUtils.getValue(graph.defaultVertexStyle,
+									mxConstants.STYLE_FILLCOLOR, (Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
+							}
+							
+							if (colorset['stroke'] == mxConstants.NONE)
+							{
+								btn.style.border = b + ' transparent';
+							}
+							else if (colorset['stroke'] == '')
+							{
+								btn.style.border = b + ' ' + mxUtils.getValue(graph.defaultVertexStyle, 
+									mxConstants.STYLE_STROKECOLOR, (!Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
+							}
+							else
+							{
+								btn.style.border = b + ' ' + (colorset['stroke'] || mxUtils.getValue(graph.defaultVertexStyle,
+										mxConstants.STYLE_STROKECOLOR, (!Editor.isDarkMode()) ? Editor.darkColor : '#ffffff'));
+							}
+
+							if (colorset['title'] != null)
+							{
+								btn.setAttribute('title', colorset['title']);
 							}
 						}
-						else if (colorset['fill'] == mxConstants.NONE)
-						{
-							btn.style.background = 'url(\'' + Dialog.prototype.noColorImage + '\')';
-						}
-						else if (colorset['fill'] == '')
-						{
-							btn.style.backgroundColor = mxUtils.getValue(graph.defaultVertexStyle,
-								mxConstants.STYLE_FILLCOLOR, (Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
-						}
 						else
 						{
-							btn.style.backgroundColor = colorset['fill'] || mxUtils.getValue(graph.defaultVertexStyle,
-								mxConstants.STYLE_FILLCOLOR, (Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
-						}
-						
-						if (colorset['stroke'] == mxConstants.NONE)
-						{
-							btn.style.border = b + ' transparent';
-						}
-						else if (colorset['stroke'] == '')
-						{
-							btn.style.border = b + ' ' + mxUtils.getValue(graph.defaultVertexStyle, 
-								mxConstants.STYLE_STROKECOLOR, (!Editor.isDarkMode()) ? Editor.darkColor : '#ffffff');
-						}
-						else
-						{
-							btn.style.border = b + ' ' + (colorset['stroke'] || mxUtils.getValue(graph.defaultVertexStyle,
-									mxConstants.STYLE_STROKECOLOR, (!Editor.isDarkMode()) ? Editor.darkColor : '#ffffff'));
+							var bg = mxUtils.getValue(graph.defaultVertexStyle, mxConstants.STYLE_FILLCOLOR, '#ffffff');
+							var bd = mxUtils.getValue(graph.defaultVertexStyle, mxConstants.STYLE_STROKECOLOR, '#000000');
+							
+							btn.style.backgroundColor = bg;
+							btn.style.border = '1px solid ' + bd;
 						}
 
-						if (colorset['title'] != null)
-						{
-							btn.setAttribute('title', colorset['title']);
-						}
-					}
-					else
-					{
-						var bg = mxUtils.getValue(graph.defaultVertexStyle, mxConstants.STYLE_FILLCOLOR, '#ffffff');
-						var bd = mxUtils.getValue(graph.defaultVertexStyle, mxConstants.STYLE_STROKECOLOR, '#000000');
+						btn.style.borderRadius = '0';
 						
-						btn.style.backgroundColor = bg;
-						btn.style.border = '1px solid ' + bd;
-					}
-
-					btn.style.borderRadius = '0';
+						picker.appendChild(btn);
+					});
 					
-					picker.appendChild(btn);
+					picker.innerText = '';
+					
+					for (var i = 0; i < colorsets.length; i++)
+					{
+						if (i > 0 && mxUtils.mod(i, 4) == 0)
+						{
+							mxUtils.br(picker);
+						}
+						
+						addButton(colorsets[i]);
+					}
 				});
-				
-				picker.innerText = '';
-				
-				for (var i = 0; i < colorsets.length; i++)
+
+				if (this.format.currentScheme == null)
 				{
-					if (i > 0 && mxUtils.mod(i, 4) == 0)
-					{
-						mxUtils.br(picker);
-					}
-					
-					addButton(colorsets[i]);
+					setScheme(Math.min(dots.length - 1, Editor.isDarkMode()
+						? 1 : (urlParams['sketch'] == '1' ? 5 : 0)));
 				}
-			});
-
-			if (this.format.currentScheme == null)
-			{
-				setScheme(Math.min(dots.length - 1, Editor.isDarkMode()
-					? 1 : (urlParams['sketch'] == '1' ? 5 : 0)));
-			}
-			else
-			{
-				setScheme(this.format.currentScheme);
-			}
-			
-			var bottom = (this.defaultColorSchemes.length <= maxEntries) ? 28 : 8;
-
-			var left = document.createElement('div');
-			left.style.cssText = 'position:absolute;left:10px;top:8px;bottom:' + bottom + 'px;width:20px;margin:4px;opacity:0.5;' +
-				'background-repeat:no-repeat;background-position:center center;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQBAMAAADQT4M0AAAAIVBMVEUAAAB2dnZ4eHh3d3d1dXVxcXF2dnZ2dnZ2dnZxcXF2dnYmb3w1AAAACnRSTlMAfCTkhhvb7cQSPH2JPgAAADRJREFUCNdjwACMAmBKaiGYs2oJmLPKAZ3DabU8AMRTXpUKopislqFyVzCAuUZgikkBZjoAcMYLnp53P/UAAAAASUVORK5CYII=);';
-			
-			mxEvent.addListener(left, 'click', mxUtils.bind(this, function()
-			{
-				setScheme(mxUtils.mod(this.format.currentScheme - 1, this.defaultColorSchemes.length));
-			}));
-			
-			var right = document.createElement('div');
-			right.style.cssText = 'position:absolute;left:202px;top:8px;bottom:' + bottom + 'px;width:20px;margin:4px;opacity:0.5;' +
-				'background-repeat:no-repeat;background-position:center center;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQBAMAAADQT4M0AAAAIVBMVEUAAAB2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnYBuwCcAAAACnRSTlMAfCTkhhvb7cQSPH2JPgAAADZJREFUCNdjQAOMAmBKaiGY8loF5rKswsZlrVo8AUiFrTICcbIWK8A5DF1gDoMymMPApIAwHwCS0Qx/U7qCBQAAAABJRU5ErkJggg==);';
-
-			if (this.defaultColorSchemes.length > 1)
-			{
-				div.appendChild(left);
-				div.appendChild(right);
-			}
-			
-			mxEvent.addListener(right, 'click', mxUtils.bind(this, function()
-			{
-				setScheme(mxUtils.mod(this.format.currentScheme + 1, this.defaultColorSchemes.length));
-			}));
-			
-			// Hover state
-			function addHoverState(elt)
-			{
-				mxEvent.addListener(elt, 'mouseenter', function()
+				else
 				{
-					elt.style.opacity = '1';
-				});
-				mxEvent.addListener(elt, 'mouseleave', function()
+					setScheme(this.format.currentScheme);
+				}
+				
+				var bottom = (this.defaultColorSchemes.length <= maxEntries) ? 28 : 8;
+
+				var left = document.createElement('div');
+				left.style.cssText = 'position:absolute;left:10px;top:8px;bottom:' + bottom + 'px;width:20px;margin:4px;opacity:0.5;' +
+					'background-repeat:no-repeat;background-position:center center;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQBAMAAADQT4M0AAAAIVBMVEUAAAB2dnZ4eHh3d3d1dXVxcXF2dnZ2dnZ2dnZxcXF2dnYmb3w1AAAACnRSTlMAfCTkhhvb7cQSPH2JPgAAADRJREFUCNdjwACMAmBKaiGYs2oJmLPKAZ3DabU8AMRTXpUKopislqFyVzCAuUZgikkBZjoAcMYLnp53P/UAAAAASUVORK5CYII=);';
+				
+				mxEvent.addListener(left, 'click', mxUtils.bind(this, function()
 				{
-					elt.style.opacity = '0.5';
-				});
-			};
-			
-			addHoverState(left);
-			addHoverState(right);
-			
-			updateScheme(this.defaultColorSchemes[this.format.currentScheme]);
-			
-			if (this.defaultColorSchemes.length <= maxEntries)
-			{
-				div.appendChild(switcher);
+					setScheme(mxUtils.mod(this.format.currentScheme - 1, this.defaultColorSchemes.length));
+				}));
+				
+				var right = document.createElement('div');
+				right.style.cssText = 'position:absolute;left:202px;top:8px;bottom:' + bottom + 'px;width:20px;margin:4px;opacity:0.5;' +
+					'background-repeat:no-repeat;background-position:center center;background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAQBAMAAADQT4M0AAAAIVBMVEUAAAB2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnZ2dnYBuwCcAAAACnRSTlMAfCTkhhvb7cQSPH2JPgAAADZJREFUCNdjQAOMAmBKaiGY8loF5rKswsZlrVo8AUiFrTICcbIWK8A5DF1gDoMymMPApIAwHwCS0Qx/U7qCBQAAAABJRU5ErkJggg==);';
+
+				if (this.defaultColorSchemes.length > 1)
+				{
+					div.appendChild(left);
+					div.appendChild(right);
+				}
+				
+				mxEvent.addListener(right, 'click', mxUtils.bind(this, function()
+				{
+					setScheme(mxUtils.mod(this.format.currentScheme + 1, this.defaultColorSchemes.length));
+				}));
+				
+				// Hover state
+				function addHoverState(elt)
+				{
+					mxEvent.addListener(elt, 'mouseenter', function()
+					{
+						elt.style.opacity = '1';
+					});
+					mxEvent.addListener(elt, 'mouseleave', function()
+					{
+						elt.style.opacity = '0.5';
+					});
+				};
+				
+				addHoverState(left);
+				addHoverState(right);
+				
+				updateScheme(this.defaultColorSchemes[this.format.currentScheme]);
+				
+				if (this.defaultColorSchemes.length <= maxEntries)
+				{
+					div.appendChild(switcher);
+				}
 			}
 			
 			return div;
@@ -5727,7 +5754,7 @@
 	 * Properties for the SVG shadow effect.
 	 */
 	Graph.prototype.svgShadowColor = '#3D4574';
-
+	
 	/**
 	 * Properties for the SVG shadow effect.
 	 */
@@ -5746,12 +5773,7 @@
 	/**
 	 * Enables move of bends/segments without selecting.
 	 */
-	Graph.prototype.edgeMode = urlParams['edge'] != 'move';
-			
-	/**
-	 * Enables move of bends/segments without selecting.
-	 */
-	Graph.prototype.hiddenTags = null;
+	Graph.prototype.hiddenTags = [];
 	
 	/**
 	 * Enables move of bends/segments without selecting.
@@ -6017,7 +6039,7 @@
 								}
 								else
 								{
-									graph.highlightCells(cells);
+									graph.highlightCells(cells, null, null, 70);
 								}
 							};
 
@@ -6058,6 +6080,33 @@
 								mxEvent.consume(evt);
 							});
 							
+							row.appendChild(td);
+
+							td = document.createElement('td');
+							td.style.align = 'center';
+							td.style.width = '16px';
+
+							var img = document.createElement('img');
+							img.setAttribute('src', Editor.selectImage);
+							img.setAttribute('title', mxResources.get('select'));
+							mxUtils.setOpacity(img, visible ? 75 : 25);
+							img.style.verticalAlign = 'middle';
+							img.style.cursor = 'pointer';
+							img.style.width = '16px';
+							
+							if (invert || Editor.isDarkMode())
+							{
+								img.style.filter = 'invert(100%)';
+							}
+
+							mxEvent.addListener(img, 'click', function(evt)
+							{
+								setAllVisible(true);
+								selectCells();	
+								mxEvent.consume(evt);
+							});
+							
+							td.appendChild(img);
 							row.appendChild(td);
 
 							td = document.createElement('td');
@@ -6112,7 +6161,7 @@
 									td.style.width = '16px';
 		
 									var img = document.createElement('img');
-									img.setAttribute('src', Editor.crossImage);
+									img.setAttribute('src', Editor.trashImage);
 									img.setAttribute('title', mxResources.get('removeIt', [tag]));
 									mxUtils.setOpacity(img, visible ? 75 : 25);
 									img.style.verticalAlign = 'middle';
@@ -8120,8 +8169,11 @@
 				pageScaleInput.value = '100 %';
 			}
 			
-			// Workaround to match available paper size in actual print output
-			printScale *= 0.75;
+			// Workaround for better output in Safari
+			if (mxClient.IS_SF)
+			{
+				printScale *= 0.75;
+			}
 			
 			// Disables dark mode while printing
 			var darkStylesheet = null;

@@ -1382,10 +1382,13 @@ PrintDialog.prototype.create = function(editorUi)
 			printScale = 1;
 			pageScaleInput.value = '100%';
 		}
-		
-		// Workaround to match available paper size in actual print output
-		printScale *= 0.75;
 
+		// Workaround to match available paper size in actual print output
+		if (mxClient.IS_SF)
+		{
+			printScale *= 0.75;
+		}
+		
 		var pf = graph.pageFormat || mxConstants.PAGE_FORMAT_A4_PORTRAIT;
 		var scale = 1 / graph.pageScale;
 		
@@ -1400,7 +1403,6 @@ PrintDialog.prototype.create = function(editorUi)
 		}
 
 		// Negative coordinates are cropped or shifted if page visible
-		var gb = graph.getGraphBounds();
 		var border = 0;
 		var x0 = 0;
 		var y0 = 0;
@@ -1490,17 +1492,9 @@ PrintDialog.printPreview = function(preview)
 				preview.wnd.close();
 			};
 			
-			// Workaround for Google Chrome which needs a bit of a
-			// delay in order to render the SVG contents
-			// Needs testing in production
-			if (mxClient.IS_GC)
-			{
-				window.setTimeout(printFn, 500);
-			}
-			else
-			{
-				printFn();
-			}
+			// Workaround for rendering SVG output and
+			// make window available for printing
+			window.setTimeout(printFn, 500);
 		}
 	}
 	catch (e)
@@ -1516,6 +1510,7 @@ PrintDialog.createPrintPreview = function(graph, scale, pf, border, x0, y0, auto
 {
 	var preview = new mxPrintPreview(graph, scale, pf, border, x0, y0);
 	preview.title = mxResources.get('preview');
+	preview.addPageCss = !mxClient.IS_SF;
 	preview.printBackgroundImage = true;
 	preview.autoOrigin = autoOrigin;
 	var bg = graph.background;
@@ -1636,6 +1631,7 @@ var PageSetupDialog = function(editorUi)
 	
 	var newBackgroundImage = graph.backgroundImage;
 	var newBackgroundColor = graph.background;
+	var newShadowVisible = graph.shadowVisible;
 	
 	function updateBackgroundImage()
 	{
@@ -1668,7 +1664,7 @@ var PageSetupDialog = function(editorUi)
 
 	var changeImage = function(evt)
 	{
-		editorUi.showBackgroundImageDialog(function(image, failed, color)
+		editorUi.showBackgroundImageDialog(function(image, failed, color, shadowVisible)
 		{
 			if (!failed)
 			{
@@ -1678,11 +1674,12 @@ var PageSetupDialog = function(editorUi)
 				}
 
 				newBackgroundImage = image;
+				newShadowVisible = shadowVisible;
 			}
 
 			newBackgroundColor = color;
 			updateBackgroundImage();
-		}, newBackgroundImage, newBackgroundColor);
+		}, newBackgroundImage, newBackgroundColor, true);
 		
 		mxEvent.consume(evt);
 	};
@@ -1733,9 +1730,15 @@ var PageSetupDialog = function(editorUi)
 		
 		change.ignoreImage = oldSrc === newSrc;
 
+		if (newShadowVisible != null)
+		{
+			change.shadowVisible = newShadowVisible;
+		}
+
 		if (graph.pageFormat.width != change.previousFormat.width ||
 			graph.pageFormat.height != change.previousFormat.height ||
-			!change.ignoreColor || !change.ignoreImage)
+			!change.ignoreColor || !change.ignoreImage||
+			change.shadowVisible != graph.shadowVisible)
 		{
 			graph.model.execute(change);
 		}
@@ -2562,9 +2565,10 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 	};
 
 	// Updates the CSS of the background to draw the grid
-	mxGraphView.prototype.validateBackgroundStyles = function()
+	mxGraphView.prototype.validateBackgroundStyles = function(factor, cx, cy)
 	{
 		var graph = this.graph;
+		factor = (factor != null) ? factor : 1;
 		var color = (graph.background == null || graph.background == mxConstants.NONE) ?
 			graph.defaultPageBackgroundColor : graph.background;
 		var gridColor = (color != null && this.gridColor != color.toLowerCase()) ? this.gridColor : '#ffffff';
@@ -2578,10 +2582,10 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 			if (mxClient.IS_SVG)
 			{
 				// Generates the SVG required for drawing the dynamic grid
-				image = unescape(encodeURIComponent(this.createSvgGrid(gridColor)));
+				image = unescape(encodeURIComponent(this.createSvgGrid(gridColor, factor)));
 				image = (window.btoa) ? btoa(image) : Base64.encode(image, true);
 				image = 'url(' + 'data:image/svg+xml;base64,' + image + ')'
-				phase = graph.gridSize * this.scale * this.gridSteps;
+				phase = graph.gridSize * this.scale * this.gridSteps * factor;
 			}
 			else
 			{
@@ -2591,6 +2595,13 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 			
 			var x0 = 0;
 			var y0 = 0;
+
+			var dx = (cx != null) ? cx - this.translate.x * this.scale : 0;
+			var dy = (cy != null) ? cy - this.translate.y * this.scale : 0;
+
+			var p = graph.gridSize * this.scale * this.gridSteps;
+			var ddx = dx % p;
+			var ddy = dy % p;
 			
 			if (graph.view.backgroundPageShape != null)
 			{
@@ -2601,8 +2612,8 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 			}
 			
 			// Computes the offset to maintain origin for grid
-			position = -Math.round(phase - mxUtils.mod(this.translate.x * this.scale - x0, phase)) + 'px ' +
-				-Math.round(phase - mxUtils.mod(this.translate.y * this.scale - y0, phase)) + 'px';
+			position = -Math.round(phase - mxUtils.mod(this.translate.x * this.scale - x0 + dx, phase) + ddx * factor) + 'px ' +
+				-Math.round(phase - mxUtils.mod(this.translate.y * this.scale - y0 + dy, phase) + ddy * factor) + 'px';
 		}
 		
 		var canvas = graph.view.canvas;
@@ -2653,9 +2664,10 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 	};
 	
 	// Returns the SVG required for painting the background grid.
-	mxGraphView.prototype.createSvgGrid = function(color)
+	mxGraphView.prototype.createSvgGrid = function(color, factor)
 	{
-		var tmp = this.graph.gridSize * this.scale;
+		factor = (factor != null) ? factor : 1;
+		var tmp = this.graph.gridSize * this.scale * factor;
 		
 		while (tmp < this.minGridSize)
 		{

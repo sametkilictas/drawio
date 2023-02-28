@@ -296,12 +296,12 @@ DrawioFile.prototype.mergeFile = function(file, success, error, diffShadow)
 		this.stats.fileMerged++;
 
 		// Loads new document as shadow document
-		var shadow = this.getShadowPages();
 		var pages = file.getShadowPages();
 
 		if (pages != null && pages.length > 0)
 		{
 			// Patches the current document
+			var shadow = this.getShadowPages();
 			var patches = [this.ui.diffPages((diffShadow != null) ?
 				diffShadow : shadow, pages)];
 			var ignored = this.ignorePatches(patches);
@@ -313,10 +313,11 @@ DrawioFile.prototype.mergeFile = function(file, success, error, diffShadow)
 				{
 					this.sync.sendLocalChanges();
 				}
-		
-				// Creates a patch for backup if the checksum fails
+				
+				// Creates patch for backup
 				this.backupPatch = (!this.isModified()) ? null :
-					this.ui.diffPages(shadow, this.ui.pages);
+					this.ui.diffPages(shadow, (this.isRealtime()) ?
+					this.ownPages : this.ui.pages);
 				
 				// Patching previous shadow to verify checksum
 				var patchedDetails = {};
@@ -1246,7 +1247,32 @@ DrawioFile.prototype.move = function(folderId, success, error) { };
  */
 DrawioFile.prototype.share = function()
 {
-	this.ui.alert(mxResources.get('sharingAvailable'), null, 380);
+	if (this.ui.drive != null)
+	{
+		this.ui.confirm(mxResources.get('saveItToGoogleDriveToCollaborate', [this.getTitle()]),
+			mxUtils.bind(this, function()
+		{
+			this.ui.pickFolder(App.MODE_GOOGLE, mxUtils.bind(this, function(folderId)
+			{
+				var graph = this.ui.editor.graph;
+				var selection = graph.getSelectionCells();
+				var viewState = graph.getViewState();
+				var page = this.ui.currentPage;
+				
+				this.ui.createFile(this.getTitle(), this.ui.getFileData(null, null, null, null, null,
+					null, null, null, this), null, App.MODE_GOOGLE, null, true, folderId, null, null,
+					mxUtils.bind(this, function()
+					{
+						this.ui.restoreViewState(page, viewState, selection);
+						this.ui.actions.get('share').funct();
+					}));
+			}));
+		}), null, mxResources.get('saveToGoogleDrive', null, 'Save to Google Drive'), mxResources.get('cancel'));
+	}
+	else
+	{
+		this.ui.alert(mxResources.get('sharingAvailable'), null, 380);
+	}
 };
 
 /**
@@ -1812,8 +1838,8 @@ DrawioFile.prototype.addUnsavedStatus = function(err)
 			var action = 'data-action="' + ((this.ui.mode == null || !this.isEditable()) ?
 				'saveAs' : 'save') + '"';
 			this.ui.editor.setStatus('<div ' + action + ' title="' +
-				status + '" class="geStatusAlertOrange">' + status +
-				' <img src="' + Editor.saveImage + '"/></div>');
+				status + '" class="geStatusAlert">' + status +
+				' <img class="geAdaptiveAsset" src="' + Editor.saveImage + '"/></div>');
 			
 			if (EditorUi.enableDrafts && (this.getMode() == null || EditorUi.isElectronApp))
 			{
@@ -2189,6 +2215,11 @@ DrawioFile.prototype.getErrorMessage = function(err)
 	if (msg == null && err != null && err.code == App.ERROR_TIMEOUT)
 	{
 		msg = mxResources.get('timeout');
+	}
+	// XHR blocked by CORS or response has no CORS headers
+	else if (msg == '0')
+	{
+		msg = mxResources.get('noResponse');
 	}
 	
 	return msg;

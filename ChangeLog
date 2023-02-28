@@ -1,3 +1,267 @@
+22-FEB-2023: 20.8.23
+
+- Fixes file extension for .drawio.pdf files [drawio-3368]
+- [conf cloud] Workaround for invalid JSON response from getContentProperty API [DID-7519]
+
+20-FEB-2023: 20.8.22
+
+- Internal release to update hidden flag template functionality [DS-942]
+
+20-FEB-2023: 20.8.21
+
+- [vsdx] Adds special case of text field esc(0) format [DID-7420]
+- Avoids NPE with bad libraries configurations [DID-7439]
+- [conf cloud] Improved Gliffy mass import logs (page links start end time) [DID-7470]
+
+10-FEB-2023: 20.8.20
+
+- Fixes rubberband, links for cells in locked layers [drawio-3343]
+
+09-FEB-2023: 20.8.19
+
+- Disables object selection in locked layers [drawio-3343] 
+
+07-FEB-2023: 20.8.18
+
+- Fixes locked is not defined in read-only diagrams [DS-944]
+- Fixes offset of terminal point after drag and drop
+- Fixes special cases for drag and drop from sidebar
+- Fixes parents for adding edges in cell hierarchies
+- Fixes point offsets for duplicated edges in groups
+
+06-FEB-2023: 20.8.17
+
+- Fixes connection points dialog, adds help button
+- Fixed connection points losing dx, dy on edit (DS-943)
+- Improves UX for UML sequence diagrams [DID-7338]
+- Fixes initial embedded inline editor position
+- Fixes default fill color on UML frame label
+- Fixes inconsistent font color for condition shape
+
+02-FEB-2023: 20.8.16
+
+- Fixes overriden CSS for buttons and button states [drawio-3326]
+- Uses manifest version 3 in Notion Chrome extension
+- Fixes possible NPE in async resize handler
+- Clear default style action disables sketch mode [drawio-3331]
+- View sketch option no longer updates existing cells[drawio-3331]
+
+01-FEB-2023: 20.8.15
+
+- Adds debug output, improves UX in Notion extension
+- Fixes clipping of start screen checkbox in dialog
+- Fixes vertical alignment of show start screen item
+- Fixes CSS for default action button [drawio-desktop-1219]
+
+31-JAN-2023: 20.8.14
+
+- Updates in-place editor after scroll and UI change
+- Fixes CSS specificity and global styles [DID-7294]
+- Limit convert labels to SVG option to online draw.io only
+- [conf cloud] Adds config option to disable the automatic generation of the preview images from the page view ["disableEmbedAutoImgGen": true] [DID-7251]
+- Ignore events on selection border and parent shape
+- Fixes library save, improves error handling [drawio-3323]
+
+26-JAN-2023: 20.8.13
+
+- Fixes NPE when changing colors from toolbar [drawio-3315]
+
+26-JAN-2023: 20.8.12
+
+- Updates CSP and script check for new JS index.html
+- Fixes setDefaultStyle if updateDefaultStyle is false
+- Updated express dependency of nodeImport (vsd server) [CSP-1246]
+- Prevent XSS due to unsanitized input [CSP-1267]
+- Attempt to fix NPE in mxVertexHandler.redrawHandles
+- Error message links to Notion and diagram template
+- Fixes picker and background in inline embed mode
+- Adds links to templates, minimum size for editor
+- Fixes initial view state for inline embed editing
+- Adds viewer entry to CSP generation
+
+24-JAN-2023: 20.8.11
+
+- Simplifies error logging code for parser in MSEdge
+- Adds orgchart to PWA, fixes orgchart in CSV [2028]
+- Adds Custom Orgchart button and handling in dialog
+- Fixes keyboard input in native color dialog [3291]
+- Improves error handling in Notion extension [3284]
+- Adds updateDefaultStyle for tracking style changes
+- Fixes possible NPE in StyleFormatPanel.addStyles
+
+20-JAN-2023: 20.8.10
+
+- [conf cloud] Handles some common errors in initializing viewer
+- [desktop] Updates internal filename in desktop after save as
+
+20-JAN-2023: 20.8.9
+
+- Handles possible errors in custom links
+- Adds paste data in style tab for multiple cells
+- Improves error logging in P2PCollab [drawio-nextcloud-27]
+
+19-JAN-2023: 20.8.8
+
+- Updates actions after undo history events [drawio-3294]
+- Adds navigation items to context menu in simple UI
+- Mermaid Updated to v9.3.0
+- Updates express dependency of nodeImport (vsd server) [CSP-1246]
+- [conf cloud] Removes auth dialog in Safari with anonymous access [DID-7219]
+
+19-JAN-2023: 20.8.7
+
+- Fixes initial page ID and name when creating files [DS-941]
+- [vsdx] Fixed edge/vertex detection [DID-7208]
+- Fixes log of ignored anoymous and extension errors
+
+18-JAN-2023: 20.8.6
+
+- Returns trash URL for trashed Google Drive files
+- Moves refresh icon to header in GitHub file dialog
+- Shift+click in shape picker updates selected cells
+- Fixes refresh icon for OneDrive picker in dark mode
+- Fixes default stroke color applied in UML subshape
+- Applies basic text styles to cells with text class
+- Updates DOMPurify from 2.3.6 to 2.4.3
+- Fixes possible NPE in mxGraph.cloneCells
+- Ignores errors in <anonymous> script source files
+- Shows paste style button for multiple selected cells
+- Calls auth fallback on parse error in Google Drive
+- Handles invalid JSON in P2PCollab message listener
+- Improves error handling for pasting cells
+- Improves error handling for firing mouse events
+- Executes layouts in min and simple layout submenu
+- Fixes center, rounds waypoint for parallel routing
+- Fixes possible NPE for adding SVG with no viewBox
+- Fixes possible NPE in shape picker
+- Hides button to add custom plugins if not allowed
+- Fixes possible NPE in hideDialog
+- Fixes possible NPE in OneDriveClient
+
+12-JAN-2023: 20.8.5
+
+- Fixes possible NPE [DID-7061]
+- Shows spinner while authorizing with Google Drive
+- Conf & Jira Cloud: Added error check to JSON.parse in multiple locations [DID-7101]
+- Lucid import: Added support for notes [DID-7053]
+- Retries saving after invalid response from Google
+- Fixes possible NPE in mxCellEditor
+- Fixes hidden Format option in view menu [DID-7133]
+- About shift+click prints window and app to console
+- Fixes possible NPE in Lucid import extension
+
+11-JAN-2023: 20.8.4
+
+- Fixes evt is not defined in selectSiblings action
+- Adds sharp, rounded, curved option for wire shapes
+- Fixes drawing of markers and shadows in wire shape
+- Fixes sidebar triggers autosave, scale for preview
+- Fixed OneDrive share link [3273]
+- Fixes clientId in checksum error fallback logging
+- Fixes preview graph state, drag preview background
+- Shift+Click on About menu item shows console
+- [conf cloud] Adds viewerCanExceedPageWidth settings to allow increasing the viewer size above the allowed width [DID-7094]
+- Adds fallback for missing translations to show key
+- Fixes specificity for gePrimaryBtn dark mode style
+- Fixes possible NPE for missing resource in confirm
+- Saves file to Google Drive if sharing unavailable
+- Fixes draft dialog shape background for dark mode
+- Adds merge/unmerge to context menu for table cells
+- Fixes reset of view state after initial file save
+- Fixes change stroke color for table cells and rows
+- Removes span with cell styles after paste of text
+
+06-JAN-2023: 20.8.3
+
+- Adds logging for merge fallback success or failure
+- Fires consumeMouseEvent event in consumeMouseEvent
+- Removes edge URL parameter
+- Fixes mouse cursors for direct edge event handling
+
+06-JAN-2023: 20.8.2
+
+- Fixes possible NPE, missing update of page tabs
+- Fallback to mergeFile after checksum error in sync [DS-940]
+- Fixes scrollbars after reset view on empty diagram
+- [jira cloud] license compliance improvements [DFJC-17]
+- Fixes empty edge label handle disables moving edge
+
+03-JAN-2023: 20.8.1
+
+- Fixes substring not a function for invalid pattern
+- Paints grid in fast zoom preview with no page view
+- Shows shapes before freehand in responsive toolbar
+- Fixes CSS for template dialog in dark mode
+- Fixes possible NPE in format panel
+
+02-JAN-2023: 20.8.0
+
+- Fixes possible NPE for window widths below 360px
+- Fixes NPE [DS-935]
+- Shows keyboard shortcuts as tooltips when disabled
+- Decreases tap and hold delay for marquee selection
+- Fixes keyboard shortcuts conflicts
+- Hides no unread notification icon in simple theme
+- Adds background color, shadow, sketch view options
+- Add selection count in simple UI delete popup menu
+- Adds dashed wire shape [3249]
+- Fixes Cloudflare workers deployment scripts to prevent removing KV bindings and dashboard configurations [DS-938]
+- Fixes ignored dark UI theme in embed mode [3172]
+- Fixes edge styles in Advanced sidebar containers
+- Fixes order after split edge and size of waypoint
+- Fixes direct moving of segment edge end points
+- Fixes moving edge segments with segment connector
+- Fixes drag from sidebar and popup on touch devices
+- Fixes ignored final rounding for fast zoom preview
+- Updates zoom label in UI during fast zoom preview
+- Enables line jump format option for wire shapes
+- Fixes dash pattern dropdown for current selection
+- Changes default edge style in simple theme
+- Fixes sketch URL parameter default and host checks
+- Removes redirect for drive button in splash [3260]
+- Fixes possible DOM error in obsolete plugin
+- Attempt to fix possible NPE in TextFormatPanel
+- Moves page actions to submenu in pages menu
+- Adds animation for sidebar and shape picker items
+- Adds live preview for drag and drop from sidebar
+- Fixes hardcoded title font color for process bar
+- Fixes scratchpad and entry background in dark mode
+- Adds native scrolling for page tabs [3265]
+- Fixes preview for edge cases where height is 0
+- Fixes sidebar live preview item count check
+- Adds select option in tags dialog
+- Fixes focus handling with props plugin [3264]
+- Fixes NPE in vsdx import, hiddenTags is null
+- Removes undo/redo from context menu in simple UI
+- Fixes border for predefined colors in dark mode
+- Fixes height for inserted SQL table shapes
+- Adds outline for zoom menu in min and sketch UI
+
+16-DEC-2022: 20.7.4
+
+- Fixes notification icon CSS styles 
+- Fixes vertical offset of bell icon in classic UI 
+- Fixes app icon and comments button in Conf Cloud 
+- Smaller notification count icon
+- Removes shadow for notification icon
+- Shows Classic menu item only in kennedy theme 
+- Darker menu highlight CSS style
+- Improves network status updates and error handling
+- Uses status box styling for collaboration updates
+
+15-DEC-2022: 20.7.3
+
+- Hides empty button container in standalone app 
+- Fixes inconsistent network status icon and message
+- Fixes direct moving of unconnected edge end points
+- Fixes NPE with disabled libs in embed mode [3247]
+- Adds order for multiple cells in popup menu [3248]
+- Adds page CSS in print preview output
+- Fixes possible NPE [DS-933] 
+- Fixes possible NPE in pages menu [DS-934]
+- Fixes print preview dialog in Safari
+- Fixes remove background color in background dialog 
+
 14-DEC-2022: 20.7.2
 
 - Fixes undefined function error when switching to simple UI

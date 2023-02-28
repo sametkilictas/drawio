@@ -1049,6 +1049,21 @@ mxStencilRegistry.allowEval = false;
         	this.spinner.stop();
         }
 	};
+	
+	EditorUi.prototype.normalizeFilename = function(title, defaultExtension)
+	{
+		var tokens = title.split('.');
+		var ext = (tokens.length > 1) ? tokens[tokens.length - 1] : '';
+		defaultExtension = (defaultExtension != null) ? defaultExtension : 'drawio';
+
+		if (tokens.length == 1 || mxUtils.indexOf(['xml',
+			'html', 'drawio', 'png', 'svg'], ext) < 0)
+		{
+			tokens.push(defaultExtension);
+		}
+
+		return tokens.join('.');
+	};
 
 	//In order not to repeat the logic for opening a file, we collect files information here and use them in openLocalFile
 	var origOpenFiles = EditorUi.prototype.openFiles;
@@ -1398,23 +1413,6 @@ mxStencilRegistry.allowEval = false;
 	{
 		this.editable = editable;
 	};
-
-	LocalFile.prototype.getFilename = function()
-	{
-		var filename = this.title;
-		
-		// Adds default extension
-		if (filename.length > 0 && (!/(\.xml)$/i.test(filename) && !/(\.html)$/i.test(filename) &&
-			!/(\.svg)$/i.test(filename) && !/(\.png)$/i.test(filename) && !/(\.drawio)$/i.test(filename)))
-		{
-			filename += '.drawio';
-		}
-		
-		return filename;
-	};
-	
-	// Prototype inheritance needs new functions to be added to subclasses
-	LocalLibrary.prototype.getFilename = LocalFile.prototype.getFilename;
 	
 	LocalFile.prototype.saveFile = async function(revision, success, error, unloading, overwrite)
 	{
@@ -1512,47 +1510,55 @@ mxStencilRegistry.allowEval = false;
 				}
 			});
 			
-			if (this.fileObject == null)
+			try
 			{
-				var lastDir = localStorage.getItem('.lastSaveDir');
-				var name = this.getFilename();
-				var ext = null;
-				
-				if (name != null)
+				if (this.fileObject == null)
 				{
-					var idx = name.lastIndexOf('.');
+					var lastDir = localStorage.getItem('.lastSaveDir');
+					var name = this.ui.normalizeFilename(this.getTitle(),
+						this.constructor == LocalLibrary ? 'xml' : null);
+					var ext = null;
 					
-					if (idx > 0)
+					if (name != null)
 					{
-						ext = name.substring(idx + 1);
-						name = name.substring(0, idx);
+						var idx = name.lastIndexOf('.');
+						
+						if (idx > 0)
+						{
+							ext = name.substring(idx + 1);
+						}
+					}
+					
+					var path = await requestSync({
+						action: 'showSaveDialog',
+						defaultPath: (lastDir || (await requestSync('getDocumentsFolder'))) + '/' + name,
+						filters: this.ui.createFileSystemFilters(ext)
+					});
+
+					if (path != null)
+					{
+						localStorage.setItem('.lastSaveDir', await requestSync({action: 'dirname', path: path}));
+						this.fileObject = new Object();
+						this.fileObject.path = path;
+						this.fileObject.name = path.replace(/^.*[\\\/]/, '');
+						this.fileObject.type = 'utf-8';
+						this.title = this.fileObject.name;
+						this.addToRecent();
+						fn();
+					}
+					else
+					{
+						this.ui.spinner.stop();
 					}
 				}
-				
-				var path = await requestSync({
-					action: 'showSaveDialog',
-					defaultPath: (lastDir || (await requestSync('getDocumentsFolder'))) + '/' + name,
-					filters: this.ui.createFileSystemFilters(ext)
-				});
-
-		        if (path != null)
-		        {
-		        	localStorage.setItem('.lastSaveDir', await requestSync({action: 'dirname', path: path}));
-					this.fileObject = new Object();
-					this.fileObject.path = path;
-					this.fileObject.name = path.replace(/^.*[\\\/]/, '');
-					this.fileObject.type = 'utf-8';
-					this.addToRecent();
+				else
+				{
 					fn();
 				}
-		        else
-		        {
-	            	this.ui.spinner.stop();
-		        }
 			}
-			else
+			catch (e)
 			{
-				fn();
+				error(e);
 			}
 		}
 	};
@@ -1573,38 +1579,45 @@ mxStencilRegistry.allowEval = false;
 
 	LocalFile.prototype.saveAs = async function(title, success, error)
 	{
-		var lastDir = localStorage.getItem('.lastSaveDir');
-		var name = this.getFilename();
-		var ext = null;
-		
-		if (name == '' && this.fileObject != null && this.fileObject.name != null)
+		try
 		{
-			name = this.fileObject.name;
-			var idx = name.lastIndexOf('.');
+			var lastDir = localStorage.getItem('.lastSaveDir');
+			var name = this.ui.normalizeFilename(this.getTitle(),
+				this.constructor == LocalLibrary ? 'xml' : null);
+			var ext = null;
 			
-			if (idx > 0)
+			if (name != null)
 			{
-				ext = name.substring(idx + 1);
-				name = name.substring(0, idx);
+				var idx = name.lastIndexOf('.');
+				
+				if (idx > 0)
+				{
+					ext = name.substring(idx + 1);
+				}
+			}
+			
+			var path = await requestSync({
+				action: 'showSaveDialog',
+				defaultPath: (lastDir || (await requestSync('getDocumentsFolder'))) + '/' + name,
+				filters: this.ui.createFileSystemFilters(ext)
+			});
+
+			if (path != null)
+			{
+				localStorage.setItem('.lastSaveDir', await requestSync({action: 'dirname', path: path}));
+				this.fileObject = new Object();
+				this.fileObject.path = path;
+				this.fileObject.name = path.replace(/^.*[\\\/]/, '');
+				this.fileObject.type = 'utf-8';
+				this.title = this.fileObject.name;
+				this.addToRecent();
+				this.setEditable(true); //In case original file is read only
+				this.save(false, success, error, null, true);
 			}
 		}
-		
-		var path = await requestSync({
-			action: 'showSaveDialog',
-			defaultPath: (lastDir || (await requestSync('getDocumentsFolder'))) + '/' + name,
-			filters: this.ui.createFileSystemFilters(ext)
-		});
-
-        if (path != null)
-        {
-        	localStorage.setItem('.lastSaveDir', await requestSync({action: 'dirname', path: path}));
-			this.fileObject = new Object();
-			this.fileObject.path = path;
-			this.fileObject.name = path.replace(/^.*[\\\/]/, '');
-			this.fileObject.type = 'utf-8';
-			this.addToRecent();
-			this.setEditable(true); //In case original file is read only
-			this.save(false, success, error, null, true);
+		catch (e)
+		{
+			error(e);
 		}
 	};
 	
@@ -1651,6 +1664,11 @@ mxStencilRegistry.allowEval = false;
 		}
 	};
 
+	LocalLibrary.prototype.addToRecent = function()
+	{
+		// do nothing
+	};
+	
 	/**
 	 * Loads the given file handle as a local file.
 	 */

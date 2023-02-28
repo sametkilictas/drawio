@@ -333,8 +333,10 @@
         }));
 
 		toggleSimpleModeAction.setToggleAction(true);
+		toggleSimpleModeAction.visible = Editor.currentTheme != 'min' && Editor.currentTheme != 'sketch' &&
+			Editor.currentTheme != 'atlas';
 		toggleSimpleModeAction.setSelectedCallback(function() { return Editor.currentTheme != 'simple'; });
-		
+
         var toggleSketchModeAction = editorUi.actions.put('toggleSketchMode', new Action(mxResources.get('sketch'), function(e)
         {
 			editorUi.setSketchMode(!Editor.sketchMode);
@@ -916,9 +918,18 @@
 		action.setToggleAction(true);
 		action.setSelectedCallback(function() { return graph.shadowVisible; });
 
-		editorUi.actions.put('about', new Action(mxResources.get('about') + ' ' + EditorUi.VERSION + '...', function()
+		editorUi.actions.put('about', new Action(mxResources.get('about') + ' ' + EditorUi.VERSION + '...', function(arg1, evt)
 		{
-			if (editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
+			if (evt != null && mxEvent.isShiftDown(evt))
+			{
+				mxLog.show();
+
+				if (window.console != null)
+				{
+					console.log(editorUi, window);
+				}
+			}
+			else if (editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
 			{
 				editorUi.alert(editorUi.editor.appName + ' ' + EditorUi.VERSION);
 			}
@@ -1077,7 +1088,7 @@
 				// Moves show start screen option to configuration dialog in sketch
 				var splashCb = document.createElement('input');
 				splashCb.setAttribute('type', 'checkbox');
-				splashCb.style.marginRight = '4px';
+				splashCb.style.marginRight = '8px';
 				splashCb.checked = mxSettings.getShowStartScreen();
 				splashCb.defaultChecked = splashCb.checked;
 
@@ -1085,10 +1096,12 @@
 					Editor.currentTheme == 'simple' || Editor.currentTheme == 'min'))
 				{
 					var showSplash = document.createElement('span');
+					showSplash.style.display = 'flex';
+					showSplash.style.alignItems = 'center';
 					showSplash.style['float'] = 'right';
 					showSplash.style.cursor = 'pointer';
 					showSplash.style.userSelect = 'none';
-					showSplash.style.marginTop = '-4px';
+					showSplash.style.marginTop = '-3px';
 					showSplash.appendChild(splashCb);
 					mxUtils.write(showSplash, mxResources.get('showStartScreen'));
 
@@ -1244,9 +1257,9 @@
 			{
 				var menubar = menusCreateMenuBar.apply(this, arguments);
 				
-				if (menubar != null && Editor.enableSimpleTheme &&
-					editorUi.getServiceName() != 'atlassian' &&
-					urlParams['embed'] != '1')
+				if ((urlParams['embed'] != '1' || urlParams['atlas'] == '1') &&
+					menubar != null && Editor.enableSimpleTheme &&
+					editorUi.getServiceName() != 'atlassian')
 				{
 					var themeMenu = this.get('appearance');
 					
@@ -1330,61 +1343,8 @@
 		// Adds action
 		editorUi.actions.addAction('runLayout', function()
 		{
-	    	var dlg = new TextareaDialog(editorUi, 'Run Layouts:',
-	    		JSON.stringify(editorUi.customLayoutConfig, null, 2),
-	    		function(newValue)
-			{
-				if (newValue.length > 0)
-				{
-					try
-					{
-						var list = JSON.parse(newValue);
-						editorUi.executeLayouts(graph.createLayouts(list));
-						editorUi.customLayoutConfig = list;
-						editorUi.hideDialog();
-					}
-					catch (e)
-					{
-						editorUi.handleError(e);
-					}
-				}
-			}, null, null, null, null, function(buttons, input)
-			{
-				var copyBtn = mxUtils.button(mxResources.get('copy'), function()
-				{
-					try
-					{
-						var orig = input.value;
-						input.value = JSON.stringify(JSON.parse(orig));
-						input.focus();
-						
-						if (mxClient.IS_GC || mxClient.IS_FF || document.documentMode >= 5)
-						{
-							input.select();
-						}
-						else
-						{
-							document.execCommand('selectAll', false, null);
-						}
-						
-						document.execCommand('copy');
-						editorUi.alert(mxResources.get('copiedToClipboard'));
-
-						input.value = orig;
-					}
-					catch (e)
-					{
-						editorUi.handleError(e);
-					}
-				});
-
-				copyBtn.setAttribute('title', 'copy');
-				copyBtn.className = 'geBtn';
-				buttons.appendChild(copyBtn);
-			}, true, null, null, 'https://www.diagrams.net/doc/faq/apply-layouts');
-
-			editorUi.showDialog(dlg.container, 620, 460, true, true);
-			dlg.init();
+	    	editorUi.showCustomLayoutDialog(JSON.stringify(
+				editorUi.customLayoutConfig, null, 2));
 		});
 
 		// Adds fullscreen toggle to zoom menu in sketch and min
@@ -1394,10 +1354,10 @@
 		viewZoomMenu.funct = mxUtils.bind(this, function(menu, parent)
 		{
 			viewZoomMenuFunct.apply(this, arguments);
-
+			
 			if (Editor.currentTheme == 'sketch' || Editor.currentTheme == 'min')
 			{
-				this.addMenuItems(menu, ['-', 'fullscreen'], parent);
+				this.addMenuItems(menu, ['-', 'outline', 'fullscreen'], parent);
 			}
 		});
 		
@@ -1417,17 +1377,20 @@
 				{
 					if (typeof mxOrgChartLayout !== 'undefined' && branchOptimizer != null)
 					{
-						var graph = editorUi.editor.graph;
-						var orgChartLayout = new mxOrgChartLayout(graph,
-							branchOptimizer, parentChildSpacingVal, siblingSpacingVal);
-						var cell = graph.getDefaultParent();
-						
-						if (graph.model.getChildCount(graph.getSelectionCell()) > 1)
+						editorUi.tryAndHandle(mxUtils.bind(this, function()
 						{
-							cell = graph.getSelectionCell();
-						}
-						
-						orgChartLayout.execute(cell);
+							var graph = editorUi.editor.graph;
+							var orgChartLayout = new mxOrgChartLayout(graph,
+								branchOptimizer, parentChildSpacingVal, siblingSpacingVal);
+							var cell = graph.getDefaultParent();
+							
+							if (graph.model.getChildCount(graph.getSelectionCell()) > 1)
+							{
+								cell = graph.getSelectionCell();
+							}
+							
+							orgChartLayout.execute(cell);
+						}));
 					}
 				};
 
@@ -1514,7 +1477,24 @@
 				{
 					siblingSpacingVal = siblingSpacing.value;
 				});
+
+				var customBtn = mxUtils.button(mxResources.get('custom') + '...', function()
+				{
+					var value = [{layout: 'mxOrgChartLayout',
+						config: {
+							branchOptimizer: parseInt(typeSelect.value),
+							parentChildSpacing: parseInt(parentChildSpacing.value),
+							siblingSpacing: parseInt(siblingSpacing.value)
+						}
+					}];
+
+					editorUi.hideDialog();
+					editorUi.showCustomLayoutDialog(
+						JSON.stringify(value, null, 2));
+				});
 				
+				customBtn.className = 'geBtn';
+
 				var dlg = new CustomDialog(editorUi, div, function()
 				{
 					if (branchOptimizer == null)
@@ -1523,8 +1503,8 @@
 					}
 					
 					editorUi.loadOrgChartLayouts(delayed);
-				});
-				
+				}, null, null, null, customBtn);
+
 				editorUi.showDialog(dlg.container, 355, 140, true, true);
 			}, parent, null, isGraphEnabled());
 			
@@ -1532,18 +1512,24 @@
 			
 			menu.addItem(mxResources.get('parallels'), null, mxUtils.bind(this, function()
 			{
-				var layout = new mxParallelEdgeLayout(graph);
-				layout.checkOverlap = true;
-
-				editorUi.prompt(mxResources.get('spacing'), layout.spacing, mxUtils.bind(this, function(newValue)
+				editorUi.tryAndHandle(mxUtils.bind(this, function()
 				{
-					layout.spacing = newValue;
-				
-					editorUi.executeLayout(function()
+					var layout = new mxParallelEdgeLayout(graph);
+					layout.checkOverlap = true;
+
+					editorUi.prompt(mxResources.get('spacing'), layout.spacing, mxUtils.bind(this, function(newValue)
 					{
-						layout.execute(graph.getDefaultParent(), (!graph.isSelectionEmpty()) ?
-							graph.getSelectionCells() : null);
-					}, false);
+						editorUi.tryAndHandle(mxUtils.bind(this, function()
+						{
+							layout.spacing = newValue;
+
+							editorUi.executeLayout(function()
+							{
+								layout.execute(graph.getDefaultParent(), (!graph.isSelectionEmpty()) ?
+									graph.getSelectionCells() : null);
+							}, false);
+						}));
+					}));
 				}));
 			}), parent);
 			
@@ -2508,6 +2494,19 @@
 		action.label = mxResources.get('searchShapes');
 		action.setToggleAction(true);
 		action.setSelectedCallback(function() { return editorUi.sidebar.isEntryVisible('search'); });
+
+		editorUi.actions.get('clearDefaultStyle').funct = function(exit)
+		{
+			if (graph.isEnabled())
+			{
+				editorUi.clearDefaultStyle();
+
+				if (Editor.sketchMode)
+				{
+					editorUi.setSketchMode(false);
+				}
+			}
+		};
 		
 		if (urlParams['embed'] == '1')
 		{
@@ -2594,7 +2593,7 @@
 							mxResources.get('cancel'), mxResources.get('discardChanges'));
 					}
 				}
-			});
+			}, null, null, (urlParams['embedInline'] == '1') ? 'Escape' : null);
 		}
 		
 		this.put('exportAs', new Menu(mxUtils.bind(this, function(menu, parent)
@@ -2931,15 +2930,20 @@
 				{
 					this.addSubmenu('insert', menu, parent);
 				}
-				
-				if (iw < 360)
+
+				if (iw < 360  && urlParams['embed'] != '1' &&
+					editorUi.getServiceName() == 'draw.io')
 				{
 					this.addSubmenu('share', menu, parent);
 				}
 			}
 
-			this.addMenuItems(menu, ['-', 'lightMode', 'darkMode',
-					'autoMode', '-', 'toggleSimpleMode'], parent);
+			this.addMenuItems(menu, ['-', 'lightMode', 'darkMode', 'autoMode'], parent);
+
+			if (urlParams['embed'] != '1')
+			{
+				this.addMenuItems(menu, ['-', 'toggleSimpleMode'], parent);
+			}
 		})));
 
 		editorUi.actions.addAction('addToScratchpad', function(evt)
@@ -3453,7 +3457,7 @@
 		
 		this.put('insert', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
-			if (urlParams['sketch'] == '1')
+			if (Editor.currentTheme == 'sketch')
 			{
 				editorUi.menus.addMenuItems(menu, ['toggleShapes'], parent);
 				editorUi.menus.addSubmenu('table', menu, parent);
@@ -3484,9 +3488,13 @@
 				if (uiTheme == 'min' || Editor.currentTheme == 'simple')
 				{
 					this.addSubmenu('table', menu, parent);
+					this.addSubmenu('layout', menu, parent);
+				}
+				else
+				{
+					this.addSubmenu('insertLayout', menu, parent, mxResources.get('layout'));
 				}
 
-				this.addSubmenu('insertLayout', menu, parent, mxResources.get('layout'));
 				this.addSubmenu('insertAdvanced', menu, parent, mxResources.get('advanced'));
 			}
 		})));
@@ -3516,14 +3524,7 @@
 			
 			if (Editor.currentTheme == 'simple' || Editor.currentTheme == 'min')
 			{
-				this.addMenuItems(menu, ['-', 'createShape'], parent);
-
-				if (Editor.currentTheme == 'simple')
-				{
-					this.addMenuItems(menu, ['insertTemplate'], parent);
-				}
-
-				this.addMenuItems(menu, ['editDiagram'], parent);
+				this.addMenuItems(menu, ['-', 'createShape', 'editDiagram'], parent);
 			}
         })));
         
@@ -4014,7 +4015,7 @@
 			}
 		}));
 		
-		// Extends toolbar dropdown to add comments
+		// Extends toolbar dropdown
 		var viewPanelsMenu = this.get('viewPanels');
 		
 		viewPanelsMenu.funct = function(menu, parent)
@@ -4049,9 +4050,21 @@
 					editorUi.menus.addMenuItems(menu, ['pageTabs'], parent);
 				}
 
-				editorUi.menus.addMenuItems(menu, ['ruler', '-', 'findReplace',
-					'layers', 'tags', 'outline', '-'], parent);
+				editorUi.menus.addMenuItems(menu, ['ruler', '-', 'search'], parent);
 
+				if (isLocalStorage || mxClient.IS_CHROMEAPP)
+				{
+					var item = editorUi.menus.addMenuItem(menu, 'scratchpad', parent);
+					
+					if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
+					{
+						editorUi.menus.addLinkToItem(item, 'https://www.diagrams.net/doc/faq/scratchpad');
+					}
+				}
+				
+				editorUi.menus.addMenuItems(menu, ['-', 'findReplace',
+					'layers', 'tags', 'outline', '-'], parent);
+				
 				if (editorUi.commentsSupported())
 				{
 					editorUi.menus.addMenuItems(menu, ['comments'], parent);
@@ -4066,8 +4079,8 @@
 			}
 			else
 			{
-				this.addMenuItems(menu, ((this.editorUi.format != null) ? ['format'] : []).
-					concat(['outline', 'layers', 'tags']).concat((editorUi.commentsSupported()) ?
+				this.addMenuItems(menu, (['format', 'outline', 'layers', 'tags']).
+					concat((editorUi.commentsSupported()) ?
 					['comments', '-'] : ['-']));
 				
 				this.addMenuItems(menu, ['-', 'search'], parent);
@@ -4110,77 +4123,39 @@
 				'editData', 'copyData', 'pasteData', '-', 'editConnectionPoints',
 				'editGeometry', '-', 'editTooltip', 'editStyle', '-', 'edit'], parent);
 		})));
-
-		// Pages menu
-		this.put('pages', new Menu(mxUtils.bind(this, function(menu, parent)
+				
+		// Current page menu
+		this.put('currentPage', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
 			var page = editorUi.currentPage;
-			var pageName = editorUi.getShortPageName(page);
-			
-			menu.addItem(mxResources.get('insertPage'), null, mxUtils.bind(this, function()
-			{
-				editorUi.insertPage();
-			}), parent);
 
 			if (page != null)
 			{
-				menu.addItem(mxResources.get('duplicateIt', [pageName]), null, mxUtils.bind(this, function()
-				{
-					editorUi.duplicatePage(page, mxResources.get('copyOf', [page.getName()]));
-				}), parent);
-			}
-			
-			menu.addSeparator(parent);
-			
-			if (editorUi.pages.length > 1)
-			{
-				for (var i = 0; i < editorUi.pages.length; i++)
-				{
-					(mxUtils.bind(this, function(index)
-					{
-						var item = menu.addItem(editorUi.getShortPageName(editorUi.pages[index]),
-							null, mxUtils.bind(this, function()
-						{
-							editorUi.selectPage(editorUi.pages[index]);
-						}), parent);
-
-						var id = editorUi.pages[index].getId();
-						item.setAttribute('title', editorUi.pages[index].getName() +
-							' (' + (index + 1) + '/' + editorUi.pages.length + ')' +
-							((id != null) ? ' [' + id + ']' : ''));
-						
-						// Adds checkmark to current page
-						if (editorUi.pages[index] == editorUi.currentPage)
-						{
-							menu.addCheckmark(item, Editor.checkmarkImage);
-						}
-					}))(i);
-				}
-			}
-			
-			if (editorUi.editor.graph.isEnabled() && page != null)
-			{
-				menu.addSeparator(parent);
-				
-				menu.addItem(mxResources.get('renameIt', [pageName]) + '...', null, mxUtils.bind(this, function()
+				menu.addItem(mxResources.get('rename') + '...', null, mxUtils.bind(this, function()
 				{
 					editorUi.renamePage(page, page.getName());
 				}), parent);
 				
-				menu.addItem(mxResources.get('removeIt', [pageName]), null, mxUtils.bind(this, function()
+				menu.addItem(mxResources.get('delete'), null, mxUtils.bind(this, function()
 				{
 					editorUi.removePage(page);
 				}), parent);
 				
-				if (Editor.currentTheme == 'sketch' ||
-					Editor.currentTheme == 'simple')
+				if (editorUi.pages.length > 1)
 				{
-					if (editorUi.pages.length > 1)
-					{
-						editorUi.menus.addSubmenu('movePage', menu, parent, mxResources.get('move'));
-						menu.addSeparator(parent);
-					}
+					editorUi.menus.addSubmenu('movePage', menu, parent, mxResources.get('move'));
+					menu.addSeparator(parent);
+				}
 
+				menu.addSeparator(parent);
+
+				menu.addItem(mxResources.get('duplicate'), null, mxUtils.bind(this, function()
+				{
+					editorUi.duplicatePage(page, mxResources.get('copyOf', [page.getName()]));
+				}), parent);
+				
+				if (urlParams['embed'] != 1)
+				{
 					menu.addSeparator(parent);
 
 					if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && editorUi.getServiceName() == 'draw.io')
@@ -4200,6 +4175,55 @@
 							editorUi.showPageLinkDialog(page);
 						}), parent);
 					}
+				}
+			}
+		})));
+
+		// Pages menu
+		this.put('pages', new Menu(mxUtils.bind(this, function(menu, parent)
+		{
+			var page = editorUi.currentPage;
+			
+			menu.addItem(mxResources.get('insertPage'), null, mxUtils.bind(this, function()
+			{
+				editorUi.insertPage();
+			}), parent);
+
+			menu.addSeparator(parent);
+			
+			if (editorUi.pages != null)
+			{
+				for (var i = 0; i < editorUi.pages.length; i++)
+				{
+					(mxUtils.bind(this, function(index)
+					{
+						var item = null;
+
+						if (editorUi.pages[index] == page)
+						{
+							item = editorUi.menus.addSubmenu('currentPage', menu, parent,
+								editorUi.getShortPageName(page));
+						}
+						else
+						{
+							item = menu.addItem(editorUi.getShortPageName(editorUi.pages[index]),
+								null, mxUtils.bind(this, function()
+							{
+								editorUi.selectPage(editorUi.pages[index]);
+							}), parent);
+						}
+
+						var id = editorUi.pages[index].getId();
+						item.setAttribute('title', editorUi.pages[index].getName() +
+							' (' + (index + 1) + '/' + editorUi.pages.length + ')' +
+							((id != null) ? ' [' + id + ']' : ''));
+						
+						// Adds checkmark to current page
+						if (editorUi.pages[index] == page)
+						{
+							menu.addCheckmark(item, Editor.checkmarkImage);
+						}
+					}))(i);
 				}
 			}
 		})));
@@ -4262,18 +4286,22 @@
 			
 			if (sketchTheme || uiTheme == 'min')
 			{
-				if (urlParams['embed'] != '1' && urlParams['extAuth'] != '1' && editorUi.mode != App.MODE_ATLAS)
+				if ((urlParams['embed'] != '1' || urlParams['atlas'] == '1') &&
+					urlParams['extAuth'] != '1' && editorUi.mode != App.MODE_ATLAS &&
+					urlParams['embedInline'] != '1' && (Editor.isDarkMode() ||
+					(!mxClient.IS_IE && !mxClient.IS_IE11)))
 				{
-					if (urlParams['embedInline'] != '1' && Editor.isDarkMode() ||
-						(!mxClient.IS_IE && !mxClient.IS_IE11))
-					{
-						editorUi.menus.addSubmenu('appearance', menu, parent);
-					}
+					editorUi.menus.addSubmenu('appearance', menu, parent);
+				}
 
+				if (urlParams['embed'] != '1' && urlParams['extAuth'] != '1' &&
+					editorUi.mode != App.MODE_ATLAS)
+				{
 					editorUi.menus.addSubmenu('theme', menu, parent);
-					menu.addSeparator(parent);
 				}
 				
+				menu.addSeparator(parent);
+
 				if (langMenu != null && (urlParams['embed'] != '1' || urlParams['lang'] == null))
 				{
 					editorUi.menus.addSubmenu('language', menu, parent);
@@ -4322,14 +4350,15 @@
 					this.addSubmenu('language', menu, parent);
 				}
 				
+				if ((urlParams['embed'] != '1' || urlParams['atlas'] == '1') &&
+					Editor.currentTheme != 'atlas' && (Editor.isDarkMode() ||
+					(!mxClient.IS_IE && !mxClient.IS_IE11)))
+				{
+					editorUi.menus.addSubmenu('appearance', menu, parent);
+				}
+
 				if (urlParams['embed'] != '1')
 				{
-					if (Editor.currentTheme != 'atlas' && (Editor.isDarkMode() ||
-						(!mxClient.IS_IE && !mxClient.IS_IE11)))
-					{
-						editorUi.menus.addSubmenu('appearance', menu, parent);
-					}
-
 					this.addSubmenu('theme', menu, parent);
 				}
 
@@ -4472,16 +4501,23 @@
 
 		this.put('share', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
-			var status = editorUi.getNetworkStatus();
-
-			if (status != null)
+			if (!editorUi.isStandaloneApp())
 			{
-				menu.addItem(status, null, null, parent, null, false);
-				menu.addSeparator(parent);
+				var err = (editorUi.isOffline(true)) ?
+					mxResources.get('offline') :
+					editorUi.getNetworkStatus();
+
+				if (err != null)
+				{
+					menu.addItem(err, null, null, parent, null, false);
+					menu.addSeparator(parent);
+				}
+
+				editorUi.menus.addMenuItems(menu, ['share'], parent);
 			}
 
-			editorUi.menus.addMenuItems(menu, ['share'], parent);
-			this.addMenuItem(menu, 'publishLink', parent, null, null, mxResources.get('publish') + '...');
+			this.addMenuItem(menu, 'publishLink', parent, null,
+				null, mxResources.get('publish') + '...');
 
 			if (editorUi.getMainUser() != null)
 			{
@@ -4844,7 +4880,7 @@
 					
 				if (Editor.currentTheme == 'simple')
 				{
-					editorUi.menus.addMenuItems(menu, ['autosave'], parent);
+					editorUi.menus.addMenuItems(menu, ['-', 'autosave'], parent);
 				}
 			}
 			else

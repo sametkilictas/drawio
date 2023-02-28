@@ -134,9 +134,16 @@ Actions.prototype.init = function()
 			// ignore
 		}
 		
-		if (cells == null)
+		try
 		{
-			mxClipboard.cut(graph);
+			if (cells == null)
+			{
+				mxClipboard.cut(graph);
+			}
+		}
+		catch (e)
+		{
+			ui.handleError(e);
 		}
 	}, null, 'sprite-cut', Editor.ctrlKey + '+X');
 	this.addAction('copy', function()
@@ -313,7 +320,7 @@ Actions.prototype.init = function()
 				ui.copiedSize = new mxRectangle(geo.x, geo.y, geo.width, geo.height);
 			}
 		}
-	}, null, null, 'Alt+Shift+X');
+	}, null, null, 'Alt+Shift+F');
 
 	this.addAction('pasteSize', function()
 	{
@@ -557,6 +564,7 @@ Actions.prototype.init = function()
 				graph.setCellStyles(mxConstants.STYLE_ROTATABLE, value, cells);
 				graph.setCellStyles(mxConstants.STYLE_DELETABLE, value, cells);
 				graph.setCellStyles(mxConstants.STYLE_EDITABLE, value, cells);
+				graph.setCellStyles('locked', (value == 1) ? 0 : 1, cells);
 				graph.setCellStyles('connectable', value, cells);
 			}
 			finally
@@ -1232,7 +1240,7 @@ Actions.prototype.init = function()
 	{
 		graph.setConnectable(!graph.connectionHandler.isEnabled());
 		ui.fireEvent(new mxEventObject('connectionPointsChanged'));
-	}, null, null, 'Alt+Shift+P');
+	}, null, null, 'Alt+Shift+O');
 	action.setToggleAction(true);
 	action.setSelectedCallback(function() { return graph.connectionHandler.isEnabled(); });
 	action = this.addAction('copyConnect', function()
@@ -1619,7 +1627,7 @@ Actions.prototype.init = function()
 				graph.getModel().endUpdate();
 			}
 		}
-	}, null, null, 'Alt+Shift+C');
+	}, null, null, 'Alt+Shift+W');
 	action = this.addAction('subscript', mxUtils.bind(this, function()
 	{
 	    if (graph.cellEditor.isContentEditing())
@@ -1876,7 +1884,7 @@ Actions.prototype.init = function()
 			});
 			dlg.init();
 		}
-	}).isEnabled = isGraphEnabled;
+	}, null, null, 'Alt+Shift+Q').isEnabled = isGraphEnabled;
 };
 
 /**

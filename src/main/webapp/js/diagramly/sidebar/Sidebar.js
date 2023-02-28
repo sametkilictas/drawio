@@ -329,9 +329,9 @@
 		{
 			for (var i = 0; i < this.customEntries.length; i++)
 			{
-				var section = this.customEntries[i];
+				var section = this.customEntries[i] || {};
 				
-				for (var j = 0; j < section.entries.length; j++)
+				for (var j = 0; section.entries != null && j < section.entries.length; j++)
 				{
 					var entry = section.entries[j];
 					
@@ -374,9 +374,9 @@
 			{
 				for (var i = 0; i < this.customEntries.length; i++)
 				{
-					var section = this.customEntries[i];
+					var section = this.customEntries[i] || {};
 					
-					for (var j = 0; j < section.entries.length; j++)
+					for (var j = 0; section.entries != null && j < section.entries.length; j++)
 					{
 						var entry = section.entries[j];
 						
@@ -471,9 +471,9 @@
 		{
 			for (var i = 0; i < this.customEntries.length; i++)
 			{
-				var section = this.customEntries[i];
+				var section = this.customEntries[i] || {};
 				
-				for (var j = 0; j < section.entries.length; j++)
+				for (var j = 0; section.entries != null && j < section.entries.length; j++)
 				{
 					var entry = section.entries[j];
 					
@@ -496,8 +496,8 @@
 	/**
 	 * Overrides the sidebar init.
 	 */
-	 Sidebar.prototype.init = function()
-	 {
+	Sidebar.prototype.init = function()
+	{
 		this.updateEntries();
 
 		// Uses search.xml index file instead (faster load times)
@@ -514,7 +514,7 @@
 		}
 		
 		this.initPalettes();
-	 }
+	};
 	 
 	/**
 	 * Defines all entries for the sidebar. This is used in the MoreShapes dialog. Create screenshots using the savesidebar URL parameter and
@@ -529,7 +529,6 @@
 			{title: mxResources.get('flowchart'), id: 'flowchart', image: IMAGE_PATH + '/sidebar-flowchart.png'}];
 		
 		if (Editor.currentTheme == 'sketch' ||
-			Editor.currentTheme == 'simple' ||
 			Editor.currentTheme == 'min')
 		{
 			stdEntries = [{title: mxResources.get('searchShapes'), id: 'search'},
@@ -929,9 +928,9 @@
 			
 			for (var i = 0; i < this.customEntries.length; i++)
 			{
-				var section = this.customEntries[i];
+				var section = this.customEntries[i] || {};
 				
-				for (var j = 0; j < section.entries.length; j++)
+				for (var j = 0; section.entries != null && j < section.entries.length; j++)
 				{
 					var entry = section.entries[j];
 					
@@ -1458,8 +1457,12 @@
 				var off = mxUtils.getOffset(this.editorUi.sidebarWindow.window.div);
 
 				off.x += this.editorUi.sidebarWindow.window.div.offsetWidth + 2;
-				off.y += elt.offsetTop - elt.offsetParent.scrollTop +
-					(elt.offsetHeight - bounds.height) / 2;
+				off.y += elt.offsetTop + (elt.offsetHeight - bounds.height) / 2;
+
+				if (elt.offsetParent != null)
+				{
+					off.y -= elt.offsetParent.scrollTop;
+				}
 				
 				return new mxPoint(Math.max(0, off.x), Math.max(0, off.y));
 			}
