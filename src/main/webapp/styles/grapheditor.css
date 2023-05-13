@@ -26,6 +26,9 @@ div td.mxWindowTitle {
 	border:none;
 	margin:0px;
 }
+.geBackground {
+	background:white;
+}
 .geEditor input[type=text]::-ms-clear {
 	display: none;
 }
@@ -138,6 +141,13 @@ html > body > div > div.geToolbarContainer.geSimpleMainMenu .geToolbarContainer{
 	box-shadow: 1px 1px 2px 0px #ddd;
 	opacity:0.8;
 	font-size:9pt;
+}
+.geHint img {
+	opacity: 0.7;
+}
+.geHint img:hover
+{
+	opacity: 1;
 }
 .geUser {
 	color:var(--text-color);

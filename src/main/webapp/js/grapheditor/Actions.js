@@ -33,7 +33,6 @@ Actions.prototype.init = function()
 		
 		ui.openFile();
 	});
-
 	this.put('smartFit', new Action(mxResources.get('fitWindow') + ' / ' + mxResources.get('resetView'), function()
 	{
 		graph.popupMenuHandler.hideMenu();
@@ -43,17 +42,18 @@ Actions.prototype.init = function()
 		var sy = graph.container.scrollTop;
         var tx = graph.view.translate.x;
         var ty = graph.view.translate.y;
+		var thresh = 5;
 
     	ui.actions.get('resetView').funct();
     	
         // Toggle scale if nothing has changed
         if (Math.abs(scale - graph.view.scale) < 0.00001 &&
-			sx == graph.container.scrollLeft &&
-			sy == graph.container.scrollTop &&
+			Math.abs(sx - graph.container.scrollLeft) < thresh &&
+			Math.abs(sy - graph.container.scrollTop) < thresh &&
 			tx == graph.view.translate.x &&
 			ty == graph.view.translate.y)
         {
-        	ui.actions.get((graph.pageVisible) ? 'fitPage' : 'fitWindow').funct();
+			ui.actions.get('fitWindow').funct();
         }
 	}, null, null, 'Enter'));
 	this.addAction('keyPressEnter', function()
@@ -939,21 +939,7 @@ Actions.prototype.init = function()
 					
 					if (html == '1' && value == null)
 			    	{
-			    		var label = graph.convertValueToString(state.cell);
-			    		
-			    		if (mxUtils.getValue(state.style, 'nl2Br', '1') != '0')
-						{
-							// Removes newlines from HTML and converts breaks to newlines
-							// to match the HTML output in plain text
-							label = label.replace(/\n/g, '').replace(/<br\s*.?>/g, '\n');
-						}
-			    		
-			    		// Removes HTML tags
-		    			var temp = document.createElement('div');
-		    			temp.innerHTML = Graph.sanitizeHtml(label);
-		    			label = mxUtils.extractTextWithWhitespace(temp.childNodes);
-		    			
-						graph.cellLabelChanged(state.cell, label);
+						graph.removeTextStyleForCell(state.cell);
 						graph.setCellStyles('html', value, [cells[i]]);
 			    	}
 					else if (html == '0' && value == '1')
@@ -1047,106 +1033,82 @@ Actions.prototype.init = function()
 	}, null, null, Editor.ctrlKey + ' - (Numpad) / Alt+Mousewheel');
 	this.addAction('fitWindow', function()
 	{
-		var bounds = (graph.isSelectionEmpty()) ? graph.getGraphBounds() :
-			graph.getBoundingBox(graph.getSelectionCells())
-		var t = graph.view.translate;
-		var s = graph.view.scale;
-		
-		bounds.x = bounds.x / s - t.x;
-		bounds.y = bounds.y / s - t.y;
-		bounds.width /= s;
-		bounds.height /= s;
-
-		if (graph.backgroundImage != null)
+		if (graph.pageVisible)
 		{
-			bounds = mxRectangle.fromRectangle(bounds);
-			bounds.add(new mxRectangle(0, 0,
-				graph.backgroundImage.width,
-				graph.backgroundImage.height));
-		}
-		
-		if (bounds.width == 0 || bounds.height == 0)
-		{
-			graph.zoomTo(1);
-			ui.resetScrollbars();
+			graph.fitPages();
 		}
 		else
 		{
-			var b = Editor.fitWindowBorders;
+			var bounds = (graph.isSelectionEmpty()) ?
+				mxRectangle.fromRectangle(graph.getGraphBounds()) :
+				graph.getBoundingBox(graph.getSelectionCells())
+			var t = graph.view.translate;
+			var s = graph.view.scale;
 			
-			if (b != null)
+			bounds.x = bounds.x / s - t.x;
+			bounds.y = bounds.y / s - t.y;
+			bounds.width /= s;
+			bounds.height /= s;
+
+			if (graph.backgroundImage != null)
 			{
-				bounds.x -= b.x;
-				bounds.y -= b.y;
-				bounds.width += b.width + b.x;
-				bounds.height += b.height + b.y;
+				bounds.add(new mxRectangle(0, 0,
+					graph.backgroundImage.width,
+					graph.backgroundImage.height));
 			}
-			
-			graph.fitWindow(bounds);
+
+			if (bounds.width == 0 || bounds.height == 0)
+			{
+				graph.zoomTo(1);
+				ui.resetScrollbars();
+			}
+			else
+			{
+				var b = Editor.fitWindowBorders;
+				
+				if (b != null)
+				{
+					bounds.x -= b.x;
+					bounds.y -= b.y;
+					bounds.width += b.width + b.x;
+					bounds.height += b.height + b.y;
+				}
+				
+				graph.fitWindow(bounds);
+			}
 		}
 	}, null, null, Editor.ctrlKey + '+Shift+H');
 	this.addAction('fitPage', mxUtils.bind(this, function()
 	{
-		if (!graph.pageVisible)
+		if (graph.pageVisible)
+		{
+			graph.fitPages(1);
+		}
+		else
 		{
 			this.get('pageView').funct();
-		}
-		
-		var fmt = graph.pageFormat;
-		var ps = graph.pageScale;
-		var cw = graph.container.clientWidth - 10;
-		var ch = graph.container.clientHeight - 10;
-		var scale = Math.floor(20 * Math.min(cw / fmt.width / ps, ch / fmt.height / ps)) / 20;
-		graph.zoomTo(scale);
-		
-		if (mxUtils.hasScrollbars(graph.container))
-		{
-			var pad = graph.getPagePadding();
-			graph.container.scrollTop = pad.y * graph.view.scale - 1;
-			graph.container.scrollLeft = Math.min(pad.x * graph.view.scale, (graph.container.scrollWidth - graph.container.clientWidth) / 2) - 1;
 		}
 	}), null, null, Editor.ctrlKey + '+J');
 	this.addAction('fitTwoPages', mxUtils.bind(this, function()
 	{
-		if (!graph.pageVisible)
+		if (graph.pageVisible)
+		{
+			graph.fitPages(2);
+		}
+		else
 		{
 			this.get('pageView').funct();
-		}
-		
-		var fmt = graph.pageFormat;
-		var ps = graph.pageScale;
-		var cw = graph.container.clientWidth - 10;
-		var ch = graph.container.clientHeight - 10;
-		
-		var scale = Math.floor(20 * Math.min(cw / (2 * fmt.width) / ps, ch / fmt.height / ps)) / 20;
-		graph.zoomTo(scale);
-		
-		if (mxUtils.hasScrollbars(graph.container))
-		{
-			var pad = graph.getPagePadding();
-			graph.container.scrollTop = Math.min(pad.y, (graph.container.scrollHeight - graph.container.clientHeight) / 2);
-			graph.container.scrollLeft = Math.min(pad.x, (graph.container.scrollWidth - graph.container.clientWidth) / 2);
 		}
 	}), null, null, Editor.ctrlKey + '+Shift+J');
 	this.addAction('fitPageWidth', mxUtils.bind(this, function()
 	{
-		if (!graph.pageVisible)
+		if (graph.pageVisible)
+		{
+			graph.fitPages(1, true);
+		}
+		else
 		{
 			this.get('pageView').funct();
-		}
-		
-		var fmt = graph.pageFormat;
-		var ps = graph.pageScale;
-		var cw = graph.container.clientWidth - 10;
-
-		var scale = Math.floor(20 * cw / fmt.width / ps) / 20;
-		graph.zoomTo(scale);
-		
-		if (mxUtils.hasScrollbars(graph.container))
-		{
-			var pad = graph.getPagePadding();
-			graph.container.scrollLeft = Math.min(pad.x * graph.view.scale,
-				(graph.container.scrollWidth - graph.container.clientWidth) / 2);
 		}
 	}));
 	this.put('customZoom', new Action(mxResources.get('custom') + '...', mxUtils.bind(this, function()
@@ -1374,6 +1336,26 @@ Actions.prototype.init = function()
 	this.addAction('borderColor...', function() { ui.menus.pickColor(mxConstants.STYLE_LABEL_BORDERCOLOR); });
 	
 	// Format actions
+	this.addAction('removeFormat', function()
+	{
+		if (graph.isEnabled() && !graph.isSelectionEmpty() && !graph.isEditing())
+		{
+			graph.getModel().beginUpdate();
+			try
+			{
+				var cells = graph.getSelectionCells();
+
+				for (var i = 0; i < cells.length; i++)
+				{
+					graph.removeTextStyleForCell(cells[i], true);
+				}
+			}
+			finally
+			{
+				graph.getModel().endUpdate();
+			}
+		}
+	});
 	this.addAction('vertical', function() { ui.menus.toggleStyle(mxConstants.STYLE_HORIZONTAL, true); });
 	this.addAction('shadow', function() { ui.menus.toggleStyle(mxConstants.STYLE_SHADOW); });
 	this.addAction('solid', function()
@@ -1627,7 +1609,7 @@ Actions.prototype.init = function()
 				graph.getModel().endUpdate();
 			}
 		}
-	}, null, null, 'Alt+Shift+W');
+	}, null, null, 'Alt+Shift+R');
 	action = this.addAction('subscript', mxUtils.bind(this, function()
 	{
 	    if (graph.cellEditor.isContentEditing())

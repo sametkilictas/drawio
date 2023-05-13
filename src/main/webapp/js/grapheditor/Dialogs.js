@@ -1556,17 +1556,45 @@ var EditDataDialog = function(ui, cell)
 			{
 				if (value != null && value.length > 0 && value != id)
 				{
-					if (graph.getModel().getCell(value) == null)
+					if (graph.model.isRoot(cell))
 					{
-						graph.getModel().cellRemoved(cell);
-						cell.setId(value);
-						id = value;
-						idInput.innerHTML = mxUtils.htmlEntities(value);
-						graph.getModel().cellAdded(cell);
+						var page = ui.getPageById(id);
+
+						if (page != null)
+						{
+							if (ui.getPageById(value) == null)
+							{
+								var index = ui.getPageIndex(page);
+
+								if (index >= 0)
+								{
+									ui.removePage(page);
+									page.node.setAttribute('id', value);
+									id = value;
+									idInput.innerHTML = mxUtils.htmlEntities(value);
+									ui.insertPage(page, index);
+								}
+							}
+							else
+							{
+								ui.handleError({message: mxResources.get('alreadyExst', [mxResources.get('page')])});
+							}
+						}
 					}
 					else
 					{
-						ui.handleError({message: mxResources.get('alreadyExst', [value])});
+						if (graph.getModel().getCell(value) == null)
+						{
+							graph.getModel().cellRemoved(cell);
+							cell.setId(value);
+							id = value;
+							idInput.innerHTML = mxUtils.htmlEntities(value);
+							graph.getModel().cellAdded(cell);
+						}
+						else
+						{
+							ui.handleError({message: mxResources.get('alreadyExst', [value])});
+						}
 					}
 				}
 			}), mxResources.get('id'), null, null, null, null, null, null, 200);
@@ -1620,7 +1648,8 @@ var EditDataDialog = function(ui, cell)
 		var name = nameInput.value;
 
 		// Avoid ':' in attribute names which seems to be valid in Chrome
-		if (name.length > 0 && name != 'label' && name != 'placeholders' && name.indexOf(':') < 0)
+		if (name.length > 0 && name != 'label' && name != 'id' &&
+			name != 'placeholders' && name.indexOf(':') < 0)
 		{
 			try
 			{
@@ -2080,8 +2109,8 @@ var LayersWindow = function(editorUi, x, y, w, h)
 	var graph = editorUi.editor.graph;
 	
 	var div = document.createElement('div');
+	div.className = 'geBackground';
 	div.style.userSelect = 'none';
-	div.style.background = (!Editor.isDarkMode()) ? '#fff' : Dialog.backdropColor;
 	div.style.border = '1px solid whiteSmoke';
 	div.style.height = '100%';
 	div.style.marginBottom = '10px';
@@ -2090,7 +2119,7 @@ var LayersWindow = function(editorUi, x, y, w, h)
 	var tbarHeight = (!EditorUi.compactUi) ? '30px' : '26px';
 	
 	var listDiv = document.createElement('div')
-	listDiv.style.backgroundColor = (!Editor.isDarkMode()) ? '#fff' : Dialog.backdropColor;
+	listDiv.className = 'geBackground';
 	listDiv.style.position = 'absolute';
 	listDiv.style.overflow = 'auto';
 	listDiv.style.left = '0px';
@@ -2388,7 +2417,8 @@ var LayersWindow = function(editorUi, x, y, w, h)
 			ldiv.style.padding = '4px';
 			ldiv.style.height = '22px';
 			ldiv.style.display = 'block';
-			ldiv.style.backgroundColor = (!Editor.isDarkMode()) ? 'whiteSmoke' : Dialog.backdropColor;
+			ldiv.style.backgroundColor = (Editor.isDarkMode()) ?
+				Editor.darkColor : 'whiteSmoke';
 			ldiv.style.borderWidth = '0px 0px 1px 0px';
 			ldiv.style.borderColor = '#c3c3c3';
 			ldiv.style.borderStyle = 'solid';

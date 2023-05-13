@@ -40,7 +40,7 @@ GitHubClient.prototype.redirectUri = window.location.protocol + '//' + window.lo
 /**
  * Maximum file size of the GitHub REST API.
  */
-GitHubClient.prototype.maxFileSize = 1000000 /*1MB*/;
+GitHubClient.prototype.maxFileSize = 50000000 /*50MB*/;
 
 /**
  * Name for the auth token header.
@@ -280,7 +280,7 @@ GitHubClient.prototype.showAuthorizeDialog = function(retryFn, cancelFn)
 	this.ui.showError(mxResources.get('accessDenied'), mxResources.get('authorizationRequired'),
 		mxResources.get('help'), mxUtils.bind(this, function()
 		{
-			this.ui.openLink('https://www.diagrams.net/blog/single-repository-diagrams');
+			this.ui.openLink('https://www.drawio.com/blog/single-repository-diagrams');
 		}), retryFn, mxResources.get('authorize'), mxUtils.bind(this, function()
 		{
 			this.ui.openLink((window.location.hostname == 'test.draw.io') ?
@@ -835,7 +835,7 @@ GitHubClient.prototype.pickLibrary = function(fn)
  */
 GitHubClient.prototype.pickFolder = function(fn)
 {
-	this.showGitHubDialog(false, fn);
+	this.showGitHubDialog(false, fn, true);
 };
 
 /**
@@ -854,7 +854,7 @@ GitHubClient.prototype.pickFile = function(fn)
 /**
  * 
  */
-GitHubClient.prototype.showGitHubDialog = function(showFiles, fn)
+GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesError)
 {
 	var org = null;
 	var repo = null;
@@ -902,7 +902,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn)
 	var dlg = new CustomDialog(this.ui, content, mxUtils.bind(this, function()
 		{
 			fn(org + '/' + repo + '/' + encodeURIComponent(ref) + '/' + path);
-		}), null, null, 'https://www.diagrams.net/blog/single-repository-diagrams', null, null, null, null,
+		}), null, null, 'https://www.drawio.com/blog/single-repository-diagrams', null, null, null, null,
 		[[mxResources.get('authorize'), mxUtils.bind(this, function()
 		{
 			this.ui.openLink((window.location.hostname == 'test.draw.io') ?
@@ -1078,7 +1078,11 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn)
 				
 				if (files == null || files.length == 0)
 				{
-					mxUtils.write(div, mxResources.get('noFiles'));
+					if (!hideNoFilesError)
+					{
+						mxUtils.br(div);
+						mxUtils.write(div, mxResources.get('noFiles'));
+					}
 				}
 				else
 				{
@@ -1211,7 +1215,8 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn)
 				
 				if (branches == null || branches.length == 0)
 				{
-					mxUtils.write(div, mxResources.get('noFiles'));
+					mxUtils.br(div);
+					mxUtils.write(div, mxResources.get('repositoryNotFound'));
 				}
 				else if (branches.length == 1 && auto)
 				{
@@ -1303,7 +1308,8 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn)
 				
 				if (repos == null || repos.length == 0)
 				{
-					mxUtils.write(div, mxResources.get('noFiles'));
+					mxUtils.br(div);
+					mxUtils.write(div, mxResources.get('repositoryNotFound'));
 				}
 				else
 				{

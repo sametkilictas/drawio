@@ -311,13 +311,14 @@ App.startTime = new Date();
 
 /**
  * Defines plugin IDs for loading via p URL parameter. Update the table at
- * https://www.diagrams.net/doc/faq/supported-url-parameters
+ * https://www.drawio.com/doc/faq/supported-url-parameters
  */
 App.pluginRegistry = {'4xAKTrabTpTzahoLthkwPNUn': 'plugins/explore.js',
-	'ex': 'plugins/explore.js', 'p1': 'plugins/p1.js',
+	'ex': 'plugins/explore.js',
 	'ac': 'plugins/connect.js', 'acj': 'plugins/connectJira.js',
 	'ac148': 'plugins/cConf-1-4-8.js', 'ac148cmnt': 'plugins/cConf-comments.js', 
 	'nxtcld': 'plugins/nextcloud.js',
+	'monday': 'plugins/monday.js',
 	'voice': 'plugins/voice.js',
 	'tips': 'plugins/tooltips.js', 'svgdata': 'plugins/svgdata.js',
 	'electron': 'plugins/electron.js',
@@ -635,6 +636,14 @@ App.main = function(callback, createUi)
 {
 	try
 	{
+		// This function is called only once, so we can set the flag here
+		// Safari calls window.load event when the location hash is set (e.g, on descriptor change) resulting in calling main twice
+		if (App.isMainCalled) 
+		{
+			return;
+		}
+		
+		App.isMainCalled = true;
 		// Handles uncaught errors before the app is loaded
 		window.onerror = function(message, url, linenumber, colno, err)
 		{
@@ -1048,7 +1057,11 @@ App.main = function(callback, createUi)
 						else
 						{
 							EditorUi.logError(e.message, null, null, null, e);
-							alert(e.message);
+
+							window.setTimeout(function()
+							{
+								alert(e.message);
+							}, 1);
 						}
 					}
 				};
@@ -1812,33 +1825,24 @@ App.prototype.init = function()
 		
 		if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && DrawioFile.SYNC == 'auto' &&
 			urlParams['local'] != '1' && urlParams['stealth'] != '1' && !this.isOffline() &&
-			(!this.editor.chromeless || this.editor.editable))
+			Editor.enableRealtimeCache && (!this.editor.chromeless || this.editor.editable))
 		{
 			// Checks if the cache is alive
 			var timeoutThread = window.setTimeout(mxUtils.bind(this, function()
 			{
-				// Switches to manual sync if cache cannot be reached
-				DrawioFile.SYNC = 'manual';
-				
-				var file = this.getCurrentFile();
-				
-				if (file != null && file.sync != null)
-				{
-					file.sync.destroy();
-					file.sync = null;
-					
-					var status = mxUtils.htmlEntities(mxResources.get('timeout'));
-					this.editor.setStatus('<div title="'+ status +
-						'" class="geStatusAlert">' + status + '</div>');
-				}
-				
-				EditorUi.logEvent({category: 'TIMEOUT-CACHE-CHECK', action: 'timeout', label: 408});
+				// Switches to sync via sockets if cache is not reachable
+				Editor.enableRealtimeCache = false;
 			}), Editor.cacheTimeout);
 			
 			mxUtils.get(EditorUi.cacheUrl + '?alive', mxUtils.bind(this, function(req)
 			{
+				Editor.enableRealtimeCache = req.getStatus() >= 200 && req.getStatus() <= 299;
 				window.clearTimeout(timeoutThread);
-			}));
+			}), function()
+			{
+				Editor.enableRealtimeCache = false;
+				window.clearTimeout(timeoutThread);
+			});
 		}
 	}
 	else if (this.menubar != null)
@@ -1882,6 +1886,44 @@ App.prototype.init = function()
 	if (this.editor.graph.isViewer())
 	{
 		this.initializeViewerMode();
+	}
+
+	// Log the ansestor frames
+	App.logAncestorFrames();
+};
+
+App.logAncestorFrames = function()
+{
+	try
+	{
+		if (window.location.ancestorOrigins && window.location.hostname &&
+				window.location.ancestorOrigins.length && window.location.ancestorOrigins.length > 0)
+		{
+			var hostname = window.location.hostname;
+
+			if (hostname && hostname.length > 1 && hostname.charAt(hostname.length - 1) == '/')
+			{
+				hostname = hostname.substring(0, hostname.length - 1)
+			}
+
+			var message = '';
+
+			for (var i = 0; i < window.location.ancestorOrigins.length; i++)
+			{
+				message += ' -> ' + window.location.ancestorOrigins[i];
+			}
+
+			if (hostname.endsWith('embed.diagrams.net') && window.location.ancestorOrigins.length > 0)
+			{
+				var img = new Image();
+				img.src = 'https://log.diagrams.net/images/1x1.png?src=EditorEmbedAncestorFrames' +
+					'&v=' + encodeURIComponent(EditorUi.VERSION) + '&data=' + encodeURIComponent(message);
+			}
+		}
+	}
+	catch (e)
+	{
+		// ignore
 	}
 };
 
@@ -2023,7 +2065,7 @@ App.prototype.showNameChangeBanner = function()
 {
 	this.showBanner('DiagramsFooter', 'draw.io is now diagrams.net', mxUtils.bind(this, function()
 	{
-		this.openLink('https://www.diagrams.net/blog/move-diagrams-net');
+		this.openLink('https://www.drawio.com/blog/move-diagrams-net');
 	}));
 };
 
@@ -2413,9 +2455,6 @@ App.prototype.updateDocumentTitle = function()
 		if (document.title != title)
 		{
 			document.title = title;
-			var graph = this.editor.graph;
-			graph.invalidateDescendantsWithPlaceholders(graph.model.getRoot());
-			graph.view.validate();
 		}
 	}
 };
@@ -2793,7 +2832,7 @@ App.prototype.appIconClicked = function(evt)
 	}
 	else
 	{
-		this.openLink('https://www.diagrams.net/');
+		this.openLink('https://www.drawio.com/');
 	}
 	
 	mxEvent.consume(evt);
@@ -2816,36 +2855,6 @@ App.prototype.clearMode = function()
 		expiry.setYear(expiry.getFullYear() - 1);
 		document.cookie = 'MODE=; expires=' + expiry.toUTCString();
 	}
-};
-
-/**
- * Translates this point by the given vector.
- * 
- * @param {number} dx X-coordinate of the translation.
- * @param {number} dy Y-coordinate of the translation.
- */
-App.prototype.getDiagramId = function()
-{
-	var id = window.location.hash;
-	
-	// Strips the hash sign
-	if (id != null && id.length > 0)
-	{
-		id = id.substring(1);
-	}
-	
-	// Workaround for Trello client appending data after hash
-	if (id != null && id.length > 1 && id.charAt(0) == 'T')
-	{
-		var idx = id.indexOf('#');
-		
-		if (idx > 0)
-		{
-			id = id.substring(0, idx);
-		}
-	}
-	
-	return id;
 };
 
 /**
@@ -3344,6 +3353,7 @@ App.prototype.start = function()
 								this.getServiceName() == 'draw.io' && (id == null || id.length == 0) &&
 								!this.editor.isChromelessView())
 							{
+								
 								this.checkDrafts();
 							}
 							else if (id != null && id.length > 0)
@@ -3695,6 +3705,11 @@ App.prototype.checkDrafts = function()
 						}
 					}));
 					dlg.init();
+				}
+				else if (urlParams['smart-template'] != null)
+				{
+					this.createFile(this.defaultFilename, this.getFileData(), null, null, null, null, null, true);
+					this.actions.get('insertTemplate').funct();
 				}
 				else if (urlParams['splash'] != '0')
 				{
@@ -4793,6 +4808,48 @@ App.prototype.getPeerForMode = function(mode)
  * @param {number} dx X-coordinate of the translation.
  * @param {number} dy Y-coordinate of the translation.
  */
+App.prototype.uncompressPages = function(data)
+{
+	if (data != null)
+	{
+		try
+		{
+			var doc = mxUtils.parseXml(data);
+
+			if (doc.documentElement.nodeName == 'mxfile')
+			{
+				var diagrams = doc.documentElement.getElementsByTagName('diagram');
+
+				for (var i = 0; i < diagrams.length; i++)
+				{
+					var node = Editor.parseDiagramNode(diagrams[i], true);
+
+					// Replaces text content with XML
+					if (node != null)
+					{
+						mxUtils.setTextContent(diagrams[i], '');
+						diagrams[i].appendChild(node);
+					}
+				}
+
+				data = mxUtils.getPrettyXml(doc.documentElement);
+			}
+		}
+		catch (e)
+		{
+			// fallback to input data in case of error
+		}
+	}
+
+	return data;
+};
+
+/**
+ * Translates this point by the given vector.
+ * 
+ * @param {number} dx X-coordinate of the translation.
+ * @param {number} dy Y-coordinate of the translation.
+ */
 App.prototype.createFile = function(title, data, libs, mode, done, replace, folderId, tempFile, clibs, success)
 {
 	mode = (tempFile) ? null : ((mode != null) ? mode : this.mode);
@@ -4800,7 +4857,13 @@ App.prototype.createFile = function(title, data, libs, mode, done, replace, fold
 	if (title != null && this.spinner.spin(document.body, mxResources.get('inserting')))
 	{
 		data = (data != null) ? data : this.emptyDiagramXml;
-		
+
+		// Decompresses existing content
+		if (data != null && !Editor.defaultCompressed)
+		{
+			data = this.uncompressPages(data);
+		}
+
 		var complete = mxUtils.bind(this, function()
 		{
 			this.spinner.stop();
@@ -5060,7 +5123,7 @@ App.prototype.fileCreated = function(file, libs, replace, done, clibs, success)
 				fn2();
 			}
 		});
-		
+
 		// Updates data in memory for local files
 		if (file.constructor == LocalFile)
 		{
@@ -5115,7 +5178,8 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 
 				if (!isLocalStorage)
 				{
-					this.handleError({message: mxResources.get('serviceUnavailableOrBlocked')}, mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
+					this.handleError({message: mxResources.get('serviceUnavailableOrBlocked')},
+						mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
 					{
 						var tempFile = this.getCurrentFile();
 						window.location.hash = (tempFile != null) ? tempFile.getHash() : '';
@@ -5125,7 +5189,8 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 				{
 					var error = mxUtils.bind(this, function (e)
 					{
-						this.handleError(e, mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
+						this.handleError(e, mxResources.get('errorLoadingFile'),
+							mxUtils.bind(this, function()
 						{
 							var tempFile = this.getCurrentFile();
 							window.location.hash = (tempFile != null) ? tempFile.getHash() : '';
@@ -5385,7 +5450,8 @@ App.prototype.loadFile = function(id, sameWindow, file, success, force)
 				
 				if (peer == null)
 				{
-					this.handleError({message: mxResources.get('serviceUnavailableOrBlocked')}, mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
+					this.handleError({message: mxResources.get('serviceUnavailableOrBlocked')},
+						mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
 					{
 						var currentFile = this.getCurrentFile();
 						window.location.hash = (currentFile != null) ? currentFile.getHash() : '';
@@ -6074,21 +6140,28 @@ App.prototype.fetchAndShowNotification = function(target, subtarget)
 		{
 			if (req.getStatus() >= 200 && req.getStatus() <= 299)
 			{
-			    var notifs = JSON.parse(req.getText());
-				
-				//Process and sort
-				notifs.sort(function(a, b)
+				try
 				{
-					return b.timestamp - a.timestamp;
-				});
+					var notifs = JSON.parse(req.getText());
+					
+					//Process and sort
+					notifs.sort(function(a, b)
+					{
+						return b.timestamp - a.timestamp;
+					});
 
-				if (isLocalStorage)
-				{
-					localStorage.setItem(cachedNotifKey, JSON.stringify({ts: Date.now(), notifs: notifs}));
+					if (isLocalStorage)
+					{
+						localStorage.setItem(cachedNotifKey, JSON.stringify({ts: Date.now(), notifs: notifs}));
+					}
+					
+					this.fetchingNotif = false;	
+					processNotif(notifs);
 				}
-				
-				this.fetchingNotif = false;	
-				processNotif(notifs);
+				catch(e)
+				{
+					// ignore
+				}
 			}
 		}));
 	}
@@ -6597,6 +6670,7 @@ App.prototype.descriptorChanged = function()
 			if (newHash.length > 0)
 			{
 				window.location.hash = newHash;
+				this.updateHashObject();
 			}
 			else if (window.location.hash.length > 0)
 			{

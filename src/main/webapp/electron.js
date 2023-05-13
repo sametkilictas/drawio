@@ -795,7 +795,7 @@ app.on('ready', e =>
 	      submenu: [
 	        {
 	          label: 'About ' + app.name,
-	          click() { shell.openExternal('https://www.diagrams.net'); }
+	          click() { shell.openExternal('https://www.drawio.com'); }
 	        },
 	        {
 	          label: 'Support',
@@ -889,7 +889,7 @@ app.on('activate', function ()
 
 app.on('will-finish-launching', function()
 {
-	app.on("open-file", function(event, path) 
+	app.on("open-file", function(event, filePath) 
 	{
 	    event.preventDefault();
 		// Creating a new window while a save/open dialog is open crashes the app
@@ -907,7 +907,7 @@ app.on('will-finish-launching', function()
 				
 				if (loadEvtCount == 2)
 				{
-	    	    	win.webContents.send('args-obj', {args: [path]});
+	    	    	win.webContents.send('args-obj', {args: [filePath]});
 				}
 			}
 			
@@ -924,7 +924,7 @@ app.on('will-finish-launching', function()
 	    }
 	    else
 		{
-	    	firstWinFilePath = path
+	    	firstWinFilePath = filePath
 		}
 	});
 });
@@ -1872,13 +1872,14 @@ async function getFileDrafts(fileObject)
 
 async function saveDraft(fileObject, data)
 {
-	if (!checkFileContent(data))
+	var draftFileName = fileObject.draftFileName || getDraftFileName(fileObject);
+
+	if (!checkFileContent(data) || path.resolve(draftFileName).startsWith(__dirname))
 	{
 		throw new Error('Invalid file data');
 	}
 	else
 	{
-		var draftFileName = fileObject.draftFileName || getDraftFileName(fileObject);
 		await fsProm.writeFile(draftFileName, data, 'utf8');
 		
 		if (isWin)
@@ -1886,7 +1887,11 @@ async function saveDraft(fileObject, data)
 			try
 			{
 				// Add Hidden attribute:
-				spawn('attrib', ['+h', draftFileName], {shell: true});
+				var child = spawn('attrib', ['+h', draftFileName], {shell: true});
+    			child.on('error', function(err) 
+				{
+					console.log('hiding draft file error: ' + err);
+    			});
 			} catch(e) {}
 		}
 
@@ -1896,7 +1901,7 @@ async function saveDraft(fileObject, data)
 
 async function saveFile(fileObject, data, origStat, overwrite, defEnc)
 {
-	if (!checkFileContent(data))
+	if (!checkFileContent(data) || path.resolve(fileObject.path).startsWith(__dirname))
 	{
 		throw new Error('Invalid file data');
 	}
@@ -1989,7 +1994,11 @@ async function saveFile(fileObject, data, origStat, overwrite, defEnc)
 					try
 					{
 						// Add Hidden attribute:
-						spawn('attrib', ['+h', bkpPath], {shell: true});
+						var child = spawn('attrib', ['+h', bkpPath], {shell: true});
+						child.on('error', function(err) 
+						{
+							console.log('hiding backup file error: ' + err);
+						});
 					} catch(e) {}
 				}
 			}
@@ -2018,15 +2027,15 @@ async function saveFile(fileObject, data, origStat, overwrite, defEnc)
 	}
 };
 
-async function writeFile(path, data, enc)
+async function writeFile(filePath, data, enc)
 {
-	if (!checkFileContent(data, enc))
+	if (!checkFileContent(data, enc) || path.resolve(filePath).startsWith(__dirname))
 	{
 		throw new Error('Invalid file data');
 	}
 	else
 	{
-		return await fsProm.writeFile(path, data, enc);
+		return await fsProm.writeFile(filePath, data, enc);
 	}
 };
 
@@ -2148,7 +2157,7 @@ async function readFile(filename, encoding)
 {
 	let data = await fsProm.readFile(filename, encoding);
 
-	if (checkFileContent(data, encoding))
+	if (checkFileContent(data, encoding) && !path.resolve(filename).startsWith(__dirname))
 	{
 		return data;
 	}
@@ -2200,7 +2209,7 @@ async function deleteFile(file)
 	await fh.read(buffer, 0, 16);
 	await fh.close();
 
-	if (checkFileContent(buffer))
+	if (checkFileContent(buffer) && !path.resolve(file).startsWith(__dirname))
 	{
 		await fsProm.unlink(file);
 	}
@@ -2253,17 +2262,17 @@ function openExternal(url)
 	return false;
 }
 
-function watchFile(path)
+function watchFile(filePath)
 {
 	let win = BrowserWindow.getFocusedWindow();
 
 	if (win)
 	{
-		fs.watchFile(path, (curr, prev) => {
+		fs.watchFile(filePath, (curr, prev) => {
 			try
 			{
 				win.webContents.send('fileChanged', {
-					path: path,
+					path: filePath,
 					curr: curr,
 					prev: prev
 				});
@@ -2273,14 +2282,9 @@ function watchFile(path)
 	}
 }
 
-function unwatchFile(path)
+function unwatchFile(filePath)
 {
-	fs.unwatchFile(path);
-}
-
-function getCurDir()
-{
-	return __dirname;
+	fs.unwatchFile(filePath);
 }
 
 ipcMain.on("rendererReq", async (event, args) => 
@@ -2362,9 +2366,6 @@ ipcMain.on("rendererReq", async (event, args) =>
 			break;
 		case 'unwatchFile':	
 			ret = await unwatchFile(args.path);
-			break;
-		case 'getCurDir':
-			ret = await getCurDir();
 			break;
 		};
 

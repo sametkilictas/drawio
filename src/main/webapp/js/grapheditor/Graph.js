@@ -764,7 +764,14 @@ Graph = function(container, model, renderHint, stylesheet, themes, standalone)
 			}
 			else
 			{
-				result = Graph.sanitizeHtml(result);
+				// Skips sanitizeHtml for unchanged labels
+				if (state.lastLabelValue != result)
+				{
+					state.lastLabelValue = result;
+					state.lastSanitizedLabelValue = Graph.sanitizeHtml(result);
+				}
+
+				result = state.lastSanitizedLabelValue;
 			}
 		}
 		
@@ -1361,7 +1368,7 @@ Graph.foreignObjectWarningText = 'Text is not SVG - cannot display';
 /**
  * Link for foreign object warning.
  */
-Graph.foreignObjectWarningLink = 'https://www.diagrams.net/doc/faq/svg-export-text-problems';
+Graph.foreignObjectWarningLink = 'https://www.drawio.com/doc/faq/svg-export-text-problems';
 
 /**
  * 
@@ -1755,14 +1762,16 @@ Graph.setOpacityForNodes = function(nodes, opacity)
 /**
  * Removes formatting from pasted HTML.
  */
-Graph.removePasteFormatting = function(elt)
+Graph.removePasteFormatting = function(elt, ignoreTabs)
 {
 	while (elt != null)
 	{
 		if (elt.firstChild != null)
 		{
-			Graph.removePasteFormatting(elt.firstChild);
+			Graph.removePasteFormatting(elt.firstChild, true);
 		}
+
+		var next = elt.nextSibling;
 		
 		if (elt.nodeType == mxConstants.NODETYPE_ELEMENT && elt.style != null)
 		{
@@ -1772,10 +1781,70 @@ Graph.removePasteFormatting = function(elt)
 			{
 				elt.style.color = '';
 			}
+
+			// Replaces tabs from macOS TextEdit
+			if (elt.nodeName == 'SPAN' && elt.className == 'Apple-tab-span')
+			{
+				var temp = Graph.createTabNode(4);
+				elt.parentNode.replaceChild(temp, elt);
+				elt = temp;
+			}
+
+			// Replaces paragraphs from macOS TextEdit
+			if (elt.nodeName == 'P' && elt.className == 'p1')
+			{
+				while (elt.firstChild != null)
+				{
+					elt.parentNode.insertBefore(elt.firstChild, elt);
+				}
+				
+				if (next != null && next.nodeName == 'P' &&
+					next.className == 'p1')
+				{
+					elt.parentNode.insertBefore(elt.ownerDocument.
+						createElement('br'), elt);
+				}
+
+				elt.parentNode.removeChild(elt);
+			}
+
+			// Replaces tabs
+			if (!ignoreTabs && elt.innerHTML != null)
+			{
+				var tabNode = Graph.createTabNode(4);
+				elt.innerHTML = elt.innerHTML.replace(/\t/g,
+					tabNode.outerHTML);
+			}
 		}
-		
-		elt = elt.nextSibling;
+
+		elt = next;
 	}
+};
+
+/**
+ * Removes formatting from pasted HTML.
+ */
+Graph.createTabNode = function(spaces)
+{
+	var str = '\t';
+			
+	if (spaces != null)
+	{
+		str = '';
+		
+		while (spaces > 0)
+		{
+			str += '\xa0';
+			spaces--;
+		}
+	}
+
+	// LATER: Fix normalized tab after editing plain text labels
+	var tabNode = document.createElement('span');
+	tabNode.style.whiteSpace = 'pre';
+	tabNode.appendChild(document.createTextNode(str));
+
+	return tabNode;
 };
 
 /**
@@ -2009,7 +2078,31 @@ Graph.createRemoveIcon = function(title, onclick)
  */
 Graph.isPageLink = function(text)
 {
-	 return text != null && text.substring(0, 13) == 'data:page/id,';
+	return text != null && text.substring(0, 13) == 'data:page/id,';
+};
+
+/**
+ * Returns true if the given string is a page link.
+ */
+Graph.rewritePageLinks = function(doc)
+{
+	var links = doc.getElementsByTagName('a');
+
+	function rewriteLink(link, attrib)
+	{
+		var href = link.getAttribute(attrib);
+
+		if (href != null && Graph.isPageLink(href))
+		{
+			link.setAttribute(attrib, '#' + href.substring(href.indexOf(':') + 1));
+		}
+	};
+
+	for (var i = 0; i < links.length; i++)
+	{
+		rewriteLink(links[i], 'href');
+		rewriteLink(links[i], 'xlink:href');
+	}
 };
 
 /**
@@ -3707,7 +3800,7 @@ Graph.prototype.createVertexWipeAnimation = function(state, wipeIn)
 	thread = window.setInterval(animate, delay);
 	animate();
 };
- 
+
 /**
  * Returns the size of the page format scaled with the page size.
  */
@@ -3723,10 +3816,12 @@ Graph.prototype.getPageSize = function()
  * left page and width and height are the vertical and horizontal
  * page count.
  */
-Graph.prototype.getPageLayout = function()
+Graph.prototype.getPageLayout = function(bounds, tr, s)
 {
+	bounds = (bounds != null) ? bounds : this.getGraphBounds();
+	tr = (tr != null) ? tr : this.view.translate;
+	s = (s != null) ? s : this.view.scale;
 	var size = this.getPageSize();
-	var bounds = this.getGraphBounds();
 
 	if (bounds.width == 0 || bounds.height == 0)
 	{
@@ -3734,16 +3829,46 @@ Graph.prototype.getPageLayout = function()
 	}
 	else
 	{
-		var x0 = Math.floor(Math.ceil(bounds.x / this.view.scale -
-			this.view.translate.x) / size.width);
-		var y0 = Math.floor(Math.ceil(bounds.y / this.view.scale -
-			this.view.translate.y) / size.height);
-		var w0 = Math.ceil((Math.floor((bounds.x + bounds.width) / this.view.scale) -
-			this.view.translate.x) / size.width) - x0;
-		var h0 = Math.ceil((Math.floor((bounds.y + bounds.height) / this.view.scale) -
-			this.view.translate.y) / size.height) - y0;
-		
+		var x0 = Math.floor(Math.ceil(bounds.x / s - tr.x) / size.width);
+		var y0 = Math.floor(Math.ceil(bounds.y / s - tr.y) / size.height);
+		var w0 = Math.ceil((Math.floor((bounds.x + bounds.width) /
+			s) - tr.x) / size.width) - x0;
+		var h0 = Math.ceil((Math.floor((bounds.y + bounds.height) /
+			s) - tr.y) / size.height) - y0;
+
 		return new mxRectangle(x0, y0, w0, h0);
+	}
+};
+
+/**
+ * Returns the default view translation for the given page layout.
+ */
+Graph.prototype.getDefaultTranslate = function(pageLayout)
+{
+	var pad = this.getPagePadding();
+	var size = this.getPageSize();
+	
+	return new mxPoint(pad.x - pageLayout.x * size.width,
+		pad.y - pageLayout.y * size.height);
+};
+
+/**
+ * Updates the minimum graph size
+ */
+Graph.prototype.updateMinimumSize = function()
+{
+	var pageLayout = this.getPageLayout();
+	var pad = this.getPagePadding();
+	var size = this.getPageSize();
+	
+	var minw = Math.ceil(2 * pad.x + pageLayout.width * size.width);
+	var minh = Math.ceil(2 * pad.y + pageLayout.height * size.height);
+	
+	if (this.minimumGraphSize == null ||
+		this.minimumGraphSize.width != minw ||
+		this.minimumGraphSize.height != minh)
+	{
+		this.minimumGraphSize = new mxRectangle(0, 0, minw, minh);
 	}
 };
 
@@ -4485,6 +4610,27 @@ Graph.prototype.isCloneConnectSource = function(source)
 };
 
 /**
+ * Inserts the given edge before the given cell.
+ */
+Graph.prototype.insertEdgeBeforeCell = function(edge, cell)
+{
+	var index = null;
+	var tmp = cell;
+	
+	while (tmp.parent != null && tmp.geometry != null &&
+		tmp.geometry.relative && tmp.parent != edge.parent)
+	{
+		tmp = this.model.getParent(tmp);
+	}
+
+	if (tmp != null && tmp.parent != null && tmp.parent == edge.parent)
+	{
+		var index = tmp.parent.getIndex(tmp);
+		this.model.add(tmp.parent, edge, index);
+	}
+};
+
+/**
  * Adds a connection to the given vertex or clones the vertex in special layout
  * containers without creating a connection.
  */
@@ -4678,22 +4824,14 @@ Graph.prototype.connectVertex = function(source, direction, length, evt, forceCl
 					(target == null && cloneSource)) ? null : this.insertEdge(this.model.getParent(source),
 						null, '', source, realTarget, this.createCurrentEdgeStyle());
 		
-				// Inserts edge before source
-				if (edge != null && this.connectionHandler.insertBeforeSource)
+				if (edge != null)
 				{
-					var index = null;
-					var tmp = source;
+					result.push(edge);
+					this.applyNewEdgeStyle(source, [edge], direction);
 					
-					while (tmp.parent != null && tmp.geometry != null &&
-						tmp.geometry.relative && tmp.parent != edge.parent)
+					if (this.connectionHandler.insertBeforeSource)
 					{
-						tmp = this.model.getParent(tmp);
-					}
-				
-					if (tmp != null && tmp.parent != null && tmp.parent == edge.parent)
-					{
-						var index = tmp.parent.getIndex(tmp);
-						this.model.add(tmp.parent, edge, index);
+						this.insertEdgeBeforeCell(edge, source);
 					}
 				}
 				
@@ -4703,12 +4841,6 @@ Graph.prototype.connectVertex = function(source, direction, length, evt, forceCl
 				{
 					var index = source.parent.getIndex(source);
 					this.model.add(source.parent, realTarget, index);
-				}
-				
-				if (edge != null)
-				{
-					result.push(edge);
-					this.applyNewEdgeStyle(source, [edge], direction);
 				}
 				
 				if (target == null && realTarget != null)
@@ -5347,6 +5479,57 @@ Graph.prototype.zoomOut = function()
 };
 
 /**
+ * Function: fitPages
+ * 
+ * Fits the given number of pages to the current view horizontally.
+ * If pageCount is null then all pages will be used. This should not
+ * be called if pages are not visible.
+ */
+Graph.prototype.fitPages = function(pageCount, ignoreHeight)
+{
+	var vcount = 1;
+
+	if (pageCount == null)
+	{
+		var layout = this.getPageLayout();
+		pageCount = layout.width;
+		vcount = layout.height;
+	}
+
+	var ps = this.pageScale;
+	var fmt = this.pageFormat;
+	var cw = this.container.clientWidth - 10;
+	var ch = this.container.clientHeight - 10;
+	var sx = cw / (pageCount * fmt.width) / ps;
+
+	var scale = Math.floor(20 * ((ignoreHeight) ? sx :
+		Math.min(sx, ch / (vcount * fmt.height) / ps))) / 20;
+
+	this.zoomTo(scale);
+	
+	if (mxUtils.hasScrollbars(this.container))
+	{
+		var pad = this.getPagePadding();
+		this.container.scrollLeft = Math.min(pad.x * this.view.scale,
+			(this.container.scrollWidth - this.container.clientWidth) / 2) - 1;
+		
+		if (!ignoreHeight)
+		{
+			if (pageCount >= 2)
+			{
+				this.container.scrollTop = Math.min(pad.y,
+					(this.container.scrollHeight -
+					this.container.clientHeight) / 2);
+			}
+			else
+			{
+				this.container.scrollTop = pad.y * this.view.scale - 1;
+			}
+		}
+	}
+};
+
+/**
  * Function: fitWindow
  * 
  * Sets the current visible rectangle of the window in graph coordinates.
@@ -5363,10 +5546,10 @@ Graph.prototype.fitWindow = function(bounds, border)
 	if (mxUtils.hasScrollbars(this.container))
 	{
 		var t = this.view.translate;
-		this.container.scrollTop = (bounds.y + t.y) * scale -
-			Math.max((ch - bounds.height * scale) / 2 + border / 2, 0);
-		this.container.scrollLeft = (bounds.x + t.x) * scale -
-			Math.max((cw - bounds.width * scale) / 2 + border / 2, 0);
+		this.container.scrollTop = (bounds.y + t.y) * this.view.scale -
+			Math.max((ch - bounds.height * this.view.scale) / 2 + border / 2, 0);
+		this.container.scrollLeft = (bounds.x + t.x) * this.view.scale -
+			Math.max((cw - bounds.width * this.view.scale) / 2 + border / 2, 0);
 	}
 };
 
@@ -6443,6 +6626,52 @@ HoverIcons.prototype.setCurrentState = function(state)
 /**
  * Returns true if the given cell is a table.
  */
+Graph.prototype.removeTextStyleForCell = function(cell, removeCellStyles)
+{
+	var style = this.getCurrentCellStyle(cell);
+	var result = false;
+
+	this.getModel().beginUpdate();
+	try
+	{
+		if (mxUtils.getValue(style, 'html', '0') == '1')
+		{
+			var label = this.convertValueToString(cell);
+							
+			if (mxUtils.getValue(style, 'nl2Br', '1') != '0')
+			{
+				// Removes newlines from HTML and converts breaks to newlines
+				// to match the HTML output in plain text
+				label = label.replace(/\n/g, '').replace(/<br\s*.?>/g, '\n');
+			}
+			
+			label = Editor.convertHtmlToText(label);
+			this.cellLabelChanged(cell, label);
+			result = true;
+		}
+
+		if (removeCellStyles)
+		{
+			this.setCellStyles('fontSource', null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_FONTFAMILY, null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_FONTSIZE, null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_FONTSTYLE, null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_FONTCOLOR, null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_LABEL_BORDERCOLOR, null, [cell]);
+			this.setCellStyles(mxConstants.STYLE_LABEL_BACKGROUNDCOLOR, null, [cell]);
+		}
+	}
+	finally
+	{
+		this.getModel().endUpdate();
+	}
+
+	return result;
+};
+
+/**
+ * Returns true if the given cell is a table.
+ */
 Graph.prototype.createParent = function(parent, child, childCount, dx, dy)
 {
 	parent = this.cloneCell(parent);
@@ -7357,11 +7586,7 @@ TableLayout.prototype.execute = function(parent)
 								if (pt != null && (Math.abs(pt.x - p0.x) > thresh ||
 									Math.abs(pt.y - p0.y) > thresh) &&
 									(Math.abs(pt.x - p1.x) > thresh ||
-									Math.abs(pt.y - p1.y) > thresh) &&
-									(Math.abs(pt.x - p2.x) > thresh ||
-									Math.abs(pt.y - p2.y) > thresh) &&
-									(Math.abs(pt.x - p3.x) > thresh ||
-									Math.abs(pt.y - p3.y) > thresh))
+									Math.abs(pt.y - p1.y) > thresh))
 								{
 									var dx = pt.x - p0.x;
 									var dy = pt.y - p0.y;
@@ -8005,7 +8230,8 @@ if (typeof mxVertexHandler !== 'undefined')
 		mxConstants.DEFAULT_VALID_COLOR = '#00a8ff';
 		mxConstants.LABEL_HANDLE_FILLCOLOR = '#cee7ff';
 		mxConstants.GUIDE_COLOR = '#0088cf';
-		mxConstants.HIGHLIGHT_OPACITY = 30;
+		mxConstants.HIGHLIGHT_STROKEWIDTH = 5;
+		mxConstants.HIGHLIGHT_OPACITY = 50;
 	    mxConstants.HIGHLIGHT_SIZE = 5;
 
 		// Sets window decoration icons
@@ -8560,14 +8786,6 @@ if (typeof mxVertexHandler !== 'undefined')
 						this.model.remove(targetLabels[i]);
 					}
 				}
-				
-				// Removes end arrow and target perimetr Spacing on first segment, start arrow on second segment
-				this.setCellStyles(mxConstants.STYLE_TARGET_PERIMETER_SPACING, null, [newEdge]);
-				this.setCellStyles(mxConstants.STYLE_ENDARROW, mxConstants.NONE, [newEdge]);
-				
-				// Removes start arrow and source perimeter spacing on second segment
-				this.setCellStyles(mxConstants.STYLE_SOURCE_PERIMETER_SPACING, null, [edge]);
-				this.setCellStyles(mxConstants.STYLE_STARTARROW, mxConstants.NONE, [edge]);
 				
 				// Removes entryX/Y and exitX/Y if snapToPoint is used
 				var target = this.model.getTerminal(newEdge, false);
@@ -9416,7 +9634,9 @@ if (typeof mxVertexHandler !== 'undefined')
 			for (var i = 0; i < cells.length; i++)
 			{
 				// Changes font tags inside HTML labels
-				if (this.isHtmlLabel(cells[i]))
+				var style = this.getCurrentCellStyle(cells[i]);
+
+				if (style != null && style['html'] == '1')
 				{
 					var label = this.convertValueToString(cells[i]);
 					
@@ -10739,8 +10959,10 @@ if (typeof mxVertexHandler !== 'undefined')
 						this.doDrawShape(state.secondLabel, canvas);
 					}
 				};
-	
-				imgExport.drawState(this.getView().getState(this.model.root), svgCanvas);
+				
+				var viewRoot = (this.view.currentRoot != null) ?
+					this.view.currentRoot : this.model.root;
+				imgExport.drawState(this.getView().getState(viewRoot), svgCanvas);
 				this.updateSvgLinks(root, linkTarget, true);
 				this.addForeignObjectWarning(svgCanvas, root);
 				
@@ -11995,23 +12217,7 @@ if (typeof mxVertexHandler !== 'undefined')
 	        var doc = editor.ownerDocument.defaultView;
 	        var sel = doc.getSelection();
 	        var range = sel.getRangeAt(0);
-			var str = '\t';
-			
-			if (spaces != null)
-			{
-				str = '';
-				
-				while (spaces > 0)
-				{
-					str += '\xa0';
-					spaces--;
-				}
-			}
-
-			// LATER: Fix normalized tab after editing plain text labels
-			var tabNode = document.createElement('span');
-			tabNode.style.whiteSpace = 'pre';
-			tabNode.appendChild(document.createTextNode(str));
+			var tabNode = Graph.createTabNode(spaces);
 			range.insertNode(tabNode);
 	        range.setStartAfter(tabNode);
 	        range.setEndAfter(tabNode); 
@@ -12330,7 +12536,7 @@ if (typeof mxVertexHandler !== 'undefined')
 							}
 							else
 							{
-								Graph.removePasteFormatting(this.textarea);
+								Graph.removePasteFormatting(this.textarea.firstChild);
 							}
 						}
 					}), 0);
@@ -12366,12 +12572,14 @@ if (typeof mxVertexHandler !== 'undefined')
 						content = mxUtils.replaceTrailingNewlines(content, '<div><br></div>');
 					}
 					
-				    content = Graph.sanitizeHtml((nl2Br) ? content.replace(/\n/g, '').replace(/&lt;br\s*.?&gt;/g, '<br>') : content, true);
+				    content = Graph.sanitizeHtml((nl2Br) ? content.replace(/\n/g, '').
+						replace(/&lt;br\s*.?&gt;/g, '<br>') : content, true);
 					this.textarea.className = 'mxCellEditor mxPlainTextEditor';
 					
 					var size = mxConstants.DEFAULT_FONTSIZE;
 					
-					this.textarea.style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ? Math.round(size * mxConstants.LINE_HEIGHT) + 'px' : mxConstants.LINE_HEIGHT;
+					this.textarea.style.lineHeight = (mxConstants.ABSOLUTE_LINE_HEIGHT) ?
+						Math.round(size * mxConstants.LINE_HEIGHT) + 'px' : mxConstants.LINE_HEIGHT;
 					this.textarea.style.fontSize = Math.round(size) + 'px';
 					this.textarea.style.textDecoration = '';
 					this.textarea.style.fontWeight = 'normal';
@@ -12842,6 +13050,17 @@ if (typeof mxVertexHandler !== 'undefined')
 		};
 
 		/**
+		 * Forces preview for title size in tables, table rows, table cells and swimlanes.
+		 */
+		var vertexHandlerIsGhostPreview = mxVertexHandler.prototype.isGhostPreview;
+		mxVertexHandler.prototype.isGhostPreview = function()
+		{
+			return vertexHandlerIsGhostPreview.apply(this, arguments) && !this.graph.isTable(this.state.cell) &&
+				!this.graph.isTableRow(this.state.cell) && !this.graph.isTableCell(this.state.cell) &&
+				!this.graph.isSwimlane(this.state.cell);
+		};
+
+		/**
 		 * Creates the shape used to draw the selection border.
 		 */
 		var vertexHandlerCreateParentHighlightShape = mxVertexHandler.prototype.createParentHighlightShape;
@@ -13243,6 +13462,9 @@ if (typeof mxVertexHandler !== 'undefined')
 			return (handles != null) ? handles.reverse() : null;
 		};
 
+		/**
+		 * Hides additional handles
+		 */
 		var vertexHandlerSetHandlesVisible = mxVertexHandler.prototype.setHandlesVisible;
 
 		mxVertexHandler.prototype.setHandlesVisible = function(visible)
@@ -13255,7 +13477,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				{
 					if (this.moveHandles[i] != null)
 					{
-						this.moveHandles[i].style.visibility = (visible) ? '' : 'hidden';
+						this.moveHandles[i].node.style.visibility = (visible) ? '' : 'hidden';
 					}
 				}
 			}
@@ -13268,17 +13490,36 @@ if (typeof mxVertexHandler !== 'undefined')
 				}
 			}
 		};
-		
+
+		/**
+		 * Function: isMoveHandlesVisible
+		 * 
+		 * Initializes the shapes required for this vertex handler.
+		 */
+		mxVertexHandler.prototype.isMoveHandlesVisible = function()
+		{
+			return this.graph.isTable(this.state.cell) &&
+				this.graph.isCellMovable(this.state.cell);
+		};
+
 		/**
 		 * Creates or updates special handles for moving rows.
 		 */
 		mxVertexHandler.prototype.refreshMoveHandles = function()
 		{
-			var graph = this.graph;
-			var model = graph.model;
-			
+			var showMoveHandles = this.isMoveHandlesVisible();
+
+			if (showMoveHandles && this.moveHandles == null)
+			{
+				this.moveHandles = this.createMoveHandles();
+			}
+			else if (!showMoveHandles && this.moveHandles != null)
+			{
+				this.destroyMoveHandles();
+			}
+
 			// Destroys existing handles
-			if (this.moveHandles != null)
+			if (showMoveHandles && this.moveHandles == null)
 			{
 				for (var i = 0; i < this.moveHandles.length; i++)
 				{
@@ -13291,8 +13532,16 @@ if (typeof mxVertexHandler !== 'undefined')
 				this.moveHandles = null;
 			}
 
-			// Creates new handles
-			this.moveHandles = [];
+		};
+		
+		/**
+		 * Creates or updates special handles for moving rows.
+		 */
+		mxVertexHandler.prototype.createMoveHandles = function()
+		{
+			var graph = this.graph;
+			var model = graph.model;
+			var handles = [];
 			
 			for (var i = 0; i < model.getChildCount(this.state.cell); i++)
 			{
@@ -13301,17 +13550,15 @@ if (typeof mxVertexHandler !== 'undefined')
 					if (rowState != null && model.isVertex(rowState.cell) &&
 						graph.isCellMovable(rowState.cell))
 					{
-						// Adds handle to move row
-						// LATER: Move to overlay pane to hide during zoom but keep padding
-						var moveHandle = mxUtils.createImage(Editor.rowMoveImage);
-						moveHandle.style.position = 'absolute';
-						moveHandle.style.cursor = 'pointer';
-						moveHandle.style.width = '7px';
-						moveHandle.style.height = '4px';
-						moveHandle.style.padding = '4px 2px 4px 2px';
+						var bounds = new mxRectangle(0, 0, this.rowHandleImage.width, this.rowHandleImage.height);
+						var moveHandle = new mxImageShape(bounds, this.rowHandleImage.src);
 						moveHandle.rowState = rowState;
-						
-						mxEvent.addGestureListeners(moveHandle, mxUtils.bind(this, function(evt)
+						moveHandle.dialect = (this.graph.dialect != mxConstants.DIALECT_SVG) ?
+							mxConstants.DIALECT_MIXEDHTML : mxConstants.DIALECT_SVG;
+						moveHandle.init(this.graph.getView().getOverlayPane());
+						moveHandle.node.style.cursor = 'move';
+
+						mxEvent.addGestureListeners(moveHandle.node, mxUtils.bind(this, function(evt)
 						{
 							this.graph.popupMenuHandler.hideMenu();
 							this.graph.stopEditing(false);
@@ -13343,35 +13590,48 @@ if (typeof mxVertexHandler !== 'undefined')
 							}
 						}));
 						
-						this.moveHandles.push(moveHandle);
-						this.graph.container.appendChild(moveHandle);
-	
+						handles.push(moveHandle);
 					}
 					else
 					{
-						this.moveHandles.push(null);
+						handles.push(null);
 					}
 				}))(this.graph.view.getState(model.getChildAt(this.state.cell, i)));
 			}
+
+			return handles;
 		};
-		
+
 		/**
-		 * Adds handle padding for editing cells and exceptions.
+		 * Function: destroyCustomHandles
+		 * 
+		 * Destroys the handler and all its resources and DOM nodes.
 		 */
-		mxVertexHandler.prototype.refresh = function()
+		mxVertexHandler.prototype.destroyMoveHandles = function()
 		{
-			if (this.customHandles != null)
+			if (this.moveHandles != null)
 			{
-				for (var i = 0; i < this.customHandles.length; i++)
+				for (var i = 0; i < this.moveHandles.length; i++)
 				{
-					if (this.customHandles[i] != null)
+					if (this.moveHandles[i] != null)
 					{
-						this.customHandles[i].destroy();
+						this.moveHandles[i].destroy();
+						// this.moveHandles[i].parentNode.removeChild(this.moveHandles[i]);
 					}
 				}
 				
-				this.customHandles = this.createCustomHandles();
+				this.moveHandles = null;
 			}
+		};
+
+		/**
+		 * Adds handle padding for editing cells and exceptions.
+		 */
+		var vertexHandlerRefresh = mxVertexHandler.prototype.refresh;
+
+		mxVertexHandler.prototype.refresh = function()
+		{
+			vertexHandlerRefresh.apply(this, arguments);
 
 			if (this.graph.isTable(this.state.cell) &&
 				this.graph.isCellMovable(this.state.cell))
@@ -13379,7 +13639,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				this.refreshMoveHandles();
 			}
 		};
-		
+
 		/**
 		 * Adds handle padding for editing cells and exceptions.
 		 */
@@ -13558,7 +13818,8 @@ if (typeof mxVertexHandler !== 'undefined')
 			
 			if (this.isSource || this.isTarget)
 			{
-				if (this.constraintHandler.currentConstraint != null &&
+				if (this.constraintHandler != null &&
+					this.constraintHandler.currentConstraint != null &&
 					this.constraintHandler.currentFocus != null)
 				{
 					var pt = this.constraintHandler.currentConstraint.point;
@@ -13626,6 +13887,10 @@ if (typeof mxVertexHandler !== 'undefined')
 		mxVertexHandler.TABLE_HANDLE_COLOR = '#fca000';
 		mxVertexHandler.prototype.handleImage = HoverIcons.prototype.mainHandle;
 		mxVertexHandler.prototype.secondaryHandleImage = HoverIcons.prototype.secondaryHandle;
+		mxVertexHandler.prototype.rowHandleImage = Graph.createSvgImage(14, 12,
+			'<rect x="2" y="2" width="10" height="3" stroke-width="1" stroke="#ffffff" fill="' + HoverIcons.prototype.arrowFill + '"/>' +
+			'<rect x="2" y="7" width="10" height="3" stroke-width="1" stroke="#ffffff" fill="' + HoverIcons.prototype.arrowFill + '"/>');
+		
 		mxEdgeHandler.prototype.handleImage = HoverIcons.prototype.mainHandle;
 		mxEdgeHandler.prototype.endHandleImage = HoverIcons.prototype.endMainHandle;
 		mxEdgeHandler.prototype.terminalHandleImage = HoverIcons.prototype.terminalHandle;
@@ -14038,9 +14303,10 @@ if (typeof mxVertexHandler !== 'undefined')
 		};
 	
 		var vertexHandlerCreateSizerShape = mxVertexHandler.prototype.createSizerShape;
-		mxVertexHandler.prototype.createSizerShape = function(bounds, index, fillColor)
+		mxVertexHandler.prototype.createSizerShape = function(bounds, index, fillColor, image)
 		{
-			this.handleImage = (index == mxEvent.ROTATION_HANDLE) ? HoverIcons.prototype.rotationHandle : (index == mxEvent.LABEL_HANDLE) ? this.secondaryHandleImage : this.handleImage;
+			image = (index == mxEvent.ROTATION_HANDLE) ? HoverIcons.prototype.rotationHandle :
+				(index == mxEvent.LABEL_HANDLE) ? this.secondaryHandleImage : image;
 			
 			return vertexHandlerCreateSizerShape.apply(this, arguments);
 		};
@@ -14302,7 +14568,12 @@ if (typeof mxVertexHandler !== 'undefined')
 					
 					if (link != null)
 					{
-						this.linkHint.appendChild(this.graph.createLinkForHint(link));
+						var wrapper = document.createElement('div');
+						wrapper.style.display = 'flex';
+						wrapper.style.alignItems = 'center';
+						wrapper.appendChild(this.graph.createLinkForHint(link));
+
+						this.linkHint.appendChild(wrapper);
 						
 						if (this.graph.isEnabled() && typeof this.graph.editLink === 'function' &&
 							!this.graph.isCellLocked(this.state.cell))
@@ -14311,12 +14582,12 @@ if (typeof mxVertexHandler !== 'undefined')
 							changeLink.className = 'geAdaptiveAsset';
 							changeLink.setAttribute('src', Editor.editImage);
 							changeLink.setAttribute('title', mxResources.get('editLink'));
-							changeLink.setAttribute('width', '11');
-							changeLink.setAttribute('height', '11');
-							changeLink.style.marginLeft = '10px';
+							changeLink.setAttribute('width', '14');
+							changeLink.setAttribute('height', '14');
+							changeLink.style.marginLeft = '6px';
 							changeLink.style.marginBottom = '-1px';
 							changeLink.style.cursor = 'pointer';
-							this.linkHint.appendChild(changeLink);
+							wrapper.appendChild(changeLink);
 							
 							mxEvent.addListener(changeLink, 'click', mxUtils.bind(this, function(evt)
 							{
@@ -14332,7 +14603,7 @@ if (typeof mxVertexHandler !== 'undefined')
 								[mxResources.get('link')]));
 							trashLink.style.marginLeft = '4px';
 
-							this.linkHint.appendChild(trashLink);
+							wrapper.appendChild(trashLink);
 
 							mxEvent.addListener(trashLink, 'click', mxUtils.bind(this, function(evt)
 							{
@@ -14369,18 +14640,28 @@ if (typeof mxVertexHandler !== 'undefined')
 		};
 
 		mxEdgeHandler.prototype.updateLinkHint = mxVertexHandler.prototype.updateLinkHint;
+
+		// Extends constraint handler
+		var edgeHandlerCreateConstraintHandler = mxEdgeHandler.prototype.createConstraintHandler;
+
+		mxEdgeHandler.prototype.createConstraintHandler = function()
+		{
+			var handler = edgeHandlerCreateConstraintHandler.apply(this, arguments);
+
+			// Disables connection points
+			handler.isEnabled = mxUtils.bind(this, function()
+			{
+				return this.state.view.graph.connectionHandler.isEnabled();
+			});
+			
+			return handler;
+		};
 		
 		// Creates special handles
 		var edgeHandlerInit = mxEdgeHandler.prototype.init;
 		mxEdgeHandler.prototype.init = function()
 		{
 			edgeHandlerInit.apply(this, arguments);
-			
-			// Disables connection points
-			this.constraintHandler.isEnabled = mxUtils.bind(this, function()
-			{
-				return this.state.view.graph.connectionHandler.isEnabled();
-			});
 			
 			var update = mxUtils.bind(this, function()
 			{
@@ -14441,10 +14722,11 @@ if (typeof mxVertexHandler !== 'undefined')
 				{
 					if (this.moveHandles[i] != null)
 					{
-						this.moveHandles[i].style.left = (this.moveHandles[i].rowState.x +
-							this.moveHandles[i].rowState.width - 5) + 'px';
-						this.moveHandles[i].style.top = (this.moveHandles[i].rowState.y +
-							this.moveHandles[i].rowState.height / 2 - 6) + 'px';
+						this.moveHandles[i].bounds.x = Math.round(this.moveHandles[i].rowState.x +
+							this.moveHandles[i].rowState.width - this.moveHandles[i].bounds.width / 2);
+						this.moveHandles[i].bounds.y = Math.round(this.moveHandles[i].rowState.y +
+							(this.moveHandles[i].rowState.height - this.moveHandles[i].bounds.height) / 2);
+						this.moveHandles[i].redraw();
 					}
 				}
 			}
@@ -14516,19 +14798,8 @@ if (typeof mxVertexHandler !== 'undefined')
 		mxVertexHandler.prototype.destroy = function()
 		{
 			vertexHandlerDestroy.apply(this, arguments);
-			
-			if (this.moveHandles != null)
-			{
-				for (var i = 0; i < this.moveHandles.length; i++)
-				{
-					if (this.moveHandles[i] != null && this.moveHandles[i].parentNode != null)
-					{
-						this.moveHandles[i].parentNode.removeChild(this.moveHandles[i]);
-					}
-				}
-				
-				this.moveHandles = null;
-			}
+
+			this.destroyMoveHandles();
 			
 			if (this.cornerHandles != null)
 			{

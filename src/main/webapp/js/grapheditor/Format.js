@@ -593,10 +593,17 @@ BaseFormatPanel.prototype.addAction = function(div, name)
 
 	if (action != null && action.isEnabled())
 	{
-		btn = mxUtils.button(action.label, function(evt)
+		btn = mxUtils.button(action.label, mxUtils.bind(this, function(evt)
 		{
-			action.funct(evt, evt);
-		});
+			try
+			{
+				action.funct(evt, evt);
+			}
+			catch (e)
+			{
+				this.editorUi.handleError(e);
+			}
+		}));
 		
 		var short = (action.shortcut != null) ? ' (' + action.shortcut + ')' : '';
 		btn.setAttribute('title', action.label + short);
@@ -1444,7 +1451,8 @@ BaseFormatPanel.prototype.addLabel = function(div, title, right, width)
 	label.style.left = (240 - right - width) + 'px';
 	label.style.width = width + 'px';
 	label.style.marginTop = '6px';
-	label.style.textAlign = 'center';
+	label.style.display = 'flex';
+	label.style.justifyContent = 'center';
 	div.appendChild(label);
 
 	return label;
@@ -2206,10 +2214,10 @@ ArrangePanel.prototype.addGeometry = function(container)
 	}
 	else
 	{
-		this.addLabel(div, mxResources.get('width'), 87);
+		this.addLabel(div, mxResources.get('width'), 87, 64);
 	}
 	
-	this.addLabel(div, mxResources.get('height'), 16);
+	this.addLabel(div, mxResources.get('height'), 16, 64);
 	mxUtils.br(div);
 
 	var wrapper = document.createElement('div');
@@ -2260,7 +2268,7 @@ ArrangePanel.prototype.addGeometry = function(container)
 	{
 		if (graph.isTableCell(cell))
 		{
-			cell = graph.model.getParent(cell);
+			cell = model.getParent(cell);
 		}
 		
 		if (graph.isTableRow(cell))
@@ -2309,6 +2317,10 @@ ArrangePanel.prototype.addGeometry = function(container)
 	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(div2);
+	
+	var coordinateLabels = true;
+	var dx = null;
+	var dy = null;
 
 	if (rect.movable)
 	{
@@ -2327,7 +2339,7 @@ ArrangePanel.prototype.addGeometry = function(container)
 				mxUtils.write(span, mxResources.get('relative'));
 				div2.appendChild(span);
 
-				this.addGenericInput(div2, '%', 87, 52, function()
+				dx = this.addGenericInput(div2, ' %', 87, 52, function()
 				{
 					return (Math.round(geo.x * 1000) / 10);
 				}, function(value)
@@ -2350,28 +2362,48 @@ ArrangePanel.prototype.addGeometry = function(container)
 					}
 				});
 
-				this.addGenericInput(div2, '%', 16, 52, function()
+				if (model.isEdge(model.getParent(rect.vertices[0])))
 				{
-					return (Math.round(geo.y * 1000) / 10);
-				}, function(value)
-				{
-					value = parseFloat(value);
-					
-					if (!isNaN(value))
+					coordinateLabels = false;
+					var dyUpdate = null;
+
+					dy = this.addUnitInput(div2, this.getUnit(), 16, 52, function()
 					{
-						model.beginUpdate();
-						try
+						dyUpdate.apply(this, arguments);
+					});
+
+					dyUpdate = this.addGeometryHandler(dy, function(geo, value)
+					{
+						console.log('value', value);
+
+						geo.y = panel.fromUnit(value);
+					});
+				}
+				else
+				{
+					dy = this.addGenericInput(div2, ' %', 16, 52, function()
+					{
+						return (Math.round(geo.y * 1000) / 10);
+					}, function(value)
+					{
+						value = parseFloat(value);
+						
+						if (!isNaN(value))
 						{
-							geo = geo.clone();
-							geo.y = parseFloat(value) / 100;
-							model.setGeometry(rect.vertices[0], geo);
+							model.beginUpdate();
+							try
+							{
+								geo = geo.clone();
+								geo.y = parseFloat(value) / 100;
+								model.setGeometry(rect.vertices[0], geo);
+							}
+							finally
+							{
+								model.endUpdate();
+							}
 						}
-						finally
-						{
-							model.endUpdate();
-						}
-					}
-				});
+					});
+				}
 
 				mxUtils.br(div2);
 			}
@@ -2379,8 +2411,8 @@ ArrangePanel.prototype.addGeometry = function(container)
 		container.appendChild(div2);
 	}
 
-	this.addLabel(div2, mxResources.get('left'), 87).style.marginTop = '8px';
-	this.addLabel(div2, mxResources.get('top'), 16).style.marginTop = '8px';
+	this.addLabel(div2, mxResources.get(coordinateLabels ? 'left' : 'line'), 87, 64).style.marginTop = '8px';
+	this.addLabel(div2, mxResources.get(coordinateLabels ? 'top' : 'orthogonal'), 16, 64).style.marginTop = '8px';
 	
 	var listener = mxUtils.bind(this, function(sender, evt, force)
 	{
@@ -2393,12 +2425,12 @@ ArrangePanel.prototype.addGeometry = function(container)
 			
 			if (force || document.activeElement != width)
 			{
-				width.value = this.inUnit(rect.width) + ((rect.width == '') ? '' : ' ' + this.getUnit());
+				width.value = this.inUnit(rect.width) + ' ' + this.getUnit();
 			}
 			
 			if (force || document.activeElement != height)
 			{
-				height.value = this.inUnit(rect.height) + ((rect.height == '') ? '' : ' ' + this.getUnit());
+				height.value = this.inUnit(rect.height) + ' ' + this.getUnit();
 			}
 		}
 		else
@@ -2407,18 +2439,40 @@ ArrangePanel.prototype.addGeometry = function(container)
 		}
 		
 		if (rect.vertices.length == graph.getSelectionCount() &&
-			rect.x != null && rect.y != null)
+			rect.vertices.length > 0 && rect.x != null &&
+			rect.y != null)
 		{
+			var geo = graph.getCellGeometry(rect.vertices[0]);
 			div2.style.display = '';
 			
 			if (force || document.activeElement != left)
 			{
-				left.value = this.inUnit(rect.x)  + ((rect.x == '') ? '' : ' ' + this.getUnit());
+				left.value = this.inUnit(rect.x) + ' ' + this.getUnit();
 			}
 			
 			if (force || document.activeElement != top)
 			{
-				top.value = this.inUnit(rect.y) + ((rect.y == '') ? '' : ' ' + this.getUnit());
+				top.value = this.inUnit(rect.y) + ' ' + this.getUnit();
+			}
+
+			if (geo != null && geo.relative)
+			{
+				if (dx != null && (force || document.activeElement != dx))
+				{
+					dx.value = (Math.round(geo.x * 1000) / 10) + ' %';
+				}
+
+				if (dy != null && (force || document.activeElement != dy))
+				{
+					if (model.isEdge(model.getParent(rect.vertices[0])))
+					{
+						dy.value = this.inUnit(geo.y) + ' ' + this.getUnit();
+					}
+					else
+					{
+						dy.value = (Math.round(geo.y * 1000) / 10) + ' %';
+					}
+				}
 			}
 		}
 		else
@@ -2427,11 +2481,10 @@ ArrangePanel.prototype.addGeometry = function(container)
 		}
 	});
 
+	this.listeners.push({destroy: function() { model.removeListener(listener); }});
+	model.addListener(mxEvent.CHANGE, listener);
 	this.addKeyHandler(left, listener);
 	this.addKeyHandler(top, listener);
-
-	model.addListener(mxEvent.CHANGE, listener);
-	this.listeners.push({destroy: function() { model.removeListener(listener); }});
 	listener();
 	
 	leftUpdate = this.addGeometryHandler(left, function(geo, value)
@@ -2708,8 +2761,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 	});
 
 	mxUtils.br(divs);
-	this.addLabel(divs, mxResources.get('left'), 87);
-	this.addLabel(divs, mxResources.get('top'), 16);
+	this.addLabel(divs, mxResources.get('left'), 87, 64);
+	this.addLabel(divs, mxResources.get('top'), 16, 64);
 	container.appendChild(divs);
 	this.addKeyHandler(xs, listener);
 	this.addKeyHandler(ys, listener);
@@ -2734,8 +2787,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 	});
 
 	mxUtils.br(divt);
-	this.addLabel(divt, mxResources.get('left'), 87);
-	this.addLabel(divt, mxResources.get('top'), 16);
+	this.addLabel(divt, mxResources.get('left'), 87, 64);
+	this.addLabel(divt, mxResources.get('top'), 16, 64);
 	container.appendChild(divt);
 	this.addKeyHandler(xt, listener);
 	this.addKeyHandler(yt, listener);
@@ -2765,7 +2818,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 		{
 			var geo = graph.model.getGeometry(cell);
 			
-			if (geo.sourcePoint != null && graph.model.getTerminal(cell, true) == null)
+			if (geo != null && geo.sourcePoint != null &&
+				graph.model.getTerminal(cell, true) == null)
 			{
 				xs.value = geo.sourcePoint.x;
 				ys.value = geo.sourcePoint.y;
@@ -2775,7 +2829,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 				divs.style.display = 'none';
 			}
 			
-			if (geo.targetPoint != null && graph.model.getTerminal(cell, false) == null)
+			if (geo != null && geo.targetPoint != null &&
+				graph.model.getTerminal(cell, false) == null)
 			{
 				xt.value = geo.targetPoint.x;
 				yt.value = geo.targetPoint.y;
@@ -2835,7 +2890,31 @@ TextFormatPanel.prototype.init = function()
 {
 	this.container.style.borderBottom = 'none';
 	this.addFont(this.container);
+
+	// Allows to lock/unload button to be added
+	this.container.appendChild(this.addFontOps(this.createPanel()));
 };
+
+
+/**
+ * 
+ */
+TextFormatPanel.prototype.addFontOps = function(div)
+{
+	var ui = this.editorUi;
+	div.style.paddingTop = '8px';
+	div.style.paddingBottom = '6px';
+
+	var count = this.addActions(div, ['removeFormat']);
+
+	if (count == 0)
+	{
+		div.style.display = 'none';
+	}
+	
+	return div;
+};
+
 
 /**
  * Adds the label menu items to the given menu and parent.
@@ -3565,8 +3644,8 @@ TextFormatPanel.prototype.addFont = function(container)
 	});
 
 	mxUtils.br(spacingPanel);
-	this.addLabel(spacingPanel, mxResources.get('top'), 87);
-	this.addLabel(spacingPanel, mxResources.get('global'), 16);
+	this.addLabel(spacingPanel, mxResources.get('top'), 87, 64);
+	this.addLabel(spacingPanel, mxResources.get('global'), 16, 64);
 	mxUtils.br(spacingPanel);
 	mxUtils.br(spacingPanel);
 
@@ -3584,9 +3663,9 @@ TextFormatPanel.prototype.addFont = function(container)
 	});
 
 	mxUtils.br(spacingPanel);
-	this.addLabel(spacingPanel, mxResources.get('left'), 158);
-	this.addLabel(spacingPanel, mxResources.get('bottom'), 87);
-	this.addLabel(spacingPanel, mxResources.get('right'), 16);
+	this.addLabel(spacingPanel, mxResources.get('left'), 158, 64);
+	this.addLabel(spacingPanel, mxResources.get('bottom'), 87, 64);
+	this.addLabel(spacingPanel, mxResources.get('right'), 16, 64);
 	
 	if (!graph.cellEditor.isContentEditing())
 	{
@@ -5082,8 +5161,8 @@ StyleFormatPanel.prototype.addStroke = function(container)
 		{
 			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], [null, null, null], 'geIcon geSprite geSprite-straight', null, true).setAttribute('title', mxResources.get('straight'));
 			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['orthogonalEdgeStyle', null, null], 'geIcon geSprite geSprite-orthogonal', null, true).setAttribute('title', mxResources.get('orthogonal'));
-			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['elbowEdgeStyle', null, null, null], 'geIcon geSprite geSprite-horizontalelbow', null, true).setAttribute('title', mxResources.get('simple'));
-			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['elbowEdgeStyle', 'vertical', null, null], 'geIcon geSprite geSprite-verticalelbow', null, true).setAttribute('title', mxResources.get('simple'));
+			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['elbowEdgeStyle', null, null, null], 'geIcon geSprite geSprite-horizontalelbow', null, true).setAttribute('title', mxResources.get('vertical'));
+			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['elbowEdgeStyle', 'vertical', null, null], 'geIcon geSprite geSprite-verticalelbow', null, true).setAttribute('title', mxResources.get('horizontal'));
 			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['isometricEdgeStyle', null, null, null], 'geIcon geSprite geSprite-horizontalisometric', null, true).setAttribute('title', mxResources.get('isometric'));
 			this.editorUi.menus.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE], ['isometricEdgeStyle', 'vertical', null, null], 'geIcon geSprite geSprite-verticalisometric', null, true).setAttribute('title', mxResources.get('isometric'));
 	

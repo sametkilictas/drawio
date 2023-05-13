@@ -1,3 +1,220 @@
+12-MAY-2023: 21.3.0
+
+- Updates DOMPurify from 3.0.2 to 3.0.3
+- Fixes in-place change of graph bounds in fitWindow
+- Restores sidebar on dark mode change [drawio-3577]
+- Fixes page scroll while editing text [drawio-3523]
+- [conf cloud] Fixed embed diagram macro when context lack the contentType [DID-8214]
+- Preserves tabs in pasted text from text editors
+- Uses simple theme on iPadOS, iOS and Android
+- [desktop]] Potential fix for spawn errors [drawio-desktop-1122]
+- Resets scrollbar state after inserting new pages
+- Fixes reset of scrollbars after deleting last page
+- 
+
+04-MAY-2023: 21.2.9
+
+- Fixes scrolling of iframe parents [drawio-3563]
+
+04-MAY-2023: 21.2.8
+
+- [jira cloud] Uses issueContext instead of the deprecated issueGlance
+- Fixes invalidation for filenames, sanitized labels [CSP-1852]
+
+03-MAY-2023: 21.2.7
+
+- Fixes possible NPE in validate
+
+02-MAY-2023: 21.2.6
+
+- Fixes setting x0 and y0 in graph.sizeDidChange [DS-949]
+
+02-MAY-2023: 21.2.5
+
+- Re-release of 21.2.4 for caching issues
+
+02-MAY-2023: 21.2.4
+
+- Adds wrapper container for view node hierarchy
+- Removes view validation for document title changes
+- Adds less strict search matching [drawio-655]
+- Improves performance for page selection
+- Adds threshhold for reset view check
+- [conf cloud] Adds space filter to pagesIds import [DID-8048]
+
+26-APR-2023: 21.2.3
+
+- Uses move cursor CSS style for table row handle
+- Adds current selected page ID to URL [drawio-3128]
+- Adds lazy ResizeObserver and blocks possible loops [DFCC-61]
+- Fixes fitWindow in page view, refactors common code
+- Fixes syntax for check of property with value of 0
+- [conf cloud] Fix uncompressed custom libraries preview [DID-8096]
+
+25-APR-2023: 21.2.2
+
+- Improves performance for window resize event handlers
+- Fixes handles for zoom and large selection changes
+- Improves performance for GraphViewer [drawio-2766]
+- Ignores invalid numbers in bounding box [DID-8051]
+- Fixes possible divide by zero in router [DID-8051]
+
+19-APR-2023: 21.2.1
+
+- Skips sanitizeHtml for unchanged labels [drawio-3530]
+- Uses cssText property to set CSS in foreignObjects
+- Adds submenu to enable and change diagram language
+
+19-APR-2023: 21.2.0
+
+- Defers bounding box update until after DOM changes [DID-7902]
+
+18-APR-2023: 21.1.9
+
+- Edit connection points in popup menu [drawio-2984]
+- [vsdx] Fixes image cropping [drawio-3518]
+- Updates DOMPurify from 2.4.3 to 3.0.2
+- Fixes image export if inside group [drawio-3516]
+- Increases maximum image size to 1200 pixels and 2 MB
+- Removes Theme submenu from MS Teams app and Confluence DC [drawio-3517]
+
+14-APR-2023: 21.1.8
+
+- Adds headless editor UI class that sets chromeless
+- Fixes line jumps crossing waypoints [drawio-2664]
+- Fixes possible NPE for VSDX import [drawio-3507]
+- Fixes remove group with drag and drop [drawio-3510]
+- Fixes moving vertical label position [drawio-3512]
+- Updates AWS icons [drawio-3336]
+
+12-APR-2023: 21.1.7
+
+- [vsdx] Fixes text overflow of zero width/height labels [DID-7950]
+- Uses Alt+Shift+R for clear waypoints [drawio-3501]
+- Allow blank replace string in dialog [drawio-3502]
+- Handles dark theme change in trees plugin [drawio-3496]
+- Adds smart-template-type, -generate URL parameters
+
+11-APR-2023: 21.1.6
+
+- [conf cloud] Fixes large instances page IDs export and import and using new API [DID-7895]
+- Fixes safari bug with embed mode (calling App.main twice) [drawio-nextcloud-37]
+- Adds support for links to pages in print preview [drawio-722]
+- Blocks direct links to plantUML images generator and from other domains [CSP-1717]
+- Fixes OneDrive saving large files with non-Ascii characters [drawio-3481]
+- Prevents mermaid insertion errors when mxMermaidToDrawio is not available [drawio-3488]
+
+06-APR-2023: 21.1.5
+
+- Fixes asynchronous MathJax rendering [drawio-2876]
+- Added mermaid insertion as draw.io diagram to Atlassian [drawio-3488]
+- [conf cloud] Adds support for importing Gliffy macros with no diagram name (only attachment ID) [DID-7470]
+- [conf cloud] Fixed space filter search when key has "-" [DID-7470]
+- [conf cloud] Added support for Historical revisions of imported pages [DID-7233]
+
+04-APR-2023: 21.1.4
+
+- Remerge and release of dev branch
+
+03-APR-2023: 21.1.3
+
+- Adds zoom and border properties for XML+SVG files
+- Adds Clear Formatting button in Text style panel
+- Removes fontSource cell styles in clear formatting
+- Fixes possible resolving of defaults in stylesheet
+- Conf Cloud: Support proper versioning for embed -> upload [DID-7828]
+- Enables compression with compressXml [drawio-3484]
+
+29-MAR-2023: 21.1.2
+
+- Fixes handling of ctrl+shift+v on Mac [drawio-291]
+- Fixes properties cannot be named id [drawio-3460]
+- [vsdx]] Adds overflow=width to improve support label alignment [DID-7420]
+- Fixes change of title size in tables [drawio-3468]
+- Adds live preview for change of swimlane title size
+
+23-MAR-2023: 21.1.1
+
+- Fixes possible f.replace is not a function
+- Fixes detection for Firefox browser [drawio-3456]
+- Fixes OutlineWindow is not defined in viewer
+- Fixes block layout in link info for multiple links
+
+23-MAR-2023: 21.1.0
+
+- Updates Pako compression library to 2.1.0
+- Fixes inconsistent file opening in app and desktop
+- Disables file compression [drawio-1724]
+- Removes compression in libraries and embedded PDFs [drawio-1724]
+- Fixes change of page ID [drawio-3397]
+
+21-MAR-2023: 21.0.10
+
+- Removes P1 plugin
+
+21-MAR-2023: 21.0.9 Build not released nor tested
+
+- Fixes dialog after resize in viewer and embed mode
+
+18-MAR-2023: 21.0.8
+
+- Fixes sequence diagram generation from mermaid
+
+17-MAR-2023: 21.0.7
+
+- Fixes order of image class in styles [drawio-3432]
+- Fixes update of global edge style [drawio-3429]
+- Connector split clones marker and spacing [DS-946]
+- VSDX import: Fixed some cases of incorrect text alignment [DID-7420]
+
+09-MAR-2023: 21.0.6
+
+- Fixes preview for smart template
+
+09-MAR-2023: 21.0.5 Build Rejected on test
+
+- Fixes e not a function error for arrow [DID-7677]
+- Fixes 404 for sign out from GitLab [drawio-3416]
+
+08-MAR-2023: 21.0.4
+
+- Enables smart templates in production [DS-942]
+
+08-MAR-2023: 21.0.3 Build Rejected on test
+
+- Updates to Mermaid v10 [DS-945]
+- Adds rack shape with vertical size determining number of units.
+- Fixes HTML entities in format change [drawio-3403]
+- [conf cloud] Shows message when conf diagram is edited from Jira Service Desk [DID-7647]
+- Fixes default for container property [drawio-3406]
+
+03-MAR-2023: 21.0.2
+
+- Fixes BPMN event attachment [draw-3342]
+- Removes testing code for no branches [drawio-3396]
+
+02-MAR-2023: 21.0.1
+
+- Changes behaviour of default styling [drawio-3312]
+
+02-MAR-2023: 21.0.0 Build Rejected on test
+
+- Build rejected, failed testing on stage
+
+01-MAR-2023: 20.8.24
+
+- Fixes tolerance and logic for shape picker [drawio-3256]
+- Updates sequence diagram styles in UML 2.5 library
+- Fixes possible clipping of help icon in save dialog
+- Using Mermaid v10 ESM in dev mode [DS-945]
+- Fixed jscompiler error due to dynamic module import.
+- Disables all diagram exports via configuration [drawio-3374]
+- Improves error messages in git clients [drawio-3185]
+- Fixes tooltip for elbow edge styles [drawio-3343]
+- Fixes NPE when "more shapes" is clicked and configured libraries are incorrect
+- [conf cloud] Sorts custom libraries alphabetically [DID-7590, drawio-1287]
+- Fixes possible NPE in ArrangePanel
+
 22-FEB-2023: 20.8.23
 
 - Fixes file extension for .drawio.pdf files [drawio-3368]

@@ -178,6 +178,13 @@
 	 * at runtime in the kennedy theme.
 	 */
 	Editor.enableSimpleTheme = true;
+			
+	/**
+	 * Specifies if the URL should be rewritten to contain the selected page.
+	 * Default is true for online app without embed.
+	 */
+	Editor.enableHashObjects = !mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp &&
+		urlParams['embed'] != '1' && window.top == window.self;
 	
 	/**
 	 * Sets the default value for including a copy of the diagram.
@@ -214,9 +221,25 @@
 	Editor.enableRealtime = true;
 
 	/**
+	 * Enables cache for patches and Pusher for messages. Default is true.
+	 */
+	Editor.enableRealtimeCache = true;
+	
+	/**
+	 * Enables P2P instead of Pusher for messages. (Ignored if enableRealtimeCache is false.)
+	 * Default is false.
+	 */
+	Editor.p2pSyncNotify = false;
+	
+	/**
 	 * Specifies if XML files should be compressed. Default is true.
 	 */
 	Editor.compressXml = true;
+
+	/**
+	 * Specifies if XML files should be compressed by default. Default is false.
+	 */
+	Editor.defaultCompressed = false;
 
 	/**
 	 * Specifies if XML files should be compressed. Default is true.
@@ -442,7 +465,13 @@
         			{val: 'centerPerimeter', dispName: 'Center'}]
         },
         {name: 'fixDash', dispName: 'Fixed Dash', type: 'bool', defVal: false},
-        {name: 'container', dispName: 'Container', type: 'bool', defVal: false, isVisible: function(state, format)
+        {name: 'container', dispName: 'Container', type: 'bool', getDefaultValue: function(state, format)
+        {
+        	var cell = (state.vertices.length == 1 && state.edges.length == 0) ? state.vertices[0] : null;
+        	var graph = format.editorUi.editor.graph;
+
+			return cell != null && graph.isSwimlane(cell);
+		}, isVisible: function(state, format)
         {
     		return state.vertices.length == 1 && state.edges.length == 0;
         }},
@@ -1756,17 +1785,17 @@
 	 * 
 	 * Hook for mermaid to draw.io converter.
 	 */
-	Editor.mermaidToDrawio = function(graph, diagramtype)
+	Editor.mermaidToDrawio = function(graph, diagramtype, exta)
 	{
 		if (typeof mxMermaidToDrawio === 'function')
 		{
-			return mxMermaidToDrawio(graph, diagramtype);
+			return mxMermaidToDrawio(graph, diagramtype, exta);
 		}
 	};
     
 	/**
 	 * Global configuration of the Editor
-	 * see https://www.diagrams.net/doc/faq/configure-diagram-editor
+	 * see https://www.drawio.com/doc/faq/configure-diagram-editor
 	 * 
 	 * For defaultVertexStyle, defaultEdgeStyle and defaultLibraries, this must be called before
 	 * mxSettings.load via global config variable window.mxLoadSettings = false.
@@ -1843,6 +1872,7 @@
 
 			if (config.compressXml != null)
 			{
+				Editor.defaultCompressed = config.compressXml;
 				Editor.compressXml = config.compressXml;
 			}
 			
@@ -2113,6 +2143,11 @@
 			if (config.showRemoteCursors != null)
 			{
 				EditorUi.prototype.showRemoteCursors = config.showRemoteCursors;
+			}
+
+			if (config.restrictExport != null)
+			{
+				DrawioFile.RESTRICT_EXPORT = config.restrictExport;
 			}
 		}
 	};
@@ -2498,14 +2533,39 @@
 		{
 			src = (src != null) ? src : DRAW_MATH_URL + '/startup.js';
 			Editor.mathJaxQueue = [];
+
+			// Blocks concurrent rendering while
+			// async rendering is in progress
+			var rendering = null;
+
+			function mathJaxDone()
+			{
+				rendering = null;
+
+				if (Editor.mathJaxQueue.length > 0)
+				{
+					Editor.doMathJaxRender(Editor.mathJaxQueue.shift());
+				}
+				else
+				{
+					Editor.onMathJaxDone();
+				}
+			};
 			
 			Editor.doMathJaxRender = function(container)
 			{
 				try
 				{
-					MathJax.typesetClear([container]);
-					MathJax.typeset([container]);
-					Editor.onMathJaxDone();
+					if (rendering == null)
+					{
+						MathJax.typesetClear([container]);
+						MathJax.typeset([container]);
+						mathJaxDone();
+					}
+					else if (rendering != container)
+					{
+						Editor.mathJaxQueue.push(container);
+					}
 				}
 				catch (e)
 				{
@@ -2513,14 +2573,24 @@
 
 					if (e.retry != null)
 					{
+						rendering = container;
+
 						e.retry.then(function()
 						{
-							MathJax.typesetPromise([container]).then(Editor.onMathJaxDone);
-						});
+							MathJax.typesetPromise([container]).then(mathJaxDone)['catch'](function(e)
+							{
+								console.log('Error in MathJax.typesetPromise: ' + e.toString());
+								mathJaxDone();
+							});
+						})['catch'](function(e)
+						{
+							console.log('Error in MathJax.retry: ' + e.toString());
+							mathJaxDone();
+						});;
 					}
 					else if (window.console != null)
 					{
-						console.log('Error in MathJax: ' + e.toString());
+						console.log('Error in MathJax.typeset: ' + e.toString());
 					}
 				}
 			};
@@ -2561,12 +2631,6 @@
 					Editor.mathJaxQueue.push(container);
 				}
 			};
-
-			// Adds global clear queue method
-			Editor.MathJaxClear = function()
-			{
-				Editor.mathJaxQueue = [];
-			};
 			
 			// Adds global MathJax render callback
 			Editor.onMathJaxDone = function()
@@ -2583,8 +2647,8 @@
 
 				var renderMath = mxUtils.bind(this, function(sender, evt)
 				{
-					if (this.graph.container != null && this.graph.mathEnabled &&
-						!this.graph.blockMathRender)
+					if (this.graph.container != null &&
+						this.graph.mathEnabled)
 					{
 						Editor.MathJaxRender(this.graph.container);
 					}
@@ -3847,7 +3911,7 @@
 	 */
 	if (window.ColorDialog)
 	{
-		FilenameDialog.filenameHelpLink = 'https://www.diagrams.net/doc/faq/save-file-formats'; 
+		FilenameDialog.filenameHelpLink = 'https://www.drawio.com/doc/faq/save-file-formats'; 
 		
 		var colorDialogAddRecentColor = ColorDialog.addRecentColor;
 		
@@ -4209,7 +4273,7 @@
 					
 					div.appendChild(option);
 					
-					var help = ui.menus.createHelpLink('https://www.diagrams.net/doc/faq/math-typesetting');
+					var help = ui.menus.createHelpLink('https://www.drawio.com/doc/faq/math-typesetting');
 					help.style.position = 'relative';
 					help.style.marginLeft = '6px';
 					option.appendChild(help);
@@ -4322,6 +4386,7 @@
 		
 		mxCellRenderer.defaultShapes['swimlane'].prototype.customProperties = [
 	        {name: 'arcSize', dispName: 'Arc Size', type: 'float', min:0, defVal: 15},
+	        {name: 'absoluteArcSize', dispName: 'Abs. Arc Size', type: 'bool', defVal: false},
 	        {name: 'startSize', dispName: 'Header Size', type: 'float'},
 			{name: 'swimlaneHead', dispName: 'Head Border', type: 'bool', defVal: true},
 			{name: 'swimlaneBody', dispName: 'Body Border', type: 'bool', defVal: true},
@@ -8189,7 +8254,7 @@
 				graph.refresh();
 			}
 
-			function printGraph(thisGraph, pv, forcePageBreaks)
+			function printGraph(thisGraph, pv, forcePageBreaks, pageId)
 			{
 				// Workaround for CSS transforms affecting the print output
 				// is to disable during print output and restore after
@@ -8254,6 +8319,8 @@
 				{
 					autoOrigin = true;
 				}
+
+				var anchorId = (pageId != null) ? 'page/id,' + pageId : null;
 				
 				if (pv == null)
 				{
@@ -8367,7 +8434,7 @@
 					}
 					
 					// Generates the print output
-					pv.open(null, null, forcePageBreaks, true);
+					pv.open(null, null, forcePageBreaks, true, anchorId);
 					
 					// Restores flowAnimation
 					graph.enableFlowAnimation = enableFlowAnimation;
@@ -8392,7 +8459,7 @@
 					
 					pv.backgroundColor = bg;
 					pv.autoOrigin = autoOrigin;
-					pv.appendGraph(thisGraph, scale, x0, y0, forcePageBreaks, true);
+					pv.appendGraph(thisGraph, scale, x0, y0, forcePageBreaks, true, anchorId);
 					
 					var extFonts = thisGraph.getCustomFonts();
 					
@@ -8565,7 +8632,7 @@
 						tempGraph.model.setRoot(page.root);
 					}
 					
-					pv = printGraph(tempGraph, pv, i != imax);
+					pv = printGraph(tempGraph, pv, i != imax, page.getId());
 
 					if (tempGraph != graph)
 					{
@@ -8600,6 +8667,9 @@
 				}
 				
 				pv.closeDocument();
+
+				// Rewrites page links to point to internal anchors
+				Graph.rewritePageLinks(pv.wnd.document);
 				
 				if (!pv.mathEnabled && print)
 				{
@@ -8632,7 +8702,7 @@
 		{
 			var helpBtn = mxUtils.button(mxResources.get('help'), function()
 			{
-				graph.openLink('https://www.diagrams.net/doc/faq/print-diagram');
+				graph.openLink('https://www.drawio.com/doc/faq/print-diagram');
 			});
 			
 			helpBtn.className = 'geBtn';

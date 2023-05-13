@@ -111,7 +111,6 @@ Editor.smallScreenWidth = 800;
 /**
  * 
  */
-Editor.rowMoveImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAEBAMAAACw6DhOAAAAGFBMVEUzMzP///9tbW1QUFCKiopBQUF8fHxfX1/IXlmXAAAAFElEQVQImWNgNVdzYBAUFBRggLMAEzYBy29kEPgAAAAASUVORK5CYII=';
 Editor.lightCheckmarkImage = 'data:image/gif;base64,R0lGODlhFQAVAMQfAGxsbHx8fIqKioaGhvb29nJycvr6+sDAwJqamltbW5OTk+np6YGBgeTk5Ly8vJiYmP39/fLy8qWlpa6ursjIyOLi4vj4+N/f3+3t7fT09LCwsHZ2dubm5r6+vmZmZv///yH/C1hNUCBEYXRhWE1QPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS4wLWMwNjAgNjEuMTM0Nzc3LCAyMDEwLzAyLzEyLTE3OjMyOjAwICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OEY4NTZERTQ5QUFBMTFFMUE5MTVDOTM5MUZGMTE3M0QiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OEY4NTZERTU5QUFBMTFFMUE5MTVDOTM5MUZGMTE3M0QiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4Rjg1NkRFMjlBQUExMUUxQTkxNUM5MzkxRkYxMTczRCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4Rjg1NkRFMzlBQUExMUUxQTkxNUM5MzkxRkYxMTczRCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PgH//v38+/r5+Pf29fTz8vHw7+7t7Ovq6ejn5uXk4+Lh4N/e3dzb2tnY19bV1NPS0dDPzs3My8rJyMfGxcTDwsHAv769vLu6ubi3trW0s7KxsK+urayrqqmop6alpKOioaCfnp2cm5qZmJeWlZSTkpGQj46NjIuKiYiHhoWEg4KBgH9+fXx7enl4d3Z1dHNycXBvbm1sa2ppaGdmZWRjYmFgX15dXFtaWVhXVlVUU1JRUE9OTUxLSklIR0ZFRENCQUA/Pj08Ozo5ODc2NTQzMjEwLy4tLCsqKSgnJiUkIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEAACH5BAEAAB8ALAAAAAAVABUAAAVI4CeOZGmeaKqubKtylktSgCOLRyLd3+QJEJnh4VHcMoOfYQXQLBcBD4PA6ngGlIInEHEhPOANRkaIFhq8SuHCE1Hb8Lh8LgsBADs=';
 Editor.darkCheckmarkImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAMAAACeyVWkAAAARVBMVEUAAACZmZkICAgEBASNjY2Dg4MYGBiTk5N5eXl1dXVmZmZQUFBCQkI3NzceHh4MDAykpKSJiYl+fn5sbGxaWlo/Pz8SEhK96uPlAAAAAXRSTlMAQObYZgAAAE5JREFUGNPFzTcSgDAQQ1HJGUfy/Y9K7V1qeOUfzQifCQZai1XHaz11LFysbDbzgDSSWMZiETz3+b8yNUc/MMsktxuC8XQBSncdLwz+8gCCggGXzBcozAAAAABJRU5ErkJggg==';
 Editor.darkHelpImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAP1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////9Du/pqAAAAFXRSTlMAT30qCJRBboyDZyCgRzUUdF46MJlgXETgAAAAeklEQVQY022O2w4DIQhEQUURda/9/28tUO2+7CQS5sgQ4F1RapX78YUwRqQjTU8ILqQfKerTKTvACJ4nLX3krt+8aS82oI8aQC4KavRgtvEW/mDvsICgA03PSGRr79MqX1YPNIxzjyqtw8ZnnRo4t5a5undtJYRywau+ds4Cyza3E6YAAAAASUVORK5CYII=';
@@ -270,6 +269,17 @@ Editor.isPngData = function(data)
 };
 
 /**
+ * Converts HTML to plain text.
+ */
+Editor.convertHtmlToText = function(label)
+{
+	var temp = document.createElement('div');
+	temp.innerHTML = Graph.sanitizeHtml(label);
+
+	return mxUtils.extractTextWithWhitespace(temp.childNodes);
+};
+
+/**
  * Extracts the XML from the compressed or non-compressed text chunk.
  */
 Editor.extractGraphModelFromPng = function(data)
@@ -340,6 +350,63 @@ Editor.extractGraphModelFromPng = function(data)
 	}
 	
 	return result;
+};
+
+/**
+ * Soundex algorithm for strings.
+ * See https://www.codedrome.com/the-soundex-algorithm-in-javascript/
+ */
+Editor.soundex = function(name)
+{
+	if (name == null || name.length == 0)
+	{
+		return '';
+	}
+	else
+	{
+		var s = [];
+		var si = 1;
+		var c;
+
+		// Changed: s maps to 0 not 2 to ignore plurals
+		//              ABCDEFGHIJKLMNOPQRSTUVWXYZ
+		var mappings = '01230120022455012603010202';
+
+		s[0] = name[0].toUpperCase();
+
+		for(var i = 1, l = name.length; i < l; i++)
+		{
+			c = (name[i].toUpperCase()).charCodeAt(0) - 65;
+
+			if(c >= 0 && c <= 25)
+			{
+				if(mappings[c] != '0')
+				{
+					if(mappings[c] != s[si-1])
+					{
+						s[si] = mappings[c];
+						si++;
+					}
+
+					if(si > 3)
+					{
+						break;
+					}
+				}
+			}
+		}
+
+		if(si <= 3)
+		{
+			while(si <= 3)
+			{
+				s[si] = '0';
+				si++;
+			}
+		}
+
+		return s.join('');
+	}
 };
 
 /**
@@ -891,13 +958,14 @@ OpenFile.prototype.cancel = function(cancel)
  */
 function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transparent, onResize, ignoreBgClick)
 {
+	this.editorUi = editorUi;
 	var dx = transparent? 57 : 0;
 	var w0 = w;
 	var h0 = h;
 	var padding = transparent? 0 : 64; //No padding needed for transparent dialogs
 	
 	var ds = (!Editor.inlineFullscreen && editorUi.embedViewport != null) ?
-		mxUtils.clone(editorUi.embedViewport) : mxUtils.getDocumentSize();
+		mxUtils.clone(editorUi.embedViewport) : this.getDocumentSize();
 	
 	// Workaround for print dialog offset in viewer lightbox
 	if (editorUi.embedViewport == null && window.innerHeight != null)
@@ -923,9 +991,8 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 
 	if (this.bg == null)
 	{
-		this.bg = editorUi.createDiv('background');
+		this.bg = editorUi.createDiv('geBackground');
 		this.bg.style.position = 'absolute';
-		this.bg.style.background = Dialog.backdropColor;
 		this.bg.style.height = dh + 'px';
 		this.bg.style.right = '0px';
 		this.bg.style.zIndex = this.zIndex - 2;
@@ -941,7 +1008,7 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 
 	if (!Editor.inlineFullscreen && editorUi.embedViewport != null)
 	{
-		this.bg.style.height = mxUtils.getDocumentSize().height + 'px';
+		this.bg.style.height = this.getDocumentSize().height + 'px';
 		top += editorUi.embedViewport.y;
 		left += editorUi.embedViewport.x;
 	}
@@ -1024,23 +1091,38 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 			}
 		}
 		
-		var ds = mxUtils.getDocumentSize();
+		var ds = (!Editor.inlineFullscreen && editorUi.embedViewport != null) ?
+			mxUtils.clone(editorUi.embedViewport) : this.getDocumentSize();
 		dh = ds.height;
 		this.bg.style.height = dh + 'px';
 		
 		if (!Editor.inlineFullscreen && editorUi.embedViewport != null)
 		{
-			this.bg.style.height = mxUtils.getDocumentSize().height + 'px';
+			this.bg.style.height = this.getDocumentSize().height + 'px';
 		}
 
 		left = Math.max(1, Math.round((ds.width - w - padding) / 2));
 		top = Math.max(1, Math.round((dh - h - editorUi.footerHeight) / 3));
 		w = (document.body != null) ? Math.min(w0, document.body.scrollWidth - padding) : w0;
 		h = Math.min(h0, dh - padding);
+
+		// var dh = ds.height;
+		var left = Math.max(1, Math.round((ds.width - w - padding) / 2));
+		var top = Math.max(1, Math.round((dh - h - editorUi.footerHeight) / 3));
 		
 		var pos = this.getPosition(left, top, w, h);
 		left = pos.x;
 		top = pos.y;
+
+		var origin = mxUtils.getDocumentScrollOrigin(document);
+		left += origin.x;
+		top += origin.y;
+	
+		if (!Editor.inlineFullscreen && editorUi.embedViewport != null)
+		{
+			top += editorUi.embedViewport.y;
+			left += editorUi.embedViewport.x;
+		}
 		
 		div.style.left = left + 'px';
 		div.style.top = top + 'px';
@@ -1060,18 +1142,20 @@ function Dialog(editorUi, elt, w, h, modal, closable, onClose, noScroll, transpa
 		}
 	});
 	
-	mxEvent.addListener(window, 'resize', this.resizeListener);
+	if (editorUi.embedViewport != null)
+	{
+		editorUi.addListener('embedViewportChanged', this.resizeListener);
+	}
+	else
+	{
+		mxEvent.addListener(window, 'resize', this.resizeListener);
+	}
 
 	this.onDialogClose = onClose;
 	this.container = div;
 	
 	editorUi.editor.fireEvent(new mxEventObject('showDialog'));
 };
-
-/**
- * 
- */
-Dialog.backdropColor = 'white';
 
 /**
  * 
@@ -1097,6 +1181,14 @@ Dialog.prototype.clearImage = (!mxClient.IS_SVG) ? IMAGE_PATH + '/clear.gif' : '
  * Removes the dialog from the DOM.
  */
 Dialog.prototype.bgOpacity = 80;
+
+/**
+ * Removes the dialog from the DOM.
+ */
+Dialog.prototype.getDocumentSize = function()
+{
+	return mxUtils.getDocumentSize();
+};
 
 /**
  * Removes the dialog from the DOM.
@@ -1131,8 +1223,15 @@ Dialog.prototype.close = function(cancel, isEsc)
 	{
 		this.bg.parentNode.removeChild(this.bg);
 	}
-	
-	mxEvent.removeListener(window, 'resize', this.resizeListener);
+
+	if (this.editorUi.embedViewport != null)
+	{
+		this.editorUi.removeListener(this.resizeListener);
+	}
+	else
+	{
+		mxEvent.removeListener(window, 'resize', this.resizeListener);
+	}
 
 	if (this.container.parentNode != null)
 	{
@@ -1171,6 +1270,12 @@ var ErrorDialog = function(editorUi, title, message, buttonText, fn, retry, butt
 	var p2 = document.createElement('div');
 	p2.style.lineHeight = '1.2em';
 	p2.style.padding = '6px';
+	
+	if (typeof message === 'string')
+	{
+		message = message.replace(/\n/g, '<br/>');
+	}
+
 	p2.innerHTML = message;
 	div.appendChild(p2);
 	
