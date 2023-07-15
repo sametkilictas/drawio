@@ -30,6 +30,11 @@
 		icon.setAttribute('valign', 'bottom');
 		icon.setAttribute('src', Editor.helpImage);
 		link.appendChild(icon);
+
+		if (Editor.enableCssDarkMode)
+		{
+			icon.className = 'geAdaptiveAsset';
+		}
 		
 		mxEvent.addGestureListeners(link, mxUtils.bind(this, function(evt)
 		{
@@ -308,7 +313,10 @@
         }));
 
 		lightModeAction.setToggleAction(true);
-		lightModeAction.setSelectedCallback(function() { return !Editor.isAutoDarkMode(true) && !Editor.isDarkMode(); });
+		lightModeAction.setSelectedCallback(function()
+		{
+			return !editorUi.isAutoDarkMode(true) && !Editor.isDarkMode() && !Editor.cssDarkMode;
+		});
 		
         var darkModeAction = editorUi.actions.put('darkMode', new Action(mxResources.get('dark'), function(e)
         {
@@ -316,7 +324,10 @@
         }));
 
 		darkModeAction.setToggleAction(true);
-		darkModeAction.setSelectedCallback(function() { return !Editor.isAutoDarkMode(true) && Editor.isDarkMode(); });
+		darkModeAction.setSelectedCallback(function()
+		{
+			return !editorUi.isAutoDarkMode(true) && (Editor.isDarkMode() || Editor.cssDarkMode);
+		});
 		
         var autoModeAction = editorUi.actions.put('autoMode', new Action(mxResources.get('automatic'), function(e)
         {
@@ -324,9 +335,12 @@
         }));
 
 		autoModeAction.setToggleAction(true);
-		autoModeAction.setSelectedCallback(function() { return Editor.isAutoDarkMode(true); });
-		
-        var toggleSimpleModeAction = editorUi.actions.put('toggleSimpleMode', new Action(mxResources.get('classic'), function(e)
+		autoModeAction.setSelectedCallback(function()
+		{
+			return editorUi.isAutoDarkMode(true);
+		});
+
+        var toggleSimpleModeAction = editorUi.actions.put('toggleSimpleMode', new Action(mxResources.get('simple'), function(e)
         {
 			editorUi.setCurrentTheme((Editor.currentTheme == 'simple') ?
 				((!Editor.isDarkMode()) ? 'kennedy' : 'dark') : 'simple');
@@ -335,7 +349,7 @@
 		toggleSimpleModeAction.setToggleAction(true);
 		toggleSimpleModeAction.visible = Editor.currentTheme != 'min' && Editor.currentTheme != 'sketch' &&
 			Editor.currentTheme != 'atlas';
-		toggleSimpleModeAction.setSelectedCallback(function() { return Editor.currentTheme != 'simple'; });
+		toggleSimpleModeAction.setSelectedCallback(function() { return Editor.currentTheme == 'simple'; });
 
         var toggleSketchModeAction = editorUi.actions.put('toggleSketchMode', new Action(mxResources.get('sketch'), function(e)
         {
@@ -348,7 +362,7 @@
 		editorUi.actions.addAction('properties...', function()
 		{
 			var dlg = new FilePropertiesDialog(editorUi);
-			editorUi.showDialog(dlg.container, 320, 140, true, true);
+			editorUi.showDialog(dlg.container, 340, 160, true, true);
 			dlg.init();
 		}).isEnabled = isGraphEnabled;
 	
@@ -799,22 +813,20 @@
 				dlg.init();
 			}
 		}, null, null, Editor.ctrlKey + '+Shift+M');
-
-		var currentStyle = null;
 		
 		editorUi.actions.addAction('copyStyle', function()
 		{
 			if (graph.isEnabled() && !graph.isSelectionEmpty())
 			{
-				currentStyle = graph.copyStyle(graph.getSelectionCell())
+				editorUi.copiedStyle = graph.copyStyle(graph.getSelectionCell())
 			}
 		}, null, null, 'Alt+Shift+Q');
 
 		editorUi.actions.addAction('pasteStyle', function()
 		{
-			if (graph.isEnabled() && !graph.isSelectionEmpty() && currentStyle != null)
+			if (graph.isEnabled() && !graph.isSelectionEmpty() && editorUi.copiedStyle != null)
 			{
-				graph.pasteStyle(currentStyle, graph.getSelectionCells())
+				graph.pasteStyle(editorUi.copiedStyle, graph.getSelectionCells())
 			}
 		}, null, null, 'Alt+Shift+W');
 		
@@ -824,7 +836,7 @@
 				'https://www.drawio.com/doc/faq/export-diagram',
 				mxUtils.bind(this, function(scale, transparentBackground, ignoreSelection,
 					addShadow, editable, embedImages, border, cropImage, currentPage,
-					linkTarget, grid, keepTheme, exportType, embedFonts, lblToSvg)
+					linkTarget, grid, theme, exportType, embedFonts, lblToSvg)
 				{
 					var val = parseInt(scale);
 					
@@ -839,7 +851,7 @@
 						{
 							editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
 								addShadow, editable, embedImages, border, !cropImage, false,
-								linkTarget, keepTheme, exportType, embedFonts);
+								linkTarget, theme, exportType, embedFonts);
 						}
 					}
 				}), true, null, 'svg', true);
@@ -852,7 +864,7 @@
 				editorUi.showExportDialog(mxResources.get('image'), false, mxResources.get('export'),
 					'https://www.drawio.com/doc/faq/export-diagram',
 					mxUtils.bind(this, function(scale, transparentBackground, ignoreSelection, addShadow, editable,
-						embedImages, border, cropImage, currentPage, dummy, grid, keepTheme, exportType)
+						embedImages, border, cropImage, currentPage, dummy, grid, theme, exportType)
 					{
 						var val = parseInt(scale);
 						
@@ -860,7 +872,7 @@
 						{
 							editorUi.exportImage(val / 100, transparentBackground, ignoreSelection,
 								addShadow, editable, border, !cropImage, false, null, grid, null,
-								keepTheme, exportType);
+								theme, exportType);
 						}
 					}), true, Editor.defaultIncludeDiagram, 'png', true);
 			}
@@ -880,7 +892,7 @@
 				editorUi.showExportDialog(mxResources.get('image'), false, mxResources.get('export'),
 					'https://www.drawio.com/doc/faq/export-diagram',
 					mxUtils.bind(this, function(scale, transparentBackground, ignoreSelection, addShadow, editable,
-						embedImages, border, cropImage, currentPage, dummy, grid, keepTheme, exportType)
+						embedImages, border, cropImage, currentPage, dummy, grid, theme, exportType)
 					{
 						var val = parseInt(scale);
 						
@@ -888,7 +900,7 @@
 						{
 							editorUi.exportImage(val / 100, false, ignoreSelection,
 								addShadow, false, border, !cropImage, false, 'jpeg',
-								grid, null, keepTheme, exportType);
+								grid, null, theme, exportType);
 						}
 					}), true, false, 'jpeg', true);
 			}
@@ -1261,7 +1273,7 @@
 					menubar != null && Editor.enableSimpleTheme &&
 					editorUi.getServiceName() != 'atlassian')
 				{
-					var themeMenu = this.get('appearance');
+					var themeMenu = this.get('dynamicAppearance');
 					
 					if (themeMenu != null)
 					{
@@ -1310,7 +1322,7 @@
 								}
 								else
 								{
-									elt.style.backgroundImage = 'url(' + ((Editor.isDarkMode()) ?
+									elt.style.backgroundImage = 'url(' + ((Editor.isDarkMode() || Editor.cssDarkMode) ?
 										Editor.thinDarkImage : Editor.thinLightImage) + ')';
 								}
 							}
@@ -1340,12 +1352,27 @@
 			'interHierarchySpacing': 60,
 			'parallelEdgeSpacing': 10}}];
 		
-		// Adds action
+		// Adds action for running layouts
 		editorUi.actions.addAction('runLayout', function()
 		{
 	    	editorUi.showCustomLayoutDialog(JSON.stringify(
 				editorUi.customLayoutConfig, null, 2));
 		});
+
+		// Adds action for converting dark mode colors
+		if (Editor.enableCssDarkMode)
+		{
+			editorUi.actions.put('convertDarkModeColors', new Action('Dark Mode Colors...', function(evt)
+			{
+				if (editorUi.darkModeColorsWindow == null)
+				{
+					editorUi.darkModeColorsWindow = new DarkModeColorsWindow(
+						editorUi, document.body.offsetWidth - 520, 80, 200, 100);
+				}
+
+				editorUi.darkModeColorsWindow.window.setVisible(true);
+			}));
+		}
 
 		// Adds fullscreen toggle to zoom menu in sketch and min
         var viewZoomMenu = this.get('viewZoom');
@@ -1678,7 +1705,8 @@
 			mxResources.parse('createSidebarEntry=Create Sidebar Entry');
 			mxResources.parse('testCheckFile=Check File');
 			mxResources.parse('testDiff=Diff/Sync');
-			mxResources.parse('testInspectPages=Check Pages');
+			mxResources.parse('testChecksum=Checksum');
+			mxResources.parse('testCheckPages=Check Pages');
 			mxResources.parse('testFixPages=Fix Pages');
 			mxResources.parse('testInspect=Inspect');
 			mxResources.parse('testShowConsole=Show Console');
@@ -1981,7 +2009,52 @@
 				}
 			}));
 
-			editorUi.actions.addAction('testInspectPages', mxUtils.bind(this, function()
+			editorUi.actions.addAction('testChecksum', mxUtils.bind(this, function()
+			{
+				var file = editorUi.getCurrentFile();
+
+				if (editorUi.pages != null && file != null)
+				{
+					if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
+					{
+						file.getLatestVersion(function(latestFile)
+						{
+							editorUi.spinner.stop();
+
+							var localChecksum = editorUi.getHashValueForPages(editorUi.pages);
+							var localRev = file.getCurrentRevisionId();
+							var remoteChecksum = editorUi.getHashValueForPages(
+								latestFile.getShadowPages());
+							var descChecksum = latestFile.getDescriptorChecksum(
+								latestFile.getDescriptor());
+							var remoteRev = latestFile.getCurrentRevisionId();
+							
+							console.log('Local File', [file],
+								'modified', file.isModified(),
+								'checksum', localChecksum);
+							
+							console.log('Remote File', [latestFile],
+								'rev', remoteRev == localRev,
+								'desc', descChecksum == remoteChecksum,
+								'checksum', remoteChecksum);
+							
+							editorUi.alert('Checksums ' +
+								(remoteChecksum == localChecksum ?
+								'match' : 'no not match'));
+						}, function(err)
+						{
+							console.log('Error getLatestVersion', err);
+							editorUi.handleError(err);
+						});
+					}
+				}
+				else
+				{
+					console.log('Checksum: no file or pages');
+				}
+			}));
+
+			editorUi.actions.addAction('testCheckPages', mxUtils.bind(this, function()
 			{
 				var file = editorUi.getCurrentFile();
 				console.log('editorUi', editorUi, 'file', file);
@@ -2195,6 +2268,11 @@
 			// Adds logging for performance
 			var prevRevalidate = null;
 			var prevSelectPage = null;
+			var prevDiffPages = null;
+			var prevPatchPages = null;
+			var prevClonePages = null;
+			var prevGetHashValueForPages = null;
+			var prevResolveCrossReferences = null;
 
 			editorUi.actions.addAction('testPerformance', mxUtils.bind(this, function()
 			{
@@ -2210,9 +2288,12 @@
 					graph.view.revalidate = function()
 					{
 						var t0 = Date.now();
-						prevRevalidate.apply(this, arguments);
+						var result = prevRevalidate.apply(this, arguments);
 						EditorUi.debug('[Performance] mxGraphView.revalidate',
-							[this], 'time', [(Date.now() - t0) + ' ms']);
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
 					};
 				}
 
@@ -2228,9 +2309,117 @@
 					editorUi.selectPage = function()
 					{
 						var t0 = Date.now();
-						prevSelectPage.apply(this, arguments);
+						var result = prevSelectPage.apply(this, arguments);
 						EditorUi.debug('[Performance] EditorUi.selectPage',
-							[this], 'time', [(Date.now() - t0) + ' ms']);
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
+					};
+				}
+
+				if (prevDiffPages != null)
+				{
+					editorUi.diffPages = prevDiffPages;
+					prevDiffPages = null;
+				}
+				else
+				{
+					prevDiffPages = editorUi.diffPages;
+
+					editorUi.diffPages = function()
+					{
+						var t0 = Date.now();
+						var result = prevDiffPages.apply(this, arguments);
+						EditorUi.debug('[Performance] EditorUi.diffPages',
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
+					};
+				}
+
+				if (prevPatchPages != null)
+				{
+					editorUi.patchPages = prevPatchPages;
+					prevPatchPages = null;
+				}
+				else
+				{
+					prevPatchPages = editorUi.patchPages;
+
+					editorUi.patchPages = function()
+					{
+						var t0 = Date.now();
+						var result = prevPatchPages.apply(this, arguments);
+						EditorUi.debug('[Performance] EditorUi.patchPages',
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
+					};
+				};
+
+				if (prevClonePages != null)
+				{
+					editorUi.clonePages = prevClonePages;
+					prevClonePages = null;
+				}
+				else
+				{
+					prevClonePages = editorUi.clonePages;
+
+					editorUi.clonePages = function()
+					{
+						var t0 = Date.now();
+						var result = prevClonePages.apply(this, arguments);
+						EditorUi.debug('[Performance] EditorUi.clonePages',
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
+					};
+				};
+
+				if (prevGetHashValueForPages != null)
+				{
+					editorUi.getHashValueForPages = prevGetHashValueForPages;
+					prevGetHashValueForPages = null;
+				}
+				else
+				{
+					prevGetHashValueForPages = editorUi.getHashValueForPages;
+
+					editorUi.getHashValueForPages = function()
+					{
+						var t0 = Date.now();
+						var result = prevGetHashValueForPages.apply(this, arguments);
+						EditorUi.debug('[Performance] EditorUi.getHashValueForPages',
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+						
+						return result;
+					};
+				}
+
+				if (prevResolveCrossReferences != null)
+				{
+					editorUi.resolveCrossReferences = prevResolveCrossReferences;
+					prevResolveCrossReferences = null;
+				}
+				else
+				{
+					prevResolveCrossReferences = editorUi.resolveCrossReferences;
+
+					editorUi.resolveCrossReferences = function()
+					{
+						var t0 = Date.now();
+						var result = prevResolveCrossReferences.apply(this, arguments);
+						EditorUi.debug('[Performance] EditorUi.resolveCrossReferences',
+							[this], 'time', (Date.now() - t0) + ' ms',
+							'args', arguments);
+
+						return result;
 					};
 				}
 
@@ -2240,8 +2429,9 @@
 			this.put('testDevelop', new Menu(mxUtils.bind(this, function(menu, parent)
 			{
 				this.addMenuItems(menu, ['createSidebarEntry', 'showBoundingBox', '-',
-					'testInspectPages', 'testFixPages', '-', 'testCheckFile', 'testDiff', '-',
-					'testInspect', 'testOptimize', '-', 'testXmlImageExport', '-'], parent);
+					'testCheckPages', 'testChecksum', 'testFixPages', '-',
+					'testCheckFile', 'testDiff', '-', 'testInspect', 'testOptimize', '-',
+					'testXmlImageExport', '-'], parent);
 
 				var item = menu.addItem(mxResources.get('testPerformance'), null, function()
 				{
@@ -3013,8 +3203,8 @@
 				}, parent);
 			}
 		}))).isEnabled = isGraphEnabled;
-		
-		this.put('appearance', new Menu(mxUtils.bind(this, function(menu, parent)
+
+		this.put('dynamicAppearance', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
 			var iw = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
 
@@ -3054,11 +3244,40 @@
 				}
 			}
 
-			this.addMenuItems(menu, ['-', 'lightMode', 'darkMode', 'autoMode'], parent);
+			this.addMenuItems(menu, ['-', 'lightMode', 'darkMode'], parent);
 
+			if (editorUi.isAutoDarkModeSupported())
+			{
+				var item = editorUi.menus.addMenuItem(menu, 'autoMode', parent);
+
+				if (item != null)
+				{
+					item.setAttribute('title', mxResources.get('automatic') +
+						' (' + mxResources.get(Editor.cssDarkMode || Editor.isDarkMode() ?
+							'dark' : 'light') + ')');
+				}
+			}
+			
 			if (urlParams['embed'] != '1')
 			{
 				this.addMenuItems(menu, ['-', 'toggleSimpleMode'], parent);
+			}
+		})));
+		
+		this.put('appearance', new Menu(mxUtils.bind(this, function(menu, parent)
+		{
+			this.addMenuItems(menu, ['-', 'lightMode', 'darkMode'], parent);
+
+			if (editorUi.isAutoDarkModeSupported())
+			{
+				var item = editorUi.menus.addMenuItem(menu, 'autoMode', parent);
+
+				if (item != null)
+				{
+					item.setAttribute('title', mxResources.get('automatic') +
+						' (' + mxResources.get(Editor.cssDarkMode || Editor.isDarkMode() ?
+							'dark' : 'light') + ')');
+				}
 			}
 		})));
 
@@ -4659,8 +4878,9 @@
 			
 			if (mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
 			{
-				editorUi.menus.addMenuItems(menu, ['new', 'open', '-', 'synchronize',
-					'-', 'save', 'saveAs', '-'], parent);
+				editorUi.menus.addMenuItems(menu, ['new', 'open', '-',
+					'synchronize', 'properties', '-',
+					'save', 'saveAs', '-'], parent);
 			}
 			else if (editorUi.mode == App.MODE_ATLAS)
 			{

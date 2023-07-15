@@ -225,6 +225,16 @@ Editor.sketchMode = false;
 /**
  * Dynamic change of dark mode for minimal and sketch theme.
  */
+Editor.enableCssDarkMode = true;
+
+/**
+ * Dynamic change of dark mode for minimal and sketch theme.
+ */
+Editor.cssDarkMode = false;
+
+/**
+ * Dynamic change of dark mode for minimal and sketch theme.
+ */
 Editor.darkMode = false;
 
 /**
@@ -235,13 +245,13 @@ Editor.currentTheme = uiTheme;
 /**
  * Dynamic change of dark mode for minimal and sketch theme.
  */
-Editor.darkColor = '#18141D';
+Editor.darkColor = (Editor.enableCssDarkMode) ? '#121212' : '#18141D';
 
 /**
  * Dynamic change of dark mode for minimal and sketch theme.
  */
 Editor.lightColor = '#f0f0f0';
-  
+
 /**
  * Returns the current state of the dark mode.
  */
@@ -273,10 +283,17 @@ Editor.isPngData = function(data)
  */
 Editor.convertHtmlToText = function(label)
 {
-	var temp = document.createElement('div');
-	temp.innerHTML = Graph.sanitizeHtml(label);
+	if (label != null)
+	{
+		var temp = document.createElement('div');
+		temp.innerHTML = Graph.sanitizeHtml(label);
 
-	return mxUtils.extractTextWithWhitespace(temp.childNodes);
+		return mxUtils.extractTextWithWhitespace(temp.childNodes)
+	}
+	else
+	{
+		return null;
+	}
 };
 
 /**
@@ -406,6 +423,59 @@ Editor.soundex = function(name)
 		}
 
 		return s.join('');
+	}
+};
+
+/**
+ * Selects the given part of the input element.
+ */
+Editor.selectFilename = function(input)
+{
+	var end = input.value.lastIndexOf('.');
+
+	if (end > 0)
+	{
+		var ext = input.value.substring(end + 1);
+
+		if (ext != 'drawio')
+		{
+			if (mxUtils.indexOf(['png', 'svg', 'html', 'xml', 'pdf'], ext) >= 0)
+			{
+				var temp = input.value.lastIndexOf('.drawio.', end);
+
+				if (temp > 0)
+				{
+					end = temp;
+				}
+			}
+		}
+	}
+	
+	end = (end > 0) ? end : input.value.length;
+	Editor.selectSubstring(input, 0, end);
+};
+
+/**
+ * Selects the given part of the input element.
+ */
+Editor.selectSubstring = function(input, startPos, endPos)
+{
+	input.focus();
+
+	if (typeof input.selectionStart != 'undefined')
+	{
+		input.selectionStart = startPos;
+		input.selectionEnd = endPos;
+	}
+	else if (document.selection && document.selection.createRange)
+	{
+		// IE branch
+		input.select();
+		var range = document.selection.createRange();
+		range.collapse(true);
+		range.moveEnd('character', endPos);
+		range.moveStart('character', startPos);
+		range.select();
 	}
 };
 
@@ -2172,18 +2242,15 @@ PageSetupDialog.getFormats = function()
 var FilenameDialog = function(editorUi, filename, buttonText, fn, label, validateFn, content, helpLink, closeOnBtn, cancelFn, hints, w, lblW)
 {
 	closeOnBtn = (closeOnBtn != null) ? closeOnBtn : true;
-	var row, td;
-	
+
 	var table = document.createElement('table');
 	var tbody = document.createElement('tbody');
-	table.style.position = 'absolute';
-	table.style.top = '30px';
-	table.style.left = '20px';
-	
-	row = document.createElement('tr');
-	
-	td = document.createElement('td');
+	var row = document.createElement('tr');
+	var td = document.createElement('td');
+	table.style.margin = '0 auto';
+
 	td.style.textOverflow = 'ellipsis';
+	td.style.whiteSpace = 'nowrap';
 	td.style.textAlign = 'right';
 	td.style.maxWidth = (lblW? lblW + 15 : 100) + 'px';
 	td.style.fontSize = '10pt';
@@ -2217,16 +2284,23 @@ var FilenameDialog = function(editorUi, filename, buttonText, fn, label, validat
 		{
 			return;
 		}
-		
-		nameInput.focus();
-		
-		if (mxClient.IS_GC || mxClient.IS_FF || document.documentMode >= 5)
+
+		if (hints != null)
 		{
-			nameInput.select();
+			Editor.selectFilename(nameInput);
 		}
 		else
 		{
-			document.execCommand('selectAll', false, null);
+			nameInput.focus();
+			
+			if (mxClient.IS_GC || mxClient.IS_FF || document.documentMode >= 5)
+			{
+				nameInput.select();
+			}
+			else
+			{
+				document.execCommand('selectAll', false, null);
+			}
 		}
 		
 		// Installs drag and drop handler for links
@@ -2358,11 +2432,6 @@ var FilenameDialog = function(editorUi, filename, buttonText, fn, label, validat
 	});
 	cancelBtn.className = 'geBtn';
 	
-	if (editorUi.editor.cancelFirst)
-	{
-		td.appendChild(cancelBtn);
-	}
-	
 	if (helpLink != null)
 	{
 		var helpBtn = mxUtils.button(mxResources.get('help'), function()
@@ -2374,6 +2443,11 @@ var FilenameDialog = function(editorUi, filename, buttonText, fn, label, validat
 		td.appendChild(helpBtn);
 	}
 
+	if (editorUi.editor.cancelFirst)
+	{
+		td.appendChild(cancelBtn);
+	}
+	
 	mxEvent.addListener(nameInput, 'keypress', function(e)
 	{
 		if (e.keyCode == 13)
@@ -2736,7 +2810,7 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 			graph.view.backgroundPageShape.node.style.backgroundImage = image;
 			graph.view.backgroundPageShape.node.style.backgroundColor = color;
 			graph.view.backgroundPageShape.node.style.borderColor = graph.defaultPageBorderColor;
-			graph.container.className = 'geDiagramContainer geDiagramBackdrop';
+			graph.container.classList.add('geDiagramBackdrop');
 			canvas.style.backgroundImage = 'none';
 			canvas.style.backgroundColor = '';
 
@@ -2751,7 +2825,7 @@ var WrapperWindow = function(editorUi, title, x, y, w, h, fn)
 		}
 		else
 		{
-			graph.container.className = 'geDiagramContainer';
+			graph.container.classList.remove('geDiagramBackdrop');
 			canvas.style.backgroundPosition = position;
 			canvas.style.backgroundImage = image;
 			

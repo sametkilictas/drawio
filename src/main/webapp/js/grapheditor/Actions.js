@@ -307,6 +307,36 @@ Actions.prototype.init = function()
 		}
 	});
 	
+	this.addAction('swap', function()
+	{
+		var cells = graph.getSelectionCells();
+		var model = graph.getModel();
+
+		if (cells.length == 2 && model.isVertex(cells[0]) && model.isVertex(cells[1]) &&
+			graph.getMovableCells(cells).length == 2)
+		{
+			var geo1 = graph.getCellGeometry(cells[0]);
+			var geo2 = graph.getCellGeometry(cells[1]);
+
+			if (geo1 != null && geo2 != null)
+			{
+				geo1 = geo1.clone();
+				geo2 = geo2.clone();
+				
+				model.beginUpdate();
+				try
+				{
+					model.setGeometry(cells[0], geo2);
+					model.setGeometry(cells[1], geo1);
+				}
+				finally
+				{
+					model.endUpdate();
+				}
+			}
+		}
+	});
+
 	this.addAction('copySize', function()
 	{
 		var cell = graph.getSelectionCell();
@@ -1033,49 +1063,13 @@ Actions.prototype.init = function()
 	}, null, null, Editor.ctrlKey + ' - (Numpad) / Alt+Mousewheel');
 	this.addAction('fitWindow', function()
 	{
-		if (graph.pageVisible)
+		if (graph.pageVisible && graph.isSelectionEmpty())
 		{
 			graph.fitPages();
 		}
 		else
 		{
-			var bounds = (graph.isSelectionEmpty()) ?
-				mxRectangle.fromRectangle(graph.getGraphBounds()) :
-				graph.getBoundingBox(graph.getSelectionCells())
-			var t = graph.view.translate;
-			var s = graph.view.scale;
-			
-			bounds.x = bounds.x / s - t.x;
-			bounds.y = bounds.y / s - t.y;
-			bounds.width /= s;
-			bounds.height /= s;
-
-			if (graph.backgroundImage != null)
-			{
-				bounds.add(new mxRectangle(0, 0,
-					graph.backgroundImage.width,
-					graph.backgroundImage.height));
-			}
-
-			if (bounds.width == 0 || bounds.height == 0)
-			{
-				graph.zoomTo(1);
-				ui.resetScrollbars();
-			}
-			else
-			{
-				var b = Editor.fitWindowBorders;
-				
-				if (b != null)
-				{
-					bounds.x -= b.x;
-					bounds.y -= b.y;
-					bounds.width += b.width + b.x;
-					bounds.height += b.height + b.y;
-				}
-				
-				graph.fitWindow(bounds);
-			}
+			ui.fitDiagramToWindow();
 		}
 	}, null, null, Editor.ctrlKey + '+Shift+H');
 	this.addAction('fitPage', mxUtils.bind(this, function()
@@ -1624,6 +1618,26 @@ Actions.prototype.init = function()
 			document.execCommand('superscript', false, null);
 		}
 	}), null, null, Editor.ctrlKey + '+.');
+	action = this.addAction('decreaseFontSize', mxUtils.bind(this, function()
+	{
+		if (!graph.isSelectionEmpty())
+		{
+			var style = graph.getCurrentCellStyle(graph.getSelectionCell());
+			var size = mxUtils.getValue(style, mxConstants.STYLE_FONTSIZE, mxConstants.DEFAULT_FONTSIZE);
+			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, Math.max(1, size - 1),
+				graph.getSelectionCells());
+		}
+	}), null, null, Editor.ctrlKey + '+Shift + (Numpad)');
+	action = this.addAction('increaseFontSize', mxUtils.bind(this, function()
+	{
+		if (!graph.isSelectionEmpty())
+		{
+			var style = graph.getCurrentCellStyle(graph.getSelectionCell());
+			var size = mxUtils.getValue(style, mxConstants.STYLE_FONTSIZE, mxConstants.DEFAULT_FONTSIZE);
+			graph.setCellStyles(mxConstants.STYLE_FONTSIZE, Math.min(100, size + 1),
+				graph.getSelectionCells());
+		}
+	}), null, null, Editor.ctrlKey + '+Shift - (Numpad)');
 
 	function applyClipPath(cell, clipPath, width, height, graph)
 	{

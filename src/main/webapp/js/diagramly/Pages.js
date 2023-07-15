@@ -243,6 +243,51 @@ ChangePage.prototype.execute = function()
 };
 
 /**
+ * 
+ */
+function ReplaceDiagram(ui, data)
+{
+	this.ui = ui;
+	this.data = data;
+};
+
+/**
+ * Function: execute
+ *
+ * Changes the current root of the view.
+ */
+ReplaceDiagram.prototype.execute = function()
+{
+	var graph = this.ui.editor.graph;
+	var data = this.ui.editor.getGraphXml();
+
+	this.ui.editor.readGraphState(this.data);
+	this.ui.editor.updateGraphComponents();
+	
+	var dec = new mxCodec(this.data.ownerDocument);
+	var model = new mxGraphModel();
+	dec.decode(this.data, model);
+	
+	this.data = data;
+
+	if (this.ui.currentPage)
+	{
+		this.ui.currentPage.viewState = graph.getViewState();
+		this.ui.currentPage.root = model.root;
+
+		if (this.ui.currentPage.model != null)
+		{
+			// Updates internal structures of offpage model
+			this.ui.currentPage.model.rootChanged(this.ui.currentPage.model.root);
+		}
+	}
+
+	graph.view.clear(graph.model.root, true);
+	graph.model.rootChanged(model.root);
+	graph.fireEvent(new mxEventObject(mxEvent.ROOT));
+};
+
+/**
  * Specifies the height of the tab container. Default is 36.
  */
 EditorUi.prototype.tabContainerHeight = 36;
@@ -361,6 +406,50 @@ EditorUi.prototype.createImageForPageLink = function(src, sourcePage, sourceGrap
 /**
  * Returns true if the given string contains an mxfile.
  */
+EditorUi.prototype.pageSelected = function()
+{
+	var graph = this.editor.graph;
+	var page = this.currentPage;
+
+	if (page != null)
+	{
+		graph.tooltipHandler.hide();
+
+		if (page.viewState == null ||
+			page.viewState.scrollTop == null ||
+			page.viewState.scrollLeft == null)
+		{
+			// Selects unlocked layer if page was never shown
+			graph.selectUnlockedLayer();
+			this.resetScrollbars();
+
+			if (graph.isLightboxView())
+			{
+				this.lightboxFit();
+			}
+
+			if (this.chromelessResize != null)
+			{
+				graph.container.scrollleft = 0;
+				graph.container.scrollTop = 0;
+				this.chromelessResize();
+			}
+		}
+		else
+		{
+			// Restores scrollbar positions
+			graph.setScrollbarPositions(page.viewState,
+				graph.view.translate.x, graph.view.translate.y);
+		}
+		
+		this.updateTabContainer();
+		this.scrollToPage();
+	}
+};
+
+/**
+ * Returns true if the given string contains an mxfile.
+ */
 EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph)
 {
 	sourceGraph = (sourceGraph != null) ? sourceGraph : this.editor.graph;
@@ -395,8 +484,10 @@ EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph)
 
 	var temp = Graph.foreignObjectWarningText;
 	Graph.foreignObjectWarningText = '';
+	var theme = (Editor.cssDarkMode || Editor.isDarkMode()) ?
+		'dark' : 'light';
 	var svgRoot = graph.getSvg(null, null, null, null, null,
-		null, null, null, null, null, null, true);
+		null, null, null, null, null, null, theme);
 	var bounds = graph.getGraphBounds();
 	document.body.removeChild(graph.container);
 	Graph.foreignObjectWarningText = temp;
@@ -475,6 +566,25 @@ EditorUi.prototype.initPages = function()
 			}
 		}));
 		
+		// Invokes pageSelected to reset/restore view state
+		var graphSizeDidChange = graph.sizeDidChange;
+		var lastPage = null;
+		var ui = this;
+
+		graph.sizeDidChange = function()
+		{
+			var result = graphSizeDidChange.apply(this, arguments);
+
+			if (ui.currentPage != null &&
+				lastPage != ui.currentPage)
+			{
+				lastPage = ui.currentPage;
+				ui.pageSelected();
+			}
+
+			return result;
+		};
+
 		var pagesChanged = mxUtils.bind(this, function()
 		{
 			this.updateDocumentTitle();
@@ -961,6 +1071,15 @@ EditorUi.prototype.updatePageRoot = function(page, checked)
 };
 
 /**
+ * Adds keyboard shortcuts for page handling.
+ */
+EditorUi.prototype.replaceDiagramData = function(data)
+{
+	this.editor.graph.model.execute(new ReplaceDiagram(
+		this, mxUtils.parseXml(data).documentElement));
+};
+
+/**
  * Returns true if the given string contains an mxfile.
  */
 EditorUi.prototype.selectPage = function(page, quiet, viewState)
@@ -990,29 +1109,6 @@ EditorUi.prototype.selectPage = function(page, quiet, viewState)
 			edit.add(change);
 			edit.notify();
 			
-			graph.tooltipHandler.hide();
-
-			// Selects unlocked layer if page was never shown
-			if (page.viewState != null &&
-				(page.viewState.scrollTop == null ||
-				page.viewState.scrollLeft == null))
-			{
-				graph.selectUnlockedLayer();
-				this.resetScrollbars();
-
-				if (graph.isLightboxView())
-				{
-					this.lightboxFit();
-				}
-
-				if (this.chromelessResize != null)
-				{
-					graph.container.scrollleft = 0;
-					graph.container.scrollTop = 0;
-					this.chromelessResize();
-				}
-			}
-
 			if (!quiet)
 			{
 				graph.model.fireEvent(new mxEventObject(
@@ -1066,12 +1162,6 @@ EditorUi.prototype.insertPage = function(page, index)
 		// Uses model to fire event and trigger autosave
 		var change = new ChangePage(this, page, page, index);
 		this.editor.graph.model.execute(change);
-
-		window.setTimeout(mxUtils.bind(this, function()
-		{
-			this.resetScrollbars();
-			this.scrollToPage();
-		}), 0);
 	}
 	
 	return page;
@@ -1329,7 +1419,8 @@ EditorUi.prototype.renamePage = function(page)
 
 	if (graph.isEnabled())
 	{
-		var dlg = new FilenameDialog(this, page.getName(), mxResources.get('rename'), mxUtils.bind(this, function(name)
+		var dlg = new FilenameDialog(this, page.getName(), mxResources.get('rename'),
+			mxUtils.bind(this, function(name)
 		{
 			if (name != null && name.length > 0)
 			{
@@ -1680,6 +1771,9 @@ EditorUi.prototype.createTabForPage = function(page, pageNumber)
 		' (' + id + ')' : '') + ' [' + pageNumber + ']');
 	
 	var label = document.createElement('span');
+	label.style.maxWidth = '160px';
+	label.style.textOverflow = 'ellipsis';
+	label.style.overflow = 'hidden';
 	mxUtils.write(label, name);
 	tab.appendChild(label);
 

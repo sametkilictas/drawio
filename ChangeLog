@@ -1,3 +1,147 @@
+11-JUL-2023: 21.6.2
+
+- Fixes application icon background color
+- Adds swap for two selected vertices in Arrange tab
+- [conf cloud] Adds Gliffy non-mapped shapes to mass import report [DID-8704]
+- Fixes inverted background page colors [drawio-desktop-1375]
+- Hides explore for unconnected cells [drawio-3716]
+- Fixes move cells on fold in lightbox [DID-8763]
+- Fixes handling of UTF-8 in SVG images [drawio-506]
+
+05-JUL-2023: 21.6.1
+
+- Fixes special cases in replace shape [drawio-3686]
+- Enables new dark mode in production [drawio-3701]
+- [conf cloud]] Adds back dark theme [drawio-3698]
+- [jira cloud]] Adds back dark theme [drawio-3697]
+- [vsdx] Fixed edge labels [DID-8697]
+- Fixes blue guides remaining in view [drawio-3695]
+- Uses new dark mode in Notion extension [#3701]
+
+04-JUL-2023: 21.6.0
+
+- Release rejected
+
+28-JUN-2023: 21.5.2
+
+- Fixes text contrast in right sidebar [drawio-3691]
+- Fixes clipping of library symbol icons [DID-8634]
+- Replacing shape replaces all styles [drawio-3686]
+- Disables dark mode in jira and conf cloud [drawio-3692]
+
+26-JUN-2023: 21.5.1
+
+- Adds tolerance for edge handles, click on terminal
+- Shift+alt+drag moves shapes, fixes inconsistencies
+- Shift+alt+drag on resize and terminal handle moves
+- Fixes highlight of connecting edges for shift+drag
+- Fixes update of table handlers, inconsistent code
+- Changes replace behavior to match find logic [drawio-3616]
+- Improves replace in html labels to cover more cases
+- Fixes status not clickable on icon [drawio-3688]
+- Fixes zoom in edit connection points [drawio-3684]
+- Adds grid in connection points dialog [drawio-3685]
+- Changes allowBrowser to an argument in LibraryDialog [DID-8641]
+- [desktop] Fixes stencils and shapes in export due to CSP restrictions
+
+17-JUN-2023: 21.5.0
+
+- Moves electron.js out of drawio project into desktop
+
+16-JUN-2023: 21.4.1
+
+- Fixes misalignment of arrow labels [drawio-3668]
+- [conf cloud] Fixes NPE in theming code 
+- Updates stage sub domain to preprod
+- Adds click handler for preview in new save dialog
+- Ctrl+Drag of active anchor point starts move cell
+- Toggle selection drag starts move of selection
+- Fixes virtual bends for custom edge handlers
+- Ctrl/shift and selected state forces move on edges
+- Reviews innerHTML usage in dialogs.js
+
+14-JUN-2023: 21.4.0
+
+- [jira cloud] Uses dark mode status from host in editor
+- [conf cloud] Uses dark mode status from host in editor
+- [conf cloud] Adds drawio-sketch macro support for page IDs import and re-indexing
+- Fixes possible NPE in fitDiagramToWindow
+- Fixes reset of view state after creating new files
+- [conf cloud] Hide support link in anon views
+- [conf cloud] Fixes link fixing of page IDs import [DID-5141]
+- Adds pass-through for user request error in GitHub
+- Fixes paste of HTML-formatted text [drawio-3666]
+- Fixes https://huntr.dev/bounties/ce75aa04-e4d6-4e0a-9db0-ae84c46ae9e2/
+
+13-JUN-2023: 21.3.9
+
+- Release rejected, failed to deploy to stage
+
+08-JUN-2023: 21.3.8
+
+- [conf cloud] Fixed page anchor of imported pages when it has spaces [DID-8417]
+- Fixes auto dark mode option after dark mode change
+- Fixes editing for Mermaid declaration with comment
+- Fixes ignored selection in fitWindow [drawio-3647]
+- Adds edit and remove for links in labels [drawio-3654]
+- Pick folder for GitHub and GitLab in new save dialog
+- Fixes lost error message for GitLab return code 400
+
+01-JUN-2023: 21.3.7
+
+- [conf cloud] Keeping trailing spaces in attachment name [DID-8309]
+- [conf cloud] Fixed space filter in new page IDs import [DID-8048]
+
+30-MAY-2023: 21.3.6
+
+- [conf cloud] Improved Import Page IDs performance [DID-8048]
+
+27-MAY-2023: 21.3.5
+
+- Fixes tabs converted to spaces in labels [drawio-3540]
+
+24-MAY-2023: 21.3.4
+
+- Adds support for MermaidJS timelines [drawio-3613]
+- Keeps MermaidJS styling after update [drawio-3417]
+- [conf cloud] Count errors of each kind in pageID import, Gliffy/Lucid import, and re-indexing and display summary at bottom of file. Add FAQ text for common fixes.
+- Forces direct load in browser to download PlantUML diagrams
+- [conf cloud] Added page IDs logging - partial [DID-8048]
+- Improves replace shapes [drawio-3505]
+- Removes hard-coded image base path [drawio-3171]
+- Adds titles to shape tags, normalizes search terms [drawio-3618]
+
+23-MAY-2023: 21.3.3
+
+- Allows http and localhost in services (OAuth) [drawio-3079]
+- Fixes nth-check dependencies vulnerability by removing react-scripts and using vite [drawio-dev-dependabot-144]
+- [desktop] Fixed page-index and page-rage CLI export arguments [drawio-3597]
+- [desktop] Fixed svg export scale [drawio-desktop-1165]
+- Fixes Trello power-up repeated auth [DND-1015]
+- Fixes possible NPE in VSDX export [drawio-3608]
+- Fixes automatic dark mode in viewer [drawio-3614]
+- Fixes patch and in-place change of local view state
+- Improves AI prompt for smart template generation
+- Fixes timeout and adds callback in synchronizeFile
+- Adds plain text tooltips to SVG export [drawio-3610]
+- Uses noopener,noreferrer to open links in viewer
+
+15-MAY-2023: 21.3.2
+
+- Fixes NPE added in 21.3.1
+
+15-MAY-2023: 21.3.1
+
+- Removes animation for lightbox in all viewers
+- Shows error for possible NPE in print preview
+- Fixes restoring scrollbars after page selection
+- Fixes view after undo, restore and for blank pages
+- Escapes HTML in embed dialog preview title and body
+- Handles possible missing child in row [drawio-3592]
+- Fixes removed text between < and > with pasteHere
+- Fixes blank PDF export [drawio-3596]
+- Adds shortcut for in-/decrease font [drawio-3585]
+
 12-MAY-2023: 21.3.0
 
 - Updates DOMPurify from 3.0.2 to 3.0.3
@@ -10,7 +154,6 @@
 - [desktop]] Potential fix for spawn errors [drawio-desktop-1122]
 - Resets scrollbar state after inserting new pages
 - Fixes reset of scrollbars after deleting last page
-- 
 
 04-MAY-2023: 21.2.9
 

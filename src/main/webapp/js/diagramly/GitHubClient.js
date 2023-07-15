@@ -92,7 +92,9 @@ GitHubClient.prototype.updateUser = function(success, error, failOnAuth)
 				}
 				else
 				{
-					error({message: mxResources.get('accessDenied')});
+					error({code: userReq.getStatus(), message:
+						this.getErrorMessage(userReq,
+						mxResources.get('accessDenied'))});
 				}
 			}
 			else if (userReq.getStatus() < 200 || userReq.getStatus() >= 300)
@@ -148,7 +150,7 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 			
 			if (authRemembered != null)
 			{
-				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.hostname + '&token=' + state), null, 'GET'); //To identify which app/domain is used
+				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state), null, 'GET'); //To identify which app/domain is used
 				
 				req.send(mxUtils.bind(this, function(req)
 				{
@@ -182,7 +184,7 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 					var win = window.open(this.baseHostUrl + '/login/oauth/authorize?client_id=' +
 						this.clientId +  
 						'&state=' + encodeURIComponent('cId=' + this.clientId + //To identify which app/domain is used
-							'&domain=' + window.location.hostname + '&token=' + state), 'ghauth');
+							'&domain=' + window.location.host + '&token=' + state), 'ghauth');
 					
 					if (win != null)
 					{
@@ -1421,7 +1423,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 GitHubClient.prototype.logout = function()
 {
 	//NOTE: GitHub doesn't provide a refresh token, so no need to clear the token cookie
-	//this.ui.editor.loadUrl(this.redirectUri + '?doLogout=1&state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.hostname));
+	//this.ui.editor.loadUrl(this.redirectUri + '?doLogout=1&state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host));
 	this.clearPersistentToken();
 	this.setUser(null);
 	_token = null;

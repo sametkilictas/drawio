@@ -1316,7 +1316,8 @@ EditorUi.prototype.init = function()
 			ui.updateActionStates();
 		};
 		
-		// Hack to make editLink available in vertex handler
+		// Hack to make showLinkDialog and editLink available in vertex handler
+		graph.showLinkDialog = mxUtils.bind(ui, ui.showLinkDialog);
 		graph.editLink = ui.actions.get('editLink').funct;
 		
 		this.updateActionStates();
@@ -1545,6 +1546,81 @@ EditorUi.prototype.tryAndHandle = function(fn, error)
 		{
 			this.handleError(e);
 		}
+	}
+};
+
+/**
+ * Returns information about the current selection.
+ */
+EditorUi.prototype.convertDarkModeColors = function(cells, keys)
+{
+	var graph = this.editor.graph;
+	cells = (cells != null) ? cells : graph.getSelectionCells();
+	keys = (keys != null) ? keys : [mxConstants.STYLE_FONTCOLOR,
+		mxConstants.STYLE_FILLCOLOR, mxConstants.STYLE_GRADIENTCOLOR,
+		mxConstants.STYLE_STROKECOLOR, mxConstants.STYLE_IMAGE_BORDER,
+		mxConstants.STYLE_IMAGE_BACKGROUND, mxConstants.STYLE_LABEL_BORDERCOLOR,
+		mxConstants.STYLE_SWIMLANE_FILLCOLOR, mxConstants.STYLE_LABEL_BACKGROUNDCOLOR];
+	
+	var colorCache = {};
+	var canvas = document.createElement('canvas');
+	canvas.width = 1;
+	canvas.height = 1;
+
+	var ctx = canvas.getContext('2d', {willReadFrequently: true});
+	ctx.filter = 'invert(100%) hue-rotate(180deg) saturate(1.3)';
+	
+	graph.model.beginUpdate();
+	try
+	{
+		for (var i = 0; i < cells.length; i++)
+		{
+			if (graph.model.isEdge(cells[i]) || graph.model.isVertex(cells[i]))
+			{
+				var style = graph.getCurrentCellStyle(cells[i]);
+
+				if (style != null)
+				{
+					for (var j = 0; j < keys.length; j++)
+					{
+						try
+						{
+							var value = style[keys[j]];
+
+							if (value != null && value.charAt(0) == '#')
+							{
+								var result = colorCache[value];
+
+								if (result == null)
+								{
+									ctx.fillStyle = value;
+									ctx.fillRect(0, 0, 1, 1);
+									var imgData = ctx.getImageData(0, 0, 1, 1);
+
+									var r = imgData.data[0];
+									var g = imgData.data[1];
+									var b = imgData.data[2];
+
+									var rgb = b | (g << 8) | (r << 16);
+									result = '#' + (0x1000000 | rgb).toString(16).substring(1);
+									colorCache[value] = result;
+								}
+
+								graph.setCellStyles(keys[j], result, [cells[i]]);
+							}
+						}
+						catch (e)
+						{
+							// ignore
+						}
+					}
+				}
+			}
+		}
+	}
+	finally
+	{
+		graph.model.endUpdate();
 	}
 };
 
@@ -3340,31 +3416,42 @@ EditorUi.prototype.initCanvas = function()
 
 					// Sets initial translate based on geometries
 					// to avoid revalidation in sizeDidChange
-					var pageLayout = graph.getPageLayout(
-						graph.getBoundingBoxFromGeometry(
-						graph.model.getCells(), true), zero, 1);
+					var bbox = graph.getBoundingBoxFromGeometry(
+						graph.model.getCells(), true);
+					
+					// Handles blank diagrams
+					if (bbox == null)
+					{
+						bbox = new mxRectangle(
+							graph.view.translate.x * graph.view.scale,
+							graph.view.translate.y * graph.view.scale);
+					}
+
+					var pageLayout = graph.getPageLayout(bbox, zero, 1);
 					var tr = graph.getDefaultTranslate(pageLayout);
 					this.x0 = pageLayout.x;
 					this.y0 = pageLayout.y;
 					
-					// Restores scrollbar positions
-					graph.setScrollbarPositions(
-						ui.currentPage.viewState,
-						tr.x, tr.y);
-					
 					if (tr.x != this.translate.x ||
 						tr.y != this.translate.y)
 					{
-						this.setTranslate(tr.x, tr.y);
-
-						return;
+						this.invalidate();
+						this.translate.x = tr.x;
+						this.translate.y = tr.y;
 					}
 				}
 				
 				var pad = graph.getPagePadding();
 				var size = graph.getPageSize();
-				this.translate.x = pad.x - (this.x0 || 0) * size.width;
-				this.translate.y = pad.y - (this.y0 || 0) * size.height;
+				var tx = pad.x - (this.x0 || 0) * size.width;
+				var ty = pad.y - (this.y0 || 0) * size.height;
+
+				if (this.translate.x != tx || this.translate.y != ty)
+				{
+					this.invalidate();	
+					this.translate.x = tx
+					this.translate.y = ty
+				}
 			}
 			
 			graphViewValidate.apply(this, arguments);
@@ -4079,6 +4166,22 @@ EditorUi.prototype.canUndo = function()
 /**
  * 
  */
+EditorUi.prototype.replaceDiagramData = function(data)
+{
+	this.editor.graph.model.beginUpdate();
+	try
+	{
+		this.editor.setGraphXml(mxUtils.parseXml(data).documentElement);
+	}
+	finally
+	{
+		this.editor.graph.model.endUpdate();				
+	}
+};
+
+/**
+ * 
+ */
 EditorUi.prototype.getEditBlankXml = function()
 {
 	return mxUtils.getXml(this.editor.getGraphXml());
@@ -4130,6 +4233,53 @@ EditorUi.prototype.setScrollbars = function(value)
 	}
 	
 	this.fireEvent(new mxEventObject('scrollbarsChanged'));
+};
+
+/**
+ * Function: fitDiagramToWindow
+ * 
+ * Zooms the diagram to fit into the window.
+ */
+EditorUi.prototype.fitDiagramToWindow = function()
+{
+	var graph = this.editor.graph;
+	var bounds = (graph.isSelectionEmpty()) ?
+		mxRectangle.fromRectangle(graph.getGraphBounds()) :
+		graph.getBoundingBox(graph.getSelectionCells())
+	var t = graph.view.translate;
+	var s = graph.view.scale;
+	
+	bounds.x = bounds.x / s - t.x;
+	bounds.y = bounds.y / s - t.y;
+	bounds.width /= s;
+	bounds.height /= s;
+
+	if (graph.backgroundImage != null)
+	{
+		bounds.add(new mxRectangle(0, 0,
+			graph.backgroundImage.width,
+			graph.backgroundImage.height));
+	}
+
+	if (bounds.width == 0 || bounds.height == 0)
+	{
+		graph.zoomTo(1);
+		this.resetScrollbars();
+	}
+	else
+	{
+		var b = Editor.fitWindowBorders;
+		
+		if (b != null)
+		{
+			bounds.x -= b.x;
+			bounds.y -= b.y;
+			bounds.width += b.width + b.x;
+			bounds.height += b.height + b.y;
+		}
+		
+		graph.fitWindow(bounds);
+	}
 };
 
 /**
@@ -4402,7 +4552,7 @@ ChangePageSetup.prototype.execute = function()
 		var tmp = graph.backgroundImage;
 		var img = this.previousImage;
 
-		if (img != null && img.src != null && img.src.substring(0, 13) == 'data:page/id,')
+		if (img != null && Graph.isPageLink(img.src))
 		{
 			img = this.ui.createImageForPageLink(img.src, this.ui.currentPage);
 		}
@@ -4605,6 +4755,7 @@ EditorUi.prototype.updateActionStates = function()
 	this.actions.get('grid').setEnabled(editable);
 	this.actions.get('undo').setEnabled(this.canUndo() && editable);
 	this.actions.get('redo').setEnabled(this.canRedo() && editable);
+	this.actions.get('swap').setEnabled(ss.cells.length == 2 && ss.vertices.length == 2);
 	this.actions.get('pasteSize').setEnabled(this.copiedSize != null && ss.vertices.length > 0);
 	this.actions.get('pasteData').setEnabled(this.copiedValue != null && ss.cells.length > 0);
 	this.actions.get('setAsDefaultStyle').setEnabled(graph.getSelectionCount() == 1);
@@ -4935,6 +5086,14 @@ EditorUi.prototype.createStatusContainer = function()
 	mxEvent.addListener(container, 'click', mxUtils.bind(this, function(evt)
 	{
 		var elt = mxEvent.getSource(evt);
+
+		if (elt != container)
+		{
+			while (elt.parentNode != container)
+			{
+				elt = elt.parentNode;
+			}
+		}
 		
 		if (elt.nodeName != 'A')
 		{
@@ -5283,7 +5442,7 @@ EditorUi.prototype.hideDialog = function(cancel, isEsc, matchContainer)
 		{
 			window.setTimeout(mxUtils.bind(this, function()
 			{
-				if (this.editor != null)
+				if (this.editor != null && (this.dialogs == null || this.dialogs.length == 0))
 				{
 					if (this.editor.graph.isEditing() && this.editor.graph.cellEditor.textarea != null)
 					{
@@ -6022,12 +6181,18 @@ EditorUi.prototype.createKeyHandler = function(editor)
 	{
 		// Handles undo/redo/ctrl+./,/u via action and allows ctrl+b/i
 		// only if editing value is HTML (except for FF and Safari)
+		// 66, 73 are keycodes for editing actions like bold, italic
 		return !(mxEvent.isShiftDown(evt) && evt.keyCode == 9) &&
 			((!this.isControlDown(evt) || mxEvent.isShiftDown(evt) ||
 			(evt.keyCode != 90 && evt.keyCode != 89 && evt.keyCode != 188 &&
 			evt.keyCode != 190 && evt.keyCode != 85)) && ((evt.keyCode != 66 && evt.keyCode != 73) ||
 			!this.isControlDown(evt) || (this.graph.cellEditor.isContentEditing() &&
-			!mxClient.IS_FF && !mxClient.IS_SF)) && isEventIgnored.apply(this, arguments));
+			!mxClient.IS_FF && !mxClient.IS_SF)) &&
+			((evt.keyCode != 109 && evt.keyCode != 107) ||
+			(!this.isControlDown(evt) && !mxEvent.isShiftDown(evt)) ||
+			(!this.graph.cellEditor.isContentEditing() &&
+			!mxClient.IS_FF && !mxClient.IS_SF)) &&
+			isEventIgnored.apply(this, arguments));
 	};
 	
 	// Ignores graph enabled state but not chromeless state
@@ -6370,6 +6535,10 @@ EditorUi.prototype.createKeyHandler = function(editor)
 		keyHandler.bindAction(80, true, 'format', true); // Ctrl+Shift+P
 		keyHandler.bindAction(85, true, 'underline'); // Ctrl+U
 		keyHandler.bindAction(85, true, 'ungroup', true); // Ctrl+Shift+U
+		keyHandler.bindAction(109, true, 'decreaseFontSize', true); // Ctrl+Shift+Minus
+		keyHandler.bindAction(107, true, 'increaseFontSize', true); // Ctrl+Shift+Plus
+		keyHandler.bindAction(219, true, 'decreaseFontSize', true); // Ctrl+{
+		keyHandler.bindAction(221, true, 'increaseFontSize', true); // Ctrl+}
 		keyHandler.bindAction(190, true, 'superscript'); // Ctrl+.
 		keyHandler.bindAction(188, true, 'subscript'); // Ctrl+,
 		keyHandler.bindAction(13, false, 'keyPressEnter'); // Enter
