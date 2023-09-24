@@ -173,7 +173,9 @@
 			{
 				if (EditorUi.enableLogging && urlParams['dev'] != '1' &&
 					message != EditorUi.lastErrorMessage && message.indexOf('extension:') < 0 &&
-					err.stack.indexOf('extension:') < 0 && err.stack.indexOf('<anonymous>:') < 0)
+					message.indexOf('ResizeObserver loop completed with undelivered notifications') < 0 &&
+					err.stack.indexOf('extension:') < 0 && err.stack.indexOf('<anonymous>:') < 0 &&
+					err.stack.indexOf('/math/es5/') < 0)
 				{
 					EditorUi.lastErrorMessage = message;
 
@@ -423,6 +425,7 @@
 	{
 		EditorUi.prototype.useCanvasForExport = false;
 		EditorUi.prototype.jpgSupported = false;
+		EditorUi.prototype.webpSupported = false;
 		
 		// Checks if canvas is supported
 		try
@@ -467,14 +470,16 @@
 			// ignore
 		}
 		
-		// Checks for client-side JPG support
+		// Checks for client-side JPG and WebP support
 		try
 		{
 		    var canvas = document.createElement('canvas');
 		    canvas.width = canvas.height = 1;
 		    var uri = canvas.toDataURL('image/jpeg');
-		    
 		    EditorUi.prototype.jpgSupported = (uri.match('image/jpeg') !== null);
+
+			uri = canvas.toDataURL('image/webp');
+		    EditorUi.prototype.webpSupported = (uri.match('image/webp') !== null);
 		}
 		catch (e)
 		{
@@ -2791,7 +2796,54 @@
 		
 		return title;
 	};
-	
+		
+	/**
+	 * Translates this point by the given vector.
+	 * 
+	 * @param {number} dx X-coordinate of the translation.
+	 * @param {number} dy Y-coordinate of the translation.
+	 */
+	EditorUi.prototype.logIfModified = function(file, discarded)
+	{
+		try
+		{
+			if (file != null)
+			{
+				if (discarded)
+				{
+					EditorUi.debug('File.closed', [file]);
+				}
+
+				if (file.isModified() && file.constructor == DriveFile &&
+					file.desc != null && this.drive != null)
+				{
+					var evt = {category: 'WARN-CLOSE-MODIFIED-FILE-' + file.getHash(),
+						action: (discarded ? 'DISCARDED' : 'WARNED') + ((file.savingFile) ? 'saving' : '') +
+						((file.savingFile && file.savingFileTime != null) ? '_' +
+							Math.round((Date.now() - file.savingFileTime.getTime()) / 1000) : '') +
+						((file.saveLevel != null) ? ('-sl_' + file.saveLevel) : '') +
+						'-age_' + ((file.ageStart != null) ? Math.round((Date.now() - file.ageStart.getTime()) / 1000) : 'x') +
+						((this.editor.autosave) ? '' : '-nosave') +
+						((file.isAutosave()) ? '' : '-noauto') +
+						'-open_' + ((file.opened != null) ? Math.round((Date.now() - file.opened.getTime()) / 1000) : 'x') +
+						'-save_' + ((file.lastSaved != null) ? Math.round((Date.now() - file.lastSaved.getTime()) / 1000) : 'x') +
+						'-change_' + ((file.lastChanged != null) ? Math.round((Date.now() - file.lastChanged.getTime()) / 1000) : 'x') +
+						'-alive_' + Math.round((Date.now() - App.startTime.getTime()) / 1000),
+						label: ((file.sync != null) ? ('client_' + file.sync.clientId) : 'nosync') +
+							((this.drive.user != null) ? ('-user_' + this.drive.user.id) : '-nouser') + '-rev_' +
+							file.desc.headRevisionId + '-mod_' + file.desc.modifiedDate + '-size_' + file.getSize() +
+							'-mime_' + file.desc.mimeType};
+
+					EditorUi.logEvent(evt);
+				}
+			}
+		}
+		catch (e)
+		{
+			// ignore
+		}
+	};
+
 	/**
 	 * Translates this point by the given vector.
 	 * 
@@ -2809,8 +2861,8 @@
 		
 		if (oldFile != null)
 		{
-			EditorUi.debug('File.closed', [oldFile]);
 			oldFile.removeListener(this.descriptorChangedListener);
+			this.logIfModified(oldFile, true);
 			oldFile.close();
 		}
 		
@@ -2948,9 +3000,9 @@
 						theme += Editor.isDarkMode() ? '-dark' : '-light';
 					}
 
-					EditorUi.logEvent({category: file.getMode().toUpperCase() + '-OPEN-FILE-' + file.getHash(),
-						action: 'size_' + file.getSize(),
-						label: 'autosave_' + ((this.editor.autosave) ? 'on' : 'off') + '_theme_' + theme});
+					// EditorUi.logEvent({category: file.getMode().toUpperCase() + '-OPEN-FILE-' + file.getHash(),
+					// 	action: 'size_' + file.getSize(),
+					// 	label: 'autosave_' + ((this.editor.autosave) ? 'on' : 'off') + '_theme_' + theme});
 				}
 				
 				EditorUi.debug('File.opened', [file]);
@@ -3384,6 +3436,24 @@
 	 * @param {number} dx X-coordinate of the translation.
 	 * @param {number} dy Y-coordinate of the translation.
 	 */
+	EditorUi.prototype.showSidebar = function()
+	{
+		if (this.sidebarWindow != null)
+		{
+			this.sidebarWindow.window.setVisible(true);
+		}
+		else
+		{
+			this.toggleShapesPanel(true);
+		}
+	};
+
+	/**
+	 * Translates this point by the given vector.
+	 * 
+	 * @param {number} dx X-coordinate of the translation.
+	 * @param {number} dy Y-coordinate of the translation.
+	 */
 	EditorUi.prototype.libraryLoaded = function(file, images, optionalTitle, expand)
 	{
 		if (this.sidebar == null)
@@ -3666,18 +3736,25 @@
 				{
 					var cells = graph.getSelectionCells();
 					var bounds = graph.view.getBounds(cells);
-					
-					var s = graph.view.scale;
-					
-					bounds.x /= s;
-					bounds.y /= s;
-					bounds.width /= s;
-					bounds.height /= s;
-					
-					bounds.x -= graph.view.translate.x;
-					bounds.y -= graph.view.translate.y;
-					
-					addCells(cells, bounds);
+
+					if (bounds != null && bounds.width > 0 && bounds.height > 0)
+					{
+						var s = graph.view.scale;
+						
+						bounds.x /= s;
+						bounds.y /= s;
+						bounds.width /= s;
+						bounds.height /= s;
+						
+						bounds.x -= graph.view.translate.x;
+						bounds.y -= graph.view.translate.y;
+						
+						addCells(cells, bounds);
+					}
+					else
+					{
+						this.showError(mxResources.get('error'), mxResources.get('invalidSel'), mxResources.get('ok'));
+					}
 				}
 				else if (graph.getRubberband().isActive())
 				{
@@ -3954,6 +4031,7 @@
 		
 		title.appendChild(buttons);
 		title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
+		this.editor.fireEvent(new mxEventObject('libraryLoaded'));
 	};
 
 	/**
@@ -3963,32 +4041,43 @@
 	{
 		for (var i = 0; i < imgs.length; i++)
 		{
-			var img = imgs[i];
-			var data = img.data;
+			try
+			{
+				var img = imgs[i];
+				var data = img.data;
+				
+				if (data != null)
+				{
+					data = this.convertDataUri(data);
+					var s = 'shape=image;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;';
+					
+					if (img.aspect == 'fixed')
+					{
+						s += 'aspect=fixed;'
+					}
+					
+					content.appendChild(this.sidebar.createVertexTemplate(s + 'image=' +
+						data, img.w, img.h, '', img.title || '', false, null, true));
+				}
+				else if (img.xml != null)
+				{
+					var cells = this.stringToCells((img.xml.charAt(0) == '<') ?
+						img.xml : Graph.decompress(img.xml));
 
-			if (data != null)
-			{
-				data = this.convertDataUri(data);
-				var s = 'shape=image;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;';
-				
-				if (img.aspect == 'fixed')
-				{
-					s += 'aspect=fixed;'
+					if (cells.length > 0)
+					{
+						content.appendChild(this.sidebar.createVertexTemplateFromCells(
+							cells, img.w, img.h, img.title || '', true, null, true));
+					}
 				}
-				
-				content.appendChild(this.sidebar.createVertexTemplate(s + 'image=' +
-					data, img.w, img.h, '', img.title || '', false, null, true));
 			}
-			else if (img.xml != null)
+			catch (e)
 			{
-				var cells = this.stringToCells((img.xml.charAt(0) == '<') ?
-					img.xml : Graph.decompress(img.xml));
-				
-				if (cells.length > 0)
-				{
-					content.appendChild(this.sidebar.createVertexTemplateFromCells(
-						cells, img.w, img.h, img.title || '', true, null, true));
-				}
+				var elt = this.sidebar.createVertexTemplateFromCells(null,
+					img.w, img.h, mxResources.get('error') + ': ' +
+					e.message, true, null, true);
+				elt.style.backgroundImage = 'url(' + Editor.svgBrokenImage.src + ')';
+				content.appendChild(elt);
 			}
 		}
 	};
@@ -4965,7 +5054,7 @@
 			}
 		});
 		
-		if (urlParams['save-dialog'] == '1')
+		if (urlParams['save-dialog'] != '0')
 		{
 			var disabled = [];
 
@@ -4985,7 +5074,7 @@
 				this.hideDialog();
 			}), disabled, data, mimeType, base64Encoded);
 
-			this.showDialog(dlg.container, 420, 100, true, false, mxUtils.bind(this, function()
+			this.showDialog(dlg.container, 420, 110, true, false, mxUtils.bind(this, function()
 			{
 				this.hideDialog();
 			}));
@@ -5423,7 +5512,7 @@
 			}
 		});
 
-		if (urlParams['save-dialog'] == '1')
+		if (urlParams['save-dialog'] != '0')
 		{
 			var disabled = [App.MODE_BROWSER];
 
@@ -5438,7 +5527,7 @@
 				this.hideDialog();
 			}), disabled, null, 'application/pdf');
 
-			this.showDialog(dlg.container, 420, 100, true, false, mxUtils.bind(this, function()
+			this.showDialog(dlg.container, 420, 110, true, false, mxUtils.bind(this, function()
 			{
 				this.hideDialog();
 			}));
@@ -6459,7 +6548,7 @@
 		var div = document.createElement('div');
 		div.style.whiteSpace = 'nowrap';
 		var graph = this.editor.graph;
-		var height = (format == 'jpeg') ? 220 : 300;
+		var height = (format == 'jpeg' || format == 'webp') ? 220 : 300;
 		
 		var hd = document.createElement('h3');
 		mxUtils.write(hd, title);
@@ -6582,7 +6671,7 @@
 				
 		var defaultTransparent = false; /*graph.background == mxConstants.NONE || graph.background == null*/; 
 		var transparent = this.addCheckbox(div, mxResources.get('transparentBackground'),
-			defaultTransparent, null, null, format != 'jpeg');
+			defaultTransparent, null, null, format != 'jpeg' && format != 'webp');
 
 		var themeSelect = null;
 
@@ -6631,7 +6720,7 @@
 				
 		var grid = null;
 		
-		if (format == 'png' || format == 'jpeg')
+		if (format == 'png' || format == 'jpeg' || format == 'webp')
 		{
 			grid = this.addCheckbox(div, mxResources.get('grid'), false,
 				this.isOffline() || !this.canvasSupported, false, true); 
@@ -6639,7 +6728,7 @@
 		}
 		
 		var include = this.addCheckbox(div, mxResources.get('includeCopyOfMyDiagram'),
-			defaultInclude, null, null, format != 'jpeg');
+			defaultInclude, null, null, format != 'jpeg' && format != 'webp');
 		include.style.marginBottom = '16px';
 		
 		var cb5 = document.createElement('input');
@@ -7844,9 +7933,9 @@
 							}
 						}
 						
-						EditorUi.logEvent({category: ext + '-MS-IMPORT-FILE',
-							action: 'filename_' + filename,
-							label: (remote) ? 'remote' : 'local'});
+						// EditorUi.logEvent({category: ext + '-MS-IMPORT-FILE',
+						// 	action: 'filename_' + filename,
+						// 	label: (remote) ? 'remote' : 'local'});
 					}
 					catch (e)
 					{
@@ -8277,9 +8366,9 @@
 			{
 				this.createTimeout(40000, mxUtils.bind(this, function(timeout)
 				{
-					EditorUi.logEvent({category: 'OPENAI-DIAGRAM',
-						action: 'generateOpenAiMermaidDiagram',
-						label: prompt});
+					// EditorUi.logEvent({category: 'OPENAI-DIAGRAM',
+					// 	action: 'generateOpenAiMermaidDiagram',
+					// 	label: prompt});
 					var url = 'https://www.draw.io/generate/v1';
 
 					var req = new mxXmlRequest(url, prompt, 'POST');
@@ -9331,6 +9420,7 @@
 			if (xml != null && xml.substring(0, 10) == '<mxlibrary')
 			{
 				this.loadLibrary(new LocalLibrary(this, xml, filename));
+				this.showSidebar();
 			}
 			else
 			{
@@ -9507,6 +9597,7 @@
 					{
 						this.spinner.stop();
 						this.loadLibrary(new LocalLibrary(this, data, filename));
+						this.showSidebar();
 		    			
 		    			return null;
 					}
@@ -10017,7 +10108,8 @@
 		maxSize = (maxSize != null) ? maxSize : this.maxImageSize;
 		var w = Math.max(1, img.width);
 		var h = Math.max(1, img.height);
-		
+		var originalData = data;
+
 		if (enabled && this.isResampleImageSize((fileSize != null) ? fileSize : data.length, thresh))
 		{
 			try
@@ -10035,7 +10127,6 @@
 	
 				    var ctx = canvas.getContext('2d');
 				    ctx.drawImage(img, 0, 0, w2, h2);
-				    
 				    var tmp = canvas.toDataURL();
 
 				    // Uses new image if smaller
@@ -10063,7 +10154,14 @@
 			}
 		}
 
-		fn(data, w, h);
+		if (enabled && originalData != data && maxSize > this.maxImageSize / 2 && data.length > this.maxImageBytes)
+		{
+			this.resizeImage(img, data, fn, enabled, maxSize / 1.5, thresh, fileSize);
+		}
+		else
+		{
+			fn(data, w, h);
+		}
 	};
 	
 	/**
@@ -10142,6 +10240,12 @@
 			}
 
 			this.formatWidth = mxSettings.getFormatWidth();
+
+			if ((Editor.config == null || Editor.config.enableCssDarkMode == null) &&
+				mxSettings.settings.enableCssDarkMode != null)
+			{
+				Editor.enableCssDarkMode = mxSettings.settings.enableCssDarkMode;
+			}
 		}
 		
 		editorUiCreateUi.apply(this, arguments);
@@ -10325,14 +10429,21 @@
 		};
 		
 		// Redirects custom link via UI for page link handling
-		graph.customLinkClicked = function(link)
+		graph.customLinkClicked = function(link, associatedCell)
 		{
 			var done = false;
 			
 			try
 			{
-				ui.handleCustomLink(link);
+				var bounds = this.getGraphBounds();
+				ui.handleCustomLink(link, associatedCell);
 				done = true;
+
+				if (ui.chromelessResize && !bounds.equals(this.getGraphBounds()))
+				{
+					ui.chromelessResize();
+					this.scrollCellToVisible(associatedCell);
+				}
 			}
 			catch (e)
 			{
@@ -10481,7 +10592,7 @@
 		{
 			var tmp = beforeClick;
 
-			beforeClick = function(evt, href)
+			beforeClick = function(evt, href, cell)
 			{
 				if (href == null)
 				{
@@ -10496,14 +10607,14 @@
 				if (href != null && graph.isCustomLink(href) &&
 					(mxEvent.isTouchEvent(evt) ||
 					!mxEvent.isPopupTrigger(evt)) &&
-					graph.customLinkClicked(href))
+					graph.customLinkClicked(href, cell))
 				{
 					mxEvent.consume(evt);
 				}
 				
 				if (tmp != null)
 				{
-					tmp(evt, href);
+					tmp(evt, href, cell);
 				}
 			};
 			
@@ -11511,13 +11622,13 @@
 			this.fitWindows();
 		}));
 
-		if (!Editor.enableCssDarkMode)
+		this.addListener('darkModeChanged', mxUtils.bind(this, function(evt)
 		{
-			this.addListener('darkModeChanged', mxUtils.bind(this, function(evt)
+			if (!Editor.enableCssDarkMode)
 			{
 				this.inlineSizeChanged();
-			}));
-		}
+			}
+		}));
 
 		this.addListener('editInlineStop', mxUtils.bind(this, function(evt)
 		{
@@ -11876,7 +11987,6 @@
 		{
 			Editor.currentTheme = value;
 			this.themeSwitching = true;
-			var scrollState = this.saveScrollState();
 
 			mxUtils.setPrefixedStyle(this.container.style, 'transition',
 				'all ' + delay + 'ms ease-in-out');
@@ -11888,6 +11998,7 @@
 
 			window.setTimeout(mxUtils.bind(this, function()
 			{
+				var scrollState = this.saveScrollState();
 				this.editor.graph.stopEditing(false);
 				this.container.style.opacity = '0';
 
@@ -11951,6 +12062,44 @@
 		}
 
 		return noRestart;
+	};
+
+	/**
+	 * Saves scroll position
+	 */
+	EditorUi.prototype.saveScrollState = function()
+	{
+		var t = this.editor.graph.view.translate;
+		var x = this.diagramContainer.scrollLeft;
+		var y = this.diagramContainer.scrollTop;
+
+		if (this.embedViewport != null)
+		{
+			if (!Editor.inlineFullscreen)
+			{
+				x += this.embedViewport.x;
+				y += this.embedViewport.y;
+			}
+			else
+			{
+				x -= this.embedViewport.x;
+				y -= this.embedViewport.y;
+			}
+		}
+
+		return {x: x, y: y, tx: t.x, ty: t.y};
+	};
+   
+	/**
+	 * Dynamic change of dark mode.
+	 */
+	EditorUi.prototype.restoreScrollState = function(state)
+	{
+		var s = this.editor.graph.view.scale;
+		var t = this.editor.graph.view.translate;
+		
+		this.diagramContainer.scrollLeft = state.x + (t.x - state.tx) * s;
+		this.diagramContainer.scrollTop = state.y + (t.y - state.ty) * s;
 	};
 
 	/**
@@ -12256,7 +12405,11 @@
 		if (value == 'simple' || value == 'sketch')
 		{
 			Editor.fitWindowBorders = new mxRectangle(60, 30, 30, 30);
-			graph.defaultEdgeLength = 120;
+
+			if (Editor.config == null || Editor.config.defaultEdgeLength == null)
+			{
+				graph.defaultEdgeLength = 120;
+			}
 
 			if (urlParams['grid'] == null)
 			{
@@ -12952,11 +13105,13 @@
 				this.editor.addListener('fileLoaded', initPicker);
 				this.addListener('sketchModeChanged', initPicker);
 				this.addListener('currentThemeChanged', initPicker);
-
-				if (!Editor.enableCssDarkMode)
+				this.addListener('darkModeChanged', mxUtils.bind(this, function()
 				{
-					this.addListener('darkModeChanged', initPicker);
-				}
+					if (!Editor.enableCssDarkMode)
+					{
+						initPicker();
+					}
+				}));
 
 				initPicker(true);
 
@@ -13508,51 +13663,54 @@
 	 */
 	EditorUi.prototype.toggleShapesPanel = function(visible)
 	{
-		var size = EditorUi.prototype.hsplitPosition;
-
-		// On smaller screens this is set to 0
-		if (size == 0)
+		if (this.isShapesPanelVisible() != visible)
 		{
-			size = 134;
-		}
+			var size = EditorUi.prototype.hsplitPosition;
 
-		var x = this.hsplitPosition;
+			// On smaller screens this is set to 0
+			if (size == 0)
+			{
+				size = 134;
+			}
 
-		var doRefresh = mxUtils.bind(this, function()
-		{
-			this.hsplitPosition = tmp;
-			this.refresh();
-			this.diagramContainer.scrollLeft -= x - this.hsplitPosition;
-		});
-		
-		var tmp = (visible) ? size : 0;
-		var delay = 0.3;
+			var x = this.hsplitPosition;
 
-		mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', (tmp == 0) ? 'translateX(0)' : 'translateX(-100%)');
+			var doRefresh = mxUtils.bind(this, function()
+			{
+				this.hsplitPosition = tmp;
+				this.refresh();
+				this.diagramContainer.scrollLeft -= x - this.hsplitPosition;
+			});
+			
+			var tmp = (visible) ? size : 0;
+			var delay = 0.3;
 
-		if (tmp != 0)
-		{
-			doRefresh();
-		}
+			mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', (tmp == 0) ? 'translateX(0)' : 'translateX(-100%)');
 
-		window.setTimeout(mxUtils.bind(this, function()
-		{
-			mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', (tmp == 0) ? 'translateX(-100%)' : 'translateX(0)');
-			mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transition', 'transform ' + delay + 's ease-in-out');
-			mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform-origin', 'top left');
+			if (tmp != 0)
+			{
+				doRefresh();
+			}
 
 			window.setTimeout(mxUtils.bind(this, function()
 			{
-				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transition', null);
-				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', null);
-				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform-origin', null);
-				
-				if (tmp == 0)
+				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', (tmp == 0) ? 'translateX(-100%)' : 'translateX(0)');
+				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transition', 'transform ' + delay + 's ease-in-out');
+				mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform-origin', 'top left');
+
+				window.setTimeout(mxUtils.bind(this, function()
 				{
-					doRefresh();
-				}
-			}), delay * 1000);
-		}), 10);
+					mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transition', null);
+					mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform', null);
+					mxUtils.setPrefixedStyle(this.sidebarContainer.style, 'transform-origin', null);
+					
+					if (tmp == 0)
+					{
+						doRefresh();
+					}
+				}), delay * 1000);
+			}), 10);
+		}
 	};
 
 	/**
@@ -13922,6 +14080,25 @@
 			(!this.editor.chromeless || this.editor.editable) &&
 			mxSettings.settings.darkMode == null)));
 	};
+		
+	/**
+	 * Dynamic change of dark mode.
+	 */
+	EditorUi.prototype.setCssDarkModeEnabled = function(value)
+	{
+		var prev = Editor.isDarkMode() || Editor.cssDarkMode;
+
+		if (prev)
+		{
+			this.setDarkMode(false);
+		}
+
+		Editor.enableCssDarkMode = value;
+		mxSettings.settings.enableCssDarkMode = Editor.enableCssDarkMode;
+		mxSettings.save();
+		this.setDarkMode(prev);
+		this.fireEvent(new mxEventObject('cssDarkModeEnabledChanged'));
+	};
 	
 	/**
 	 * Dynamic change of dark mode.
@@ -14181,46 +14358,6 @@
 	};
     
 	/**
-	 * Saves scroll position
-	 */
-	EditorUi.prototype.saveScrollState = function()
-	{
-		var t = this.editor.graph.view.translate;
-		var off = mxUtils.getOffset(this.diagramContainer);
-		var x = this.diagramContainer.scrollLeft - off.x;
-		var y = this.diagramContainer.scrollTop - off.y;
-
-		if (this.embedViewport != null)
-		{
-			if (!Editor.inlineFullscreen)
-			{
-				x += this.embedViewport.x;
-				y += this.embedViewport.y;
-			}
-			else
-			{
-				x -= this.embedViewport.x;
-				y -= this.embedViewport.y;
-			}
-		}
-
-		return {x: x, y: y, tx: t.x, ty: t.y};
-	};
-   
-	/**
-	 * Dynamic change of dark mode.
-	 */
-	EditorUi.prototype.restoreScrollState = function(state)
-	{
-		var s = this.editor.graph.view.scale;
-		var t = this.editor.graph.view.translate;
-		var off = mxUtils.getOffset(this.diagramContainer);
-		
-		this.diagramContainer.scrollLeft = state.x + off.x + (t.x - state.tx) * s;
-		this.diagramContainer.scrollTop = state.y + off.y + (t.y - state.ty) * s;
-	};
-
-	/**
 	 * Dynamic change of dark mode.
 	 */
 	EditorUi.prototype.setInlineFullscreen = function(value)
@@ -14473,16 +14610,43 @@
 		}
 		else if (href.substring(0, 5) == 'data:')
 		{
-			title = mxResources.get('action');
+			title = this.getCustomLinkTitle(href);
 		}
 		
 		return title;
 	};
-	
+
 	/**
 	 * 
 	 */
-	EditorUi.prototype.handleCustomLink = function(href)
+	EditorUi.prototype.getCustomLinkTitle = function(href)
+	{
+		var result = mxResources.get('action');
+
+		if (href.substring(0, 17) == 'data:action/json,')
+		{
+			try
+			{
+				var link = JSON.parse(href.substring(17));
+
+				if (link != null && link.title != null)
+				{
+					result = link.title;
+				}
+			}
+			catch (e)
+			{
+				// ignore
+			}
+		}
+
+		return result;
+	};
+
+	/**
+	 * 
+	 */
+	EditorUi.prototype.handleCustomLink = function(href, cell)
 	{
 		if (Graph.isPageLink(href))
 		{
@@ -14501,7 +14665,7 @@
 		}
 		else
 		{
-			this.editor.graph.handleCustomLink(href);
+			this.editor.graph.handleCustomLink(href, cell);
 		}
 	};
 
@@ -15341,6 +15505,7 @@
     				try
 	    			{
     					this.loadLibrary(new LocalLibrary(this, xml, name));
+						this.showSidebar();
 	    			}
     				catch (e)
 	    			{
@@ -15430,6 +15595,7 @@
 				try
     			{
     				this.loadLibrary(new LocalLibrary(this, data, file.name));
+					this.showSidebar();
     			}
     			catch (e)
     			{
@@ -16308,8 +16474,19 @@
 								this.editor.graph.setEnabled(false);
 								var graph = this.editor.graph;
 								
-								var postDataBack = mxUtils.bind(this, function(uri)
+								var postDataBack = mxUtils.bind(this, function(uri, svg)
 								{
+									if (data.withSvg)
+									{
+										data.withSvg = false;
+										this.getEmbeddedSvg(xml, this.editor.graph, null, true, function(svg)
+										{
+											postDataBack(uri, svg);
+										}, null, null, data.embedImages, this.editor.graph.background, 
+										data.scale, data.border, data.shadow);	
+										return;
+									}
+
 									this.editor.graph.setEnabled(true);
 									this.spinner.stop();
 									
@@ -16317,6 +16494,7 @@
 									msg.format = data.format;
 									msg.message = data;
 									msg.data = uri;
+									msg.svg = svg;
 									msg.xml = xml;
 									parent.postMessage(JSON.stringify(msg), '*');
 								});
@@ -17661,15 +17839,16 @@
 							}
 
 							var heightValue = (height.charAt(0) == '@') ? cell.getAttribute(height.substring(1)) : null;
-
-							if (heightValue != null && heightValue != 'auto')
+							
+							if (heightValue != null && heightValue != 'auto' && height != 'width')
 							{
 								cell.geometry.height = parseFloat(heightValue);
 							}
 							else
 							{
 								cell.geometry.height = (height == 'auto' || heightValue == 'auto') ?
-									size.height + padding : parseFloat(height);
+									size.height + padding : (height == 'width' ?
+										cell.geometry.width : parseFloat(height));
 							}
 							
 							y += cell.geometry.height + nodespacing;
@@ -17816,6 +17995,15 @@
 													}
 								
 													edgeCell.insert(el);
+												}
+											}
+
+											// Adds edge metadata
+											if (edge.data != null)
+											{
+												for (var key in edge.data)
+												{
+													graph.setAttributeForCell(edgeCell, key, edge.data[key]);
 												}
 											}
 											
@@ -18119,7 +18307,7 @@
 	EditorUi.prototype.showLinkDialog = function(value, btnLabel, fn, showNewWindowOption, linkTarget)
 	{
 		var dlg = new LinkDialog(this, value, btnLabel, fn, true, showNewWindowOption, linkTarget);
-		this.showDialog(dlg.container, 560, 130, true, true);
+		this.showDialog(dlg.container, 440, 140, true, true);
 		dlg.init();
 	};
 	
@@ -18293,11 +18481,13 @@
 			this.restoreOpenLibraries();
 		});
 
-		if (!Editor.enableCssDarkMode)
+		this.addListener('darkModeChanged', mxUtils.bind(this, function()
 		{
-			this.addListener('darkModeChanged', refreshSidebar);
-		}
-
+			if (!Editor.enableCssDarkMode)
+			{
+				refreshSidebar();
+			}
+		}));
 		this.addListener('sketchModeChanged', refreshSidebar);
 		this.addListener('currentThemeChanged', refreshSidebar);
 		
@@ -18619,6 +18809,7 @@
 						try
 						{
 							this.loadLibrary(new RemoteLibrary(this, libContent, lib));
+							this.showSidebar();
 						}
 						catch (e)
 						{

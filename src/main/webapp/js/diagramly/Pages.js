@@ -486,8 +486,9 @@ EditorUi.prototype.getImageForPage = function(page, sourcePage, sourceGraph)
 	Graph.foreignObjectWarningText = '';
 	var theme = (Editor.cssDarkMode || Editor.isDarkMode()) ?
 		'dark' : 'light';
-	var svgRoot = graph.getSvg(null, null, null, null, null,
-		null, null, null, null, null, null, theme);
+	var svgRoot = graph.getSvg(null, null, null, null, null, null,
+		null, null, null, null, null, theme, null, null, true);
+	
 	var bounds = graph.getGraphBounds();
 	document.body.removeChild(graph.container);
 	Graph.foreignObjectWarningText = temp;
@@ -557,7 +558,7 @@ EditorUi.prototype.initPages = function()
 			for (var i = 0; i < changes.length; i++)
 			{
 				if (changes[i] instanceof RenamePage ||
-					changes[i] instanceof MovePage ||
+					changes[i] instanceof ChangePage ||
 					changes[i] instanceof mxRootChange)
 				{
 					this.updateTabContainer();
@@ -585,6 +586,17 @@ EditorUi.prototype.initPages = function()
 			return result;
 		};
 
+		// Selects new default parent if root changes
+		graph.addListener(mxEvent.ROOT, mxUtils.bind(this, function()
+		{
+			if (graph.defaultParent != null &&
+				!graph.model.contains(graph.defaultParent))
+			{
+				graph.setDefaultParent(null);
+				graph.selectUnlockedLayer();
+			}
+		}));
+		
 		var pagesChanged = mxUtils.bind(this, function()
 		{
 			this.updateDocumentTitle();

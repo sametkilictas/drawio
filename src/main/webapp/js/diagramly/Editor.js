@@ -204,7 +204,7 @@
 	/**
 	 * Specifies if web fonts are enabled.
 	 */
-	Editor.enableWebFonts = urlParams['safe-style-src'] != '1';
+	Editor.enableWebFonts = urlParams['safe-style-src'] != '1' && !window.mxIsElectron;
 
 	/**
 	 * Disables the shadow option in the format panel.
@@ -629,6 +629,7 @@
 		'## x is from -1 to 1 along the edge, y is orthogonal, and dx/dy are offsets in pixels.\n' +
 		'## An optional placeholders with the string value "source" or "target" can be specified\n' +
 		'## to replace placeholders in the additional label with data from the source or target.\n' +
+		'## An optional data object can be specified to define the metadata for the connector.\n' +
 		'## The target column may contain a comma-separated list of values.\n' +
 		'## Multiple connect entries are allowed.\n' +
 		'#\n' +
@@ -651,7 +652,7 @@
 		'#\n' +
 		'# width: auto\n' +
 		'#\n' +
-		'## Node height. Possible value is a number (in px), auto or an @ sign followed by a column\n' +
+		'## Node height. Possible value is a number (in px), auto, width or an @ sign followed by a column\n' +
 		'## name that contains the value for the height. Default is auto.\n' +
 		'#\n' +
 		'# height: auto\n' +
@@ -2238,7 +2239,7 @@
 		{description: 'diagramSvgDesc', extension: 'svg', mimeType: 'image/svg'},
 		{description: 'diagramHtmlDesc', extension: 'html', mimeType: 'text/html'}];
 	
-	if (urlParams['save-dialog'] != '1')
+	if (urlParams['save-dialog'] == '0')
 	{
 		Editor.prototype.diagramFileTypes.push({description: 'diagramXmlDesc', extension: 'xml', mimeType: 'text/xml'});
 	}
@@ -2791,7 +2792,7 @@
 	/**
 	 * 
 	 */
-	Editor.prototype.convertImageToDataUri = function(url, callback)
+	Editor.prototype.convertImageToDataUri = function(url, callback, error)
 	{
 		try
 		{
@@ -2862,7 +2863,14 @@
 					
 					if (acceptResponse)
 					{
-						callback(Editor.svgBrokenImage.src);
+						if (error != null)
+						{
+							error();
+						}
+						else
+						{
+							callback(Editor.svgBrokenImage.src);
+						}
 					}
 			    };
 			    
@@ -2871,7 +2879,14 @@
 		}
 		catch (e)
 		{
-			callback(Editor.svgBrokenImage.src);
+			if (error != null)
+			{
+				error();
+			}
+			else
+			{
+				callback(Editor.svgBrokenImage.src);
+			}
 		}
 	};
 	
@@ -6523,24 +6538,26 @@
 	 */
 	Graph.prototype.adaptBackgroundPage = function(image, theme)
 	{
-		if (image != null && image.src != null)
+		if (image != null && image.src != null && Graph.isPageLink(image.originalSrc))
 		{
-			var svg = Graph.getSvgFromDataUri(image.src);
-
-			if (svg != null)
+			try
 			{
-				try
+				var svg = Graph.getSvgFromDataUri(image.src);
+
+				if (svg != null)
 				{
 					var doc = new DOMParser().parseFromString(svg, 'text/xml');
 
 					// Removes dark theme CSS
 					var styles = doc.getElementsByTagName('style');
+					var css = mxUtils.htmlEntities(Graph.createSvgDarkModeCss(), false);
 
 					for (var i = 0; i < styles.length; i++)
 					{
-						if (styles[i].innerHTML == Graph.svgDarkModeCss)
+						if (styles[i].innerHTML == css)
 						{
 							styles[i].parentNode.removeChild(styles[i]);
+							
 							break;
 						}
 					}
@@ -6556,10 +6573,10 @@
 						doc.documentElement)), image.width, image.height,
 						image.x, image.y)
 				}
-				catch (e)
-				{
-					// ignore
-				}
+			}
+			catch (e)
+			{
+				// ignore
 			}
 		}
 
@@ -6573,7 +6590,7 @@
 	
 	Graph.prototype.getSvg = function(background, scale, border, nocrop, crisp,
 		ignoreSelection, showText, imgExport, linkTarget, hasShadow,
-		incExtFonts, theme, exportType, cells)
+		incExtFonts, theme, exportType, cells, noCssClass)
 	{
 		var temp = null;
 		var tempFg = null;
@@ -6606,10 +6623,17 @@
 
 		if (Editor.enableCssDarkMode && (theme == 'dark' || theme == 'auto'))
 		{
-			var style = Graph.createSvgDarkModeStyle(result.ownerDocument, theme);
+			var cssClass = (noCssClass) ? null : 'ge-export-svg-' + theme;
+			
+			if (cssClass != null)
+			{
+				result.setAttribute('class', cssClass);
+			}
+
+			var style = Graph.createSvgDarkModeStyle(result.ownerDocument, theme, cssClass);
 			result.getElementsByTagName('defs')[0].appendChild(style);
 		}
-
+		
 		var extFonts = this.getCustomFonts();
 		
 		// Adds external fonts
@@ -6649,6 +6673,14 @@
 			document.body.appendChild(result);
 			Editor.MathJaxRender(result);
 			result.parentNode.removeChild(result);
+
+			// Copies MathJax CSS to output
+			var style = result.ownerDocument.getElementById('MJX-SVG-styles');
+
+			if (style != null)
+			{
+				result.getElementsByTagName('defs')[0].appendChild(style.cloneNode(true));
+			}
 		}
 
 		if (bgImg != null)
@@ -6858,7 +6890,7 @@
 	 * 
 	 * This toggles the visible state of the cells with ID 3 and 4.
 	 */
-	Graph.prototype.handleCustomLink = function(href)
+	Graph.prototype.handleCustomLink = function(href, cell)
 	{
 		if (href.substring(0, 17) == 'data:action/json,')
 		{
@@ -6866,7 +6898,7 @@
 
 			if (link.actions != null)
 			{
-				this.executeCustomActions(link.actions);
+				this.executeCustomActions(link.actions, null, cell);
 			}
 		}
 	};
@@ -6876,7 +6908,7 @@
 	 * When adding new actions that reference cell IDs support for updating
 	 * those cell IDs must be handled in Graph.updateCustomLinkActions
 	 */
-	Graph.prototype.executeCustomActions = function(actions, done)
+	Graph.prototype.executeCustomActions = function(actions, done, cell)
 	{
 		if (!this.executingCustomActions)
 		{
@@ -6931,7 +6963,7 @@
 
 						if (this.isCustomLink(action.open))
 						{
-							if (!this.customLinkClicked(action.open))
+							if (!this.customLinkClicked(action.open, cell))
 							{
 								return;
 							}
@@ -7061,6 +7093,11 @@
 					if (cells.length > 0)
 					{
 						this.scrollCellToVisible(cells[0]);
+					}
+					
+					if (cell != null && action.explore != null)
+					{
+						Graph.exploreFromCell(this, cell, action.explore);
 					}
 
 					if (action.tags != null)
@@ -8487,6 +8524,19 @@
 							}
 						}
 					};
+
+					// Adapts background images
+					if (Editor.enableCssDarkMode)
+					{
+						var printGetBackgroundImage = pv.getBackgroundImage;
+						
+						pv.getBackgroundImage = function()
+						{
+							return graph.adaptBackgroundPage(
+								printGetBackgroundImage.apply(
+									this, arguments));
+						};
+					}
 					
 					if (typeof(MathJax) !== 'undefined')
 					{

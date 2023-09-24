@@ -310,30 +310,10 @@ Actions.prototype.init = function()
 	this.addAction('swap', function()
 	{
 		var cells = graph.getSelectionCells();
-		var model = graph.getModel();
 
-		if (cells.length == 2 && model.isVertex(cells[0]) && model.isVertex(cells[1]) &&
-			graph.getMovableCells(cells).length == 2)
+		if (cells.length == 2)
 		{
-			var geo1 = graph.getCellGeometry(cells[0]);
-			var geo2 = graph.getCellGeometry(cells[1]);
-
-			if (geo1 != null && geo2 != null)
-			{
-				geo1 = geo1.clone();
-				geo2 = geo2.clone();
-				
-				model.beginUpdate();
-				try
-				{
-					model.setGeometry(cells[0], geo2);
-					model.setGeometry(cells[1], geo1);
-				}
-				finally
-				{
-					model.endUpdate();
-				}
-			}
+			graph.swapShapes(cells[0], cells[1]);
 		}
 	});
 
@@ -710,6 +690,11 @@ Actions.prototype.init = function()
 		    	}
 				
 				graph.removeCellsFromParent(temp);
+
+				if (temp.length > 0)
+				{
+					graph.scrollCellToVisible(temp[0]);
+				}
 			}
 		}
 	});
@@ -780,7 +765,7 @@ Actions.prototype.init = function()
 		{
 			var value = graph.getLinkForCell(cell) || '';
 			
-			ui.showLinkDialog(value, mxResources.get('apply'), function(link, docs, linkTarget)
+			ui.showLinkDialog(value, mxResources.get('ok'), function(link, docs, linkTarget)
 			{
 				link = mxUtils.trim(link);
     			graph.setLinkForCell(cell, (link.length > 0) ? link : null);
@@ -804,7 +789,7 @@ Actions.prototype.init = function()
 	{
 		if (graph.isEnabled() && !graph.isCellLocked(graph.getDefaultParent()))
 		{
-			ui.showLinkDialog('', mxResources.get('insert'), function(link, docs, linkTarget)
+			ui.showLinkDialog('', mxResources.get('ok'), function(link, docs, linkTarget)
 			{
 				link = mxUtils.trim(link);
 				
@@ -891,7 +876,7 @@ Actions.prototype.init = function()
 				
 				var selState = graph.cellEditor.saveSelection();
 				
-				ui.showLinkDialog(oldValue, mxResources.get('apply'), mxUtils.bind(this, function(value)
+				ui.showLinkDialog(oldValue, mxResources.get('ok'), mxUtils.bind(this, function(value)
 				{
 		    		graph.cellEditor.restoreSelection(selState);
 

@@ -47,7 +47,7 @@ App = function(editor, container, lightbox)
 						'-mime_' + file.desc.mimeType;
 				}
 
-				EditorUi.logEvent(evt);
+				// EditorUi.logEvent(evt);
 			}
 		});
 	}
@@ -323,7 +323,6 @@ App.pluginRegistry = {'4xAKTrabTpTzahoLthkwPNUn': 'plugins/explore.js',
 	'ac148': 'plugins/cConf-1-4-8.js', 'ac148cmnt': 'plugins/cConf-comments.js', 
 	'nxtcld': 'plugins/nextcloud.js',
 	'monday': 'plugins/monday.js',
-	'voice': 'plugins/voice.js',
 	'tips': 'plugins/tooltips.js', 'svgdata': 'plugins/svgdata.js',
 	'number': 'plugins/number.js', 'sql': 'plugins/sql.js',
 	'props': 'plugins/props.js', 'text': 'plugins/text.js',
@@ -331,14 +330,12 @@ App.pluginRegistry = {'4xAKTrabTpTzahoLthkwPNUn': 'plugins/explore.js',
 	'trees': 'plugins/trees/trees.js', 'import': 'plugins/import.js',
 	'replay': 'plugins/replay.js', 'anon': 'plugins/anonymize.js',
 	'tr': 'plugins/trello.js', 'f5': 'plugins/rackF5.js',
-	'tickets': 'plugins/tickets.js', 'flow': 'plugins/flow.js',
 	'webcola': 'plugins/webcola/webcola.js', 'rnd': 'plugins/random.js',
 	'page': 'plugins/page.js', 'gd': 'plugins/googledrive.js',
 	'tags': 'plugins/tags.js'};
 
 App.publicPlugin = [
 	'ex',
-	'voice',
 	'tips',
 	'svgdata',
 	'number',
@@ -351,8 +348,6 @@ App.publicPlugin = [
 //	'import',
 	'replay',
 	'anon',
-	'tickets',
-	'flow',
 	'webcola',
 //	'rnd', 'page', 'gd',
 	'tags'
@@ -714,7 +709,7 @@ App.main = function(callback, createUi)
 				{
 					var content = mxUtils.getTextContent(scripts[0]);
 					
-					if (CryptoJS.MD5(content).toString() != '3428184eed5811f9c1458f703cb2806b')
+					if (CryptoJS.MD5(content).toString() != '97d48990b1ef6de28697d2cc7083ca53')
 					{
 						console.log('Change bootstrap script MD5 in the previous line:', CryptoJS.MD5(content).toString());
 						alert('[Dev] Bootstrap script change requires update of CSP');
@@ -1637,7 +1632,7 @@ App.prototype.init = function()
 					{
 						this.updateUserElement();
 						this.restoreLibraries();
-						this.checkLicense();
+						// this.checkLicense();
 					}))
 					
 					// Notifies listeners of new client
@@ -1836,6 +1831,8 @@ App.prototype.init = function()
 
 App.logAncestorFrames = function()
 {
+	return;
+
 	try
 	{
 		if (window.location.ancestorOrigins && window.location.hostname &&
@@ -1927,7 +1924,7 @@ App.prototype.sanityCheck = function()
 				'-mime_' + file.desc.mimeType;
 		}
 			
-		EditorUi.logEvent(evt);
+		// EditorUi.logEvent(evt);
 
 		var msg = mxResources.get('ensureDataSaved');
 		
@@ -1955,7 +1952,7 @@ App.prototype.sanityCheck = function()
 				this.stopSanityCheck();
 				this.actions.get((this.mode == null || !file.isEditable()) ?
 					'saveAs' : 'save').funct();
-			}), null, null, 360, 120, null, mxUtils.bind(this, function()
+			}), null, null, 360, 140, null, mxUtils.bind(this, function()
 			{
 				this.scheduleSanityCheck();
 			}));
@@ -1997,17 +1994,6 @@ App.prototype.getPusher = function()
 	}
 	
 	return this.pusher;
-};
-
-/**
- * Shows a footer to download the desktop version once per session.
- */
-App.prototype.showNameChangeBanner = function()
-{
-	this.showBanner('DiagramsFooter', 'draw.io is now diagrams.net', mxUtils.bind(this, function()
-	{
-		this.openLink('https://www.drawio.com/blog/move-diagrams-net');
-	}));
 };
 
 /**
@@ -2257,7 +2243,7 @@ App.prototype.updateActionStates = function()
 /**
  * Adds the specified entry to the recent file list in local storage
  */
-App.prototype.addRecent = function(entry, type)
+App.prototype.addRecent = function(entry, type, max)
 {
 	if (isLocalStorage && localStorage != null)
 	{
@@ -2282,8 +2268,9 @@ App.prototype.addRecent = function(entry, type)
 		
 		if (recent != null)
 		{
+			max = (max != null) ? max : 10;
 			recent.unshift(entry);
-			recent = recent.slice(0, 10);
+			recent = recent.slice(0, max);
 			localStorage.setItem('.recent' + type, JSON.stringify(recent));
 		}
 	}
@@ -2360,6 +2347,8 @@ App.prototype.onBeforeUnload = function()
 			}
 			else if (file.isModified())
 			{
+				this.logIfModified(file);
+
 				return mxResources.get('allChangesLost');
 			}
 			else
@@ -2378,31 +2367,29 @@ App.prototype.onBeforeUnload = function()
  */
 App.prototype.updateDocumentTitle = function()
 {
-	if (!this.editor.graph.isLightboxView())
-	{
-		var title = this.editor.appName;
-		var file = this.getCurrentFile();
+	var title = this.editor.appName;
+	var file = this.getCurrentFile();
 
-		if (file != null && Editor.currentTheme == 'simple' &&
-			this.pages != null && this.currentPage != null)
-		{
-			title = this.getShortPageName(this.currentPage);
-		}
-		else if (this.isOfflineApp())
-		{
-			title += ' app';
-		}
-		
-		if (file != null)
-		{
-			var filename = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
-			title = filename + ' - ' + title;
-		}
-		
-		if (document.title != title)
-		{
-			document.title = title;
-		}
+	if (file != null && (this.editor.graph.isLightboxView() ||
+		Editor.currentTheme == 'simple') &&
+		this.pages != null && this.currentPage != null)
+	{
+		title = this.getShortPageName(this.currentPage);
+	}
+	else if (this.isOfflineApp())
+	{
+		title += ' app';
+	}
+	
+	if (file != null)
+	{
+		var filename = (file.getTitle() != null) ? file.getTitle() : this.defaultFilename;
+		title = filename + ' - ' + title;
+	}
+	
+	if (document.title != title)
+	{
+		document.title = title;
 	}
 };
 
@@ -3128,13 +3115,6 @@ App.prototype.start = function()
 							file.saveDraft();
 						}
 					}));
-				}
-
-				if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && !this.isOfflineApp() &&
-					urlParams['open'] == null && /www\.draw\.io$/.test(window.location.hostname) &&
-					(!this.editor.chromeless || this.editor.editable))
-				{
-					this.showNameChangeBanner();
 				}
 			}
 			catch (e)
@@ -4148,6 +4128,7 @@ App.prototype.pickLibrary = function(mode)
 					try
 					{
 						this.loadLibrary(optionalFile);
+						this.showSidebar();
 					}
 					catch (e)
 					{
@@ -4165,6 +4146,7 @@ App.prototype.pickLibrary = function(mode)
 							try
 							{
 								this.loadLibrary(file);
+								this.showSidebar();
 							}
 							catch (e)
 							{
@@ -4200,7 +4182,9 @@ App.prototype.pickLibrary = function(mode)
 							{
 								try
 								{
-									this.loadLibrary(new LocalLibrary(this, e.target.result, file.name));
+									this.loadLibrary(new LocalLibrary(this,
+										e.target.result, file.name));
+									this.showSidebar();
 								}
 								catch (e)
 								{
@@ -4259,8 +4243,10 @@ App.prototype.pickLibrary = function(mode)
 		{
 			try
 			{
-				this.loadLibrary((mode == App.MODE_BROWSER) ? new StorageLibrary(this, xml, filename) :
+				this.loadLibrary((mode == App.MODE_BROWSER) ?
+					new StorageLibrary(this, xml, filename) :
 					new LocalLibrary(this, xml, filename));
+				this.showSidebar();
 			}
 			catch (e)
 			{
@@ -4621,7 +4607,7 @@ App.prototype.saveFile = function(forceDialog, success)
 
 			var allowTab = !mxClient.IS_IOS || !navigator.standalone;
 
-			if (urlParams['save-dialog'] == '1')
+			if (urlParams['save-dialog'] != '0')
 			{
 				var dlg = new SaveDialog(this, filename, mxUtils.bind(this, function(input, mode, folderId)
 				{
@@ -4629,7 +4615,7 @@ App.prototype.saveFile = function(forceDialog, success)
 					this.hideDialog();
 				}), (allowTab) ? null : ['_blank']);
 
-				this.showDialog(dlg.container, 420, 136, true, false, mxUtils.bind(this, function()
+				this.showDialog(dlg.container, 420, 150, true, false, mxUtils.bind(this, function()
 				{
 					this.hideDialog();
 				}));
@@ -6998,20 +6984,20 @@ App.prototype.updateHeader = function()
 			this.appIconClicked(evt);
 		}));
 		
-		if (!Editor.enableCssDarkMode)
+		var updateBackground = mxUtils.bind(this, function()
 		{
-			var updateBackground = mxUtils.bind(this, function()
+			if (Editor.enableCssDarkMode)
+			{
+				this.appIcon.style.backgroundColor = '#f08705';
+			}
+			else
 			{
 				this.appIcon.style.backgroundColor = (!Editor.isDarkMode()) ? '#f08705' : '';
-			});
+			}
+		});
 
-			this.addListener('darkModeChanged', updateBackground);
-			updateBackground();
-		}
-		else
-		{
-			this.appIcon.style.backgroundColor = '#f08705';
-		}
+		this.addListener('darkModeChanged', updateBackground);
+		updateBackground();
 
 		mxUtils.setPrefixedStyle(this.appIcon.style, 'transition', 'all 125ms linear');
 
@@ -7152,9 +7138,6 @@ App.prototype.updateHeader = function()
 		
 		mxEvent.addListener(this.toggleFormatElement, 'click', mxUtils.bind(this, function(evt)
 		{
-			EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
-				action: 'format'});
-		
 			this.actions.get('format').funct();
 			mxEvent.consume(evt);
 		}));
@@ -7192,9 +7175,6 @@ App.prototype.updateHeader = function()
 		{
 			var visible = this.fullscreenMode;
 
-			EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
-				action: 'fullscreen' , currentstate: visible});
-			
 			if (Editor.currentTheme != 'atlas' && urlParams['embed'] != '1')
 			{
 				this.toggleCompactMode(visible);
@@ -7250,8 +7230,6 @@ App.prototype.updateHeader = function()
 			// Toggles compact mode
 			mxEvent.addListener(this.toggleElement, 'click', mxUtils.bind(this, function(evt)
 			{
-				EditorUi.logEvent({category: 'TOOLBAR-ACTION-',
-					action: 'toggleUI'});
 				this.toggleCompactMode();
 				mxEvent.consume(evt);
 			}));
@@ -7457,11 +7435,7 @@ App.prototype.updateUserElementIcon = function()
 				icon.style.left = '16px';
 				icon.style.width = '12px';
 				icon.style.height = '12px';
-
-				if (Editor.enableCssDarkMode)
-				{
-					icon.className = 'geAdaptiveAsset';
-				}
+				icon.className = 'geAdaptiveAsset';
 
 				var err = file.getRealtimeError();
 				var state = file.getRealtimeState();
