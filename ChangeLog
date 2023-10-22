@@ -1,3 +1,43 @@
+19-OCT-2023: 22.0.6
+
+- [conf cloud] Fixes Gliffy import hanging when import API fails [DID-9752]
+- [conf cloud] Adds support for importing short links with special characters [DID-9687]
+
+18-OCT-2023: 22.0.5
+
+- [conf cloud] Adds support for importing short links less than 6 characters [DID-9687]
+- [conf cloud] Fixes direct editing in blogposts [DID-9702]
+- [conf cloud] Fixes fullscreen (lightbox) view of diagrams in page templates [DID-9690]
+
+06-OCT-2023: 22.0.4
+
+- Adds Emoji shape support
+
+05-OCT-2023: 22.0.3
+
+- Fixes possible NPE in clonePages error handler
+- [vsdx] Stops using default theme when theme index not found [DID-9622]
+- Fixes tags dialog icons in dark mode [drawio-3910]
+
+03-OCT-2023: 22.0.2
+
+- Fixes new save dialog for SharePoint [drawio-3900]
+- Fixes copy/paste after dialog was shown [drawio-3903]
+
+02-OCT-2023: 22.0.1
+
+- Ignores selection for nested cells with part style
+- Adds salesforce icons [drawio-2793]
+
+28-SEP-2023: 22.0.0
+
+- Adds DRAWIO_SERVER_URL as an additional URL to DRAWIO_BASE_URL. BASE_URL used to indicate
+	the URL both the back-end and static code were delivered on. SERVER_URL now provides a 
+	way to delivery on one URL and server the back-end functions on a different URL. 
+	By default the server URL value is blank.
+- Fixes search for uncompressed shapes, result order
+- Fixes dialog stack order [drawio-3883]
+
 24-SEP-2023: 21.8.2
 
 - Confirm escape key for insert layout [drawio-3880]

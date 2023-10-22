@@ -1255,6 +1255,7 @@ var CreateGraphDialog = function(editorUi, title, type)
 		var container = document.createElement('div');
 		container.style.position = 'relative';
 		container.style.border = '1px solid gray';
+		container.style.boxSizing = 'border-box';
 		container.style.width = '100%';
 		container.style.height = '360px';
 		container.style.overflow = 'hidden';
@@ -3670,9 +3671,17 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 				{
 					if (loading && editorUi.sidebar.currentElt == elt)
 					{
-						showTooltip(xml, mxEvent.getClientX(evt),
-							mxEvent.getClientY(evt), elt,
-							tooltipTitle);
+						try
+						{
+							showTooltip(xml, mxEvent.getClientX(evt),
+								mxEvent.getClientY(evt), elt,
+								tooltipTitle);
+						}
+						catch (e)
+						{
+							editorUi.sidebar.currentElt = null;
+							editorUi.handleError(e);
+						}
 					}
 					
 					loading = false;
@@ -4773,7 +4782,6 @@ var SaveDialog = function(editorUi, title, saveFn, disabledModes, data, mimeType
 		return option;
 	};
 
-	var pickFolderOption = null;
 	var defaultValue = null;
 
 	function pickFolder(mode)
@@ -4788,7 +4796,8 @@ var SaveDialog = function(editorUi, title, saveFn, disabledModes, data, mimeType
 			}
 			else if (mode == App.MODE_ONEDRIVE && result.value != null && result.value.length > 0)
 			{
-				entry = {mode: mode, path: result.value[0].name, id: result.value[0].id};
+				entry = {mode: mode, path: result.value[0].name,
+					id: OneDriveFile.prototype.getIdOf(result.value[0])};
 			}
 			else if ((mode == App.MODE_GITHUB || mode == App.MODE_GITLAB) &&
 				result != null && result.length > 0)
@@ -4803,10 +4812,19 @@ var SaveDialog = function(editorUi, title, saveFn, disabledModes, data, mimeType
 
 				var option = addStorageEntry(entry.mode, entry.path, entry.id, true);
 				storageSelect.innerHTML = '';
-				pickFolderOption = null;
 				entries = {};
-				storageSelect.value = option.value;
 				addStorageEntries();
+
+				// Selects new entry
+				var prev = storageSelect.selectedIndex;
+				storageSelect.value = option.value;
+
+				// Checks if entry exists
+				// LATER: Pass value to select to addStorageEntries
+				if (storageSelect.selectedIndex < 0)
+				{
+					storageSelect.selectedIndex = prev;
+				}
 			}
 		}, true, true, true, true);
 	};
@@ -4905,15 +4923,15 @@ var SaveDialog = function(editorUi, title, saveFn, disabledModes, data, mimeType
 			storageSelect.value = prev;
 		}
 
-		// Avoids folder picker on initial state
+		// Adds title to avoid entries that execute an action
 		if (storageSelect.value.substring(0, 11) == 'pickFolder-' ||
 			storageSelect.value == 'reset')
 		{
-			pickFolderOption = document.createElement('option');
-			pickFolderOption.setAttribute('value', '');
-			pickFolderOption.setAttribute('selected', 'selected');
-			mxUtils.write(pickFolderOption, mxResources.get('pickFolder') + '...');
-			storageSelect.insertBefore(pickFolderOption, storageSelect.firstChild);
+			var option = document.createElement('option');
+			option.setAttribute('value', '');
+			option.setAttribute('selected', 'selected');
+			mxUtils.write(option, mxResources.get('pickFolder') + '...');
+			storageSelect.insertBefore(option, storageSelect.firstChild);
 		}
 		
 		defaultValue = storageSelect.value;
