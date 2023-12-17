@@ -170,7 +170,8 @@ EditorUi = function(editor, container, lightbox)
 					'cells', [cell], 'force', true));
 				
 				// Blocks update of default style with style changes
-				// once the it was set using this function
+				// and allows change of edge style if default style
+				// was changed using this function via app UI
 				if (graph.getModel().isEdge(cell))
 				{
 					edgeStyleIgnored = true;
@@ -334,9 +335,13 @@ EditorUi = function(editor, container, lightbox)
 						var key = appliedStyles[j];
 						var styleValue = current[key];
 	
-						if (styleValue != null && key != 'edgeStyle' && (key != 'shape' || edge))
+						// Edge style is only applied if user assigned a
+						// default style using the respective button but
+						// not if the edge style is globally configured
+						if (styleValue != null && (key != 'edgeStyle' ||
+							edgeStyleIgnored) && (key != 'shape' || edge))
 						{
-							// Special case: Connect styles are not applied here but in the connection handler
+							// Special case: Some styles are not applied here but in the connection handler
 							if (!edge || applyAll || mxUtils.indexOf(ignoredEdgeStyles, key) < 0)
 							{
 								newStyle = mxUtils.setStyle(newStyle, key, styleValue);
@@ -5643,21 +5648,22 @@ EditorUi.prototype.ctrlEnter = function()
 /**
  * Display a color dialog.
  */
-EditorUi.prototype.pickColor = function(color, apply)
+EditorUi.prototype.pickColor = function(color, apply, defaultColor, defaultColorValue)
 {
 	var graph = this.editor.graph;
 	var selState = graph.cellEditor.saveSelection();
 	var h = 230 + ((Math.ceil(ColorDialog.prototype.presetColors.length / 12) +
 		Math.ceil(ColorDialog.prototype.defaultColors.length / 12)) * 17);
 	
-	var dlg = new ColorDialog(this, mxUtils.rgba2hex(color) || 'none', function(color)
+	var dlg = new ColorDialog(this, (color != 'default') ?
+		(mxUtils.rgba2hex(color) || 'none') : color, function(color)
 	{
 		graph.cellEditor.restoreSelection(selState);
 		apply(color);
 	}, function()
 	{
 		graph.cellEditor.restoreSelection(selState);
-	});
+	}, defaultColor, defaultColorValue);
 	
 	this.showDialog(dlg.container, 230, h, true, false);
 	dlg.init();

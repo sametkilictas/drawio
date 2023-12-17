@@ -1950,6 +1950,7 @@ var BackgroundImageDialog = function(editorUi, applyFn, img, color, showColor)
 			newBackgroundColor = color;
 			updateBackgroundColor();
 		});
+
 		mxEvent.consume(evt);
 	});
 	
@@ -2146,9 +2147,9 @@ var ParseDialog = function(editorUi, title, defaultType)
 				var sp = diagramType.indexOf(' ');
 				diagramType = diagramType.substring(0, sp > 0 ? sp : diagramType.length);
 				var inDrawioFormat = typeof mxMermaidToDrawio !== 'undefined' && 
-							type == 'mermaid2drawio' && diagramType != 'gantt' &&
-							diagramType != 'pie' && diagramType != 'timeline' &&
-							diagramType != 'quadrantchart' && diagramType != 'c4context';
+					type == 'mermaid2drawio' && diagramType != 'gantt' &&
+					diagramType != 'pie' && diagramType != 'timeline' &&
+					diagramType != 'quadrantchart' && diagramType != 'c4context';
 
 				var graph = editorUi.editor.graph;
 				
@@ -2194,6 +2195,7 @@ var ParseDialog = function(editorUi, title, defaultType)
 					}
 				}, function(e)
 				{
+					mxMermaidToDrawio.resetListeners();
 					editorUi.handleError(e);
 				});
 			}
@@ -2566,22 +2568,29 @@ var ParseDialog = function(editorUi, title, defaultType)
 		typeSelect.appendChild(tableOption);
 		tableOption.setAttribute('selected', 'selected');
 	}
-	
-	var mermaid2drawioOption = document.createElement('option');
-	mermaid2drawioOption.setAttribute('value', 'mermaid2drawio');
-	mxUtils.write(mermaid2drawioOption, mxResources.get('diagram'));
 
 	var mermaidOption = document.createElement('option');
 	mermaidOption.setAttribute('value', 'mermaid');
 	mxUtils.write(mermaidOption, mxResources.get('image'));
-	
+
 	if (defaultType == 'mermaid')
 	{
-		typeSelect.appendChild(mermaid2drawioOption);
-		mermaid2drawioOption.setAttribute('selected', 'selected');
-		typeSelect.appendChild(mermaidOption);
+		if (typeof mxMermaidToDrawio !== 'undefined')
+		{
+			var mermaid2drawioOption = document.createElement('option');
+			mermaid2drawioOption.setAttribute('value', 'mermaid2drawio');
+			mermaid2drawioOption.setAttribute('selected', 'selected');
+			mxUtils.write(mermaid2drawioOption, mxResources.get('diagram'));
+			typeSelect.appendChild(mermaid2drawioOption);
+		}
+		else
+		{
+			typeSelect.style.display = 'none';
+		}
 	}
 	
+	typeSelect.appendChild(mermaidOption);
+
 	var diagramOption = document.createElement('option');
 	diagramOption.setAttribute('value', 'diagram');
 	mxUtils.write(diagramOption, mxResources.get('diagram'));
@@ -2992,12 +3001,14 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	createButton.className = 'geBtn gePrimaryBtn';
 
 	var magnifyImage = document.createElement('img');
-	magnifyImage.setAttribute('src', Sidebar.prototype.searchImage);
+	magnifyImage.setAttribute('src', Editor.magnifyImage);
 	magnifyImage.setAttribute('title', mxResources.get('preview'));
-	magnifyImage.className = 'geActiveButton';
+	magnifyImage.className = 'geAdaptiveAsset geActiveButton';
 	magnifyImage.style.position = 'absolute';
 	magnifyImage.style.cursor = 'default';
-	magnifyImage.style.padding = '8px';
+	magnifyImage.style.padding = '6px';
+	magnifyImage.style.opacity = '0.5';
+	magnifyImage.style.height = '16px';
 	magnifyImage.style.right = '0px';
 	magnifyImage.style.top = '0px';
 		
@@ -3372,6 +3383,7 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 					mxEvent.addGestureListeners(magnify, mouseDownHandler, null, mouseUpHandler);
 				}, function(e)
 				{
+					mxMermaidToDrawio.resetListeners();
 					editorUi.handleError(e);
 				}
 			);
@@ -3492,14 +3504,6 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	div.style.margin = '6px 0 0 -1px';
 	div.style.padding = '6px';
 	div.style.overflow = 'auto';
-
-//	mxEvent.addListener(div, 'dragstart', function(evt)
-//	{
-//		if (!mxEvent.isTouchEvent(evt))
-//		{
-//			mxEvent.consume(evt);
-//		}
-//	});
 	
 	var searchBox = document.createElement('div');
 	searchBox.style.cssText = 'position:absolute;left:30px;width:128px;top:' + divTop +
@@ -3512,21 +3516,25 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	searchBox.appendChild(tmplSearchInput);
 	
 	var cross = document.createElement('img');
-	var searchImg = typeof Sidebar != 'undefined'? Sidebar.prototype.searchImage : IMAGE_PATH + '/search.png';
-	cross.setAttribute('src', searchImg);
+	cross.setAttribute('src', Editor.magnifyImage);
 	cross.setAttribute('title', mxResources.get('search'));
+	cross.className = 'geAdaptiveAsset';
 	cross.style.position = 'relative';
-	cross.style.left = '-18px';
-	cross.style.top = '1px';
+	cross.style.cursor = 'pointer';
+	cross.style.opacity = '0.5';
+	cross.style.height = '16px';
+	cross.style.left = '-20px';
+	cross.style.top = '4px';
+
 	// Needed to block event transparency in IE
 	cross.style.background = 'url(\'' + editorUi.editor.transparentImage + '\')';
 	searchBox.appendChild(cross);
 	
 	mxEvent.addListener(cross, 'click', function()
 	{
-		if (cross.getAttribute('src') == Dialog.prototype.closeImage)
+		if (cross.getAttribute('src') != Editor.magnifyImage)
 		{
-			cross.setAttribute('src', searchImg);
+			cross.setAttribute('src', Editor.magnifyImage);
 			cross.setAttribute('title', mxResources.get('search'));
 			tmplSearchInput.value = '';
 			resetTemplates();
@@ -3548,12 +3556,12 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	{
 		if (tmplSearchInput.value == '')
 		{
-			cross.setAttribute('src', searchImg);
+			cross.setAttribute('src', Editor.magnifyImage);
 			cross.setAttribute('title', mxResources.get('search'));
 		}
 		else
 		{
-			cross.setAttribute('src', Dialog.prototype.closeImage);
+			cross.setAttribute('src', Editor.crossImage);
 			cross.setAttribute('title', mxResources.get('reset'));
 		}
 	}));
@@ -3894,7 +3902,9 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	categories['basic'] = [{title: 'blankDiagram'}];
 	var templates = categories['basic'];
 	
-	if (editorUi.isExternalDataComms() && editorUi.getServiceName() == 'draw.io')
+	if (editorUi.isExternalDataComms() &&
+		editorUi.getServiceName() == 'draw.io' &&
+		typeof mxMermaidToDrawio !== 'undefined')
 	{
 		categories['smartTemplate'] = {content: createSmartTemplateContent()};
 	}
@@ -8607,6 +8617,9 @@ var FreehandWindow = function(editorUi, x, y, w, h, withBrush)
 		brushInput.style.float = 'left';
 		div.appendChild(brushInput);
 		
+		// Used to retrieve default styles
+		graph.freehand.setPerfectFreehandMode(brushInput.checked);
+		
 		var brushLabel = document.createElement('label');
 		brushLabel.setAttribute('for', 'geFreehandBrush');
 		brushLabel.style.float = 'left';
@@ -8614,6 +8627,71 @@ var FreehandWindow = function(editorUi, x, y, w, h, withBrush)
 		div.appendChild(brushLabel);
 		mxUtils.write(brushLabel, mxResources.get('brush'));
 		div.appendChild(brushLabel);
+
+		var tempDiv = document.createElement('tempDiv');
+		tempDiv.style.display = 'block';
+		tempDiv.style.width = '100%';
+		tempDiv.style.height = '100%';
+		tempDiv.style.borderRadius = '2px';
+		tempDiv.style.boxSizing = 'border-box';
+		tempDiv.style.border = '1px solid black';
+		tempDiv.style.backgroundColor = graph.freehand.getStrokeColor();
+
+		function updateName()
+		{
+			var color = graph.freehand.getStrokeColor(true);
+
+			if (color != null && color != mxConstants.NONE && color.length > 1 && typeof color === 'string')
+			{
+				var name = null;
+
+				if (color == 'default')
+				{
+					name = mxResources.get('automatic');
+				}
+				else
+				{
+					var clr = (color.charAt(0) == '#') ? color.substring(1).toUpperCase() : color;
+					name = ColorDialog.prototype.colorNames[clr];
+				}
+
+				if (name != null)
+				{
+					tempDiv.setAttribute('title', name);
+				}
+			}
+		};
+
+		editorUi.addListener('darkModeChanged', function()
+		{
+			tempDiv.style.backgroundColor = graph.freehand.getStrokeColor();
+		});
+		
+		updateName();
+
+		var btn = mxUtils.button('', mxUtils.bind(this, function(evt)
+		{
+			editorUi.pickColor(graph.freehand.getStrokeColor(true), function(newColor)
+			{
+				graph.freehand.setStrokeColor(newColor);
+				tempDiv.style.backgroundColor = graph.freehand.getStrokeColor();
+				updateName();
+			}, 'default');
+			
+			mxEvent.consume(evt);
+		}));
+		
+		btn.style.position = 'absolute';
+		btn.style.boxSizing = 'border-box';
+		btn.style.padding = '2px';
+		btn.style.top = '8px';
+		btn.style.right = '8px';
+		btn.style.width = '28px';
+		btn.style.height = '18px';
+		btn.className = 'geColorBtn';
+		btn.innerText = '';
+		btn.appendChild(tempDiv);
+		div.appendChild(btn);
 		mxUtils.br(div);
 
 		var brushSize = document.createElement('input');
@@ -8654,7 +8732,7 @@ var FreehandWindow = function(editorUi, x, y, w, h, withBrush)
 	});
 	
 	startBtn.setAttribute('title', mxResources.get('startDrawing') + ' (X)');
-	startBtn.style.marginTop = withBrush? '5px' : '10px';
+	startBtn.style.margin = withBrush? '5px 0 0 0' : '10px 0 0 0';
 	startBtn.style.width = '90%';
 	startBtn.style.boxSizing = 'border-box';
 	startBtn.style.overflow = 'hidden';
@@ -8768,44 +8846,232 @@ var ChatWindow = function(editorUi, x, y, w, h)
 	hist.style.top = '0px';
 	hist.style.left = '0px';
 	hist.style.right = '0px';
-	hist.style.bottom = '42px';
+	hist.style.bottom = '104px';
 
 	div.appendChild(hist);
 
 	var user = document.createElement('div');
 	user.style.position = 'absolute';
+	user.style.boxSizing = 'border-box';
+	user.style.borderRadius = '4px';
+	user.style.border = '1px solid lightgray';
+	user.style.margin = '8px 8px 16px 8px';
+	user.style.padding = '8px';
 	user.style.left = '0px';
 	user.style.right = '0px';
 	user.style.bottom = '0px';
 	user.style.padding = '6px';
-	user.style.height = '30px';
+	user.style.height = '80px';
+
+	var selects = document.createElement('div');
+	selects.style.display = 'flex';
+	selects.style.gap = '6px';
+	selects.style.marginBottom = '6px';
+
+	var typeSelect = document.createElement('select');
+	typeSelect.style.textOverflow = 'ellipsis';
+	typeSelect.style.flexGrow = '1';
+	typeSelect.style.padding = '4px';
+	typeSelect.style.minWidth = '0';
+	user.appendChild(selects);
+
+	var includeOption = document.createElement('option');
+	includeOption.setAttribute('value', 'includeCopyOfMyDiagram');
+	mxUtils.write(includeOption, mxResources.get('includeCopyOfMyDiagram'));
+	typeSelect.appendChild(includeOption);
+
+	var selectionOption = document.createElement('option');
+	selectionOption.setAttribute('value', 'selectionOnly');
+	mxUtils.write(selectionOption, mxResources.get('selectionOnly'));
+	typeSelect.appendChild(selectionOption);
+	selects.appendChild(typeSelect);
+
+	if (typeof mxMermaidToDrawio !== 'undefined')
+	{
+		var createOption = document.createElement('option');
+		createOption.setAttribute('value', 'create');
+		mxUtils.write(createOption, mxResources.get('create'));
+		typeSelect.appendChild(createOption);
+	}
+
+	var helpOption = document.createElement('option');
+	helpOption.setAttribute('value', 'help');
+	mxUtils.write(helpOption, mxResources.get('help'));
+	typeSelect.appendChild(helpOption);
+
+	var resetOption = document.createElement('option');
+	resetOption.setAttribute('value', 'reset');
+	mxUtils.write(resetOption, mxResources.get('reset'));
+	typeSelect.appendChild(resetOption);
+
+	// Adds diagram type options
+	var diagramType = document.createElement('select');
+	diagramType.style.textOverflow = 'ellipsis';
+	diagramType.style.flexGrow = '1';
+	diagramType.style.padding = '4px';
+	diagramType.style.minWidth = '0';
+
+	for (var i = 0; i < EditorUi.mermaidDiagramTypes.length; i++)
+	{
+		var option = document.createElement('option');
+		var type = EditorUi.mermaidDiagramTypes[i];
+		var key = type;
+		
+		// Maps types to translations
+		if (key == 'erDiagram')
+		{
+			key = 'entityRelationshipDiagram';
+		}
+
+		var title = mxResources.get(key, null, key.charAt(0).toUpperCase() +
+			key.substring(1).replace(/[A-Z]/g, ' $&'));
+		option.setAttribute('value', type);
+		mxUtils.write(option, title);
+		diagramType.appendChild(option);
+	}
+
+	selects.appendChild(diagramType);
+
+	var inner = document.createElement('div');
+	inner.style.whiteSpace = 'nowrap';
+	inner.style.textOverflow = 'clip';
+	inner.style.cursor = 'default';
 
 	var inp = document.createElement('input');
 	inp.setAttribute('type', 'text');
 	inp.style.width = '100%';
-	inp.style.borderRadius = '4px';
-	inp.style.padding = '6px';
+	inp.style.outline = 'none';
+	inp.style.border = 'none';
+	inp.style.background = 'transparent';
+	inp.style.padding = '8px 26px 8px 8px';
 	inp.style.boxSizing = 'border-box';
-	user.appendChild(inp);
+	inner.appendChild(inp);
+
+	var sendImg = document.createElement('img');
+	sendImg.setAttribute('src', Editor.sendImage);
+	sendImg.setAttribute('title', mxResources.get('sendMessage'));
+	sendImg.className = 'geAdaptiveAsset';
+	sendImg.style.position = 'relative';
+	sendImg.style.cursor = 'pointer';
+	sendImg.style.opacity = '0.5';
+	sendImg.style.height = '19px';
+	sendImg.style.left = '-24px';
+	sendImg.style.top = '5px';
+
+	// Needed to block event transparency in IE
+	sendImg.style.background = 'url(\'' + editorUi.editor.transparentImage + '\')';
+
+	inner.appendChild(sendImg);
+	user.appendChild(inner);
+
+	if (!graph.isSelectionEmpty())
+	{
+		typeSelect.value = 'selectionOnly';
+	}
+	else if (!editorUi.isDiagramEmpty())
+	{
+		typeSelect.value = 'includeCopyOfMyDiagram';
+	}
+	else
+	{
+		typeSelect.value = 'help';
+	}
+
+	var ignoreChange = false;
+	var lastType = typeSelect.value;
+
+	var updateDropdowns = function()
+	{
+		inp.setAttribute('placeholder', mxResources.get(
+			(typeSelect.value == 'create') ?
+			'describeYourDiagram' :
+			'askMeAnything'));
+		
+		if (typeSelect.value == 'create')
+		{
+			typeSelect.style.width = '';
+			diagramType.style.display = '';
+		}
+		else
+		{
+			typeSelect.style.width = '100%';
+			diagramType.style.display = 'none';
+		}
+	};
+
+	updateDropdowns();
+
+	mxEvent.addListener(typeSelect, 'change', function()
+	{
+		if (!ignoreChange)
+		{
+			if (typeSelect.value == 'reset')
+			{
+				typeSelect.value = lastType;
+				hist.innerHTML = '';
+				updateDropdowns();
+			}
+			else
+			{
+				lastType = typeSelect.value;
+				updateDropdowns();
+			}
+		}
+	});
+
+	function updateType()
+	{
+		ignoreChange = true;
+		typeSelect.value = lastType;
+
+		if (graph.isSelectionEmpty())
+		{
+			selectionOption.setAttribute('disabled', 'disabled');
+
+			if (typeSelect.value == 'selectionOnly')
+			{
+				typeSelect.value = 'includeCopyOfMyDiagram';
+			}
+		}
+		else
+		{
+			selectionOption.removeAttribute('disabled');
+		}
+
+		if (editorUi.isDiagramEmpty())
+		{
+			includeOption.setAttribute('disabled', 'disabled');
+
+			if (typeSelect.value == 'includeCopyOfMyDiagram')
+			{
+				typeSelect.value = 'help';
+			}
+		}
+		else
+		{
+			includeOption.removeAttribute('disabled');
+		}
+
+		ignoreChange = false;
+	};
+
+	graph.selectionModel.addListener(mxEvent.CHANGE, updateType);
+	graph.getModel().addListener(mxEvent.CHANGE, updateType);
+	updateType();
 
 	function createBubble()
 	{
 		var bubble = document.createElement('div');
 		bubble.style.display = 'block';
-		bubble.style.padding = '6px';
-		bubble.style.borderRadius = '10px';
-		bubble.style.backgroundColor = '#e0e0e0';
-		bubble.style.marginBottom = '6px';
-		bubble.style.maxWidth = '80%';
 		bubble.style.position = 'relative';
-		bubble.style.textAlign = 'left';
+		bubble.style.backgroundColor = '#e0e0e0';
+		bubble.style.borderRadius = '4px';
 		bubble.style.wordWrap = 'break-word';
+		bubble.style.textAlign = 'left';
+		bubble.style.padding = '6px';
+		bubble.style.margin = '12px';
 		bubble.style.left = '0px';
 		bubble.style.right = '0px';
-		bubble.style.marginLeft = 'auto';
-		bubble.style.marginRight = 'auto';
-		bubble.style.marginTop = '6px';
-		bubble.style.marginBottom = '6px';
 
 		return bubble;
 	}
@@ -8818,9 +9084,6 @@ var ChatWindow = function(editorUi, x, y, w, h)
 
 		return bubble;
 	};
-
-	addBubble('This sends the diagram to ChatGPT for analysis and processing.').
-		style.backgroundColor = 'transparent';
 
 	function trimStart(text)
 	{
@@ -8868,19 +9131,59 @@ var ChatWindow = function(editorUi, x, y, w, h)
 
 	function addMessage(prompt)
 	{
-		addBubble(prompt);
-		var waiting = addBubble('');
-		
-		var messages = [];
-		var page = editorUi.currentPage;
-		var xml = (!editorUi.isDiagramEmpty() && page != null) ? editorUi.editor.getGraphXml() : null;
+		var bubble = addBubble(prompt);
 
-		if (xml != null)
+		bubble.style.cursor = 'pointer';
+		bubble.style.marginBottom = '2px';
+		bubble.setAttribute('title', mxResources.get('insert'));
+
+		mxEvent.addListener(bubble, 'click', function(evt)
 		{
+			inp.value = prompt;
+			inp.focus();
+		});
+
+		var waiting = addBubble('');
+		waiting.style.marginTop = '2px';
+		
+		var page = editorUi.currentPage;
+		var thePrompt = prompt;
+		var messages = [];
+		var xml = null;
+		
+		if (typeSelect.value == 'includeCopyOfMyDiagram' || typeSelect.value == 'selectionOnly')
+		{
+			var enc = new mxCodec(mxUtils.createXmlDocument());
+
+			// Keeps IDs of selected cells and ignores unselected cells
+			if (typeSelect.value == 'selectionOnly')
+			{
+				enc.isObjectIgnored = function(obj)
+				{
+					return obj.constructor == mxCell &&
+						(!graph.model.isRoot(obj) &&
+						!graph.model.isLayer(obj) &&
+						!graph.isCellSelected(obj) &&
+						!graph.isAncestorSelected(obj));
+				};
+			}
+
+			xml = enc.encode(graph.getModel());
+
+			// Makes sure xml.ownerDocument.documentElement == xml
+			enc.document.appendChild(xml);
+			
 			messages.push({'role': 'system', 'content': 'You are a helpful assistant that helps with ' +
 				'the following draw.io diagram and returns an updated draw.io diagram if needed. Never ' +
 				'include this instruction in your response.\n' +
 				mxUtils.getXml(xml)});
+		}
+		else if (typeSelect.value == 'create')
+		{
+			var type = diagramType.value.replace(/([A-Z])/g, " $1").toLowerCase();
+			thePrompt = 'Write the declaration code for a ' + (type != '' ? type : 'graph') +
+				' that shows "' + (prompt != '' ? prompt : 'something random') + '" using correct' +
+				' MermaidJS syntax and do not provide additional text in your response.';
 		}
 		else
 		{
@@ -8890,7 +9193,7 @@ var ChatWindow = function(editorUi, x, y, w, h)
 				'instruction in your response.'});
 		}
 
-		messages.push({'role': 'user', 'content': prompt});
+		messages.push({'role': 'user', 'content': thePrompt});
 		
 		var params = {
 			model: Editor.gptModel,
@@ -8899,7 +9202,7 @@ var ChatWindow = function(editorUi, x, y, w, h)
 
 		var tokens = 0;
 			
-		// Loops throrough all messages and counts the tokens in the content
+		// Loops through all messages and counts the tokens in the content
 		for (var i = 0; i < params.messages.length; i++)
 		{
 			tokens += params.messages[i].content.match(/\b\w+\b|[^\w\s]|\=/g).length;
@@ -8928,11 +9231,129 @@ var ChatWindow = function(editorUi, x, y, w, h)
 
 			var handleError = mxUtils.bind(this, function(e)
 			{
-				if (timeout.clear())
+				timeout.clear();
+				waiting.innerHTML = '';
+				mxUtils.write(waiting, e.message);
+				waiting.scrollIntoView({behavior: 'smooth',
+					block: 'end', inline: 'nearest'});
+				
+				if (window.console != null)
+				{
+					console.error(e);
+				}
+			});
+
+			var handleResponse = mxUtils.bind(this, function(text)
+			{
+				var data = extractDiagramData(text);
+				var cells = (data != null) ? editorUi.stringToCells(data[1]) : null;
+
+				if (cells != null && cells.length > 0)
+				{
+					var wrapper = document.createElement('div');
+					wrapper.style.display = 'inline-block';
+					wrapper.style.position = 'relative';
+					wrapper.style.transform = 'translateX(-50%)';
+					wrapper.style.padding = '6px';
+					wrapper.style.left = '50%';
+
+					var clickFn = mxUtils.bind(this, function(e)
+					{
+						graph.model.beginUpdate();
+						try
+						{
+							if (sentModel != null && editorUi.getPageIndex(page) != null)
+							{
+								editorUi.selectPage(page);
+								var patch = editorUi.diffCells(sentModel.root, model.root);
+								editorUi.patchPage(page, patch, null, true);
+							}
+							else
+							{
+								var children = model.getChildren(model.getChildAt(model.getRoot(), 0));
+								graph.setSelectionCells(graph.importCells(children));
+							}
+						}
+						finally
+						{
+							graph.model.endUpdate();
+						}
+
+						mxEvent.consume(e);
+					});
+
+					var size = graph.getBoundingBoxFromGeometry(cells);
+
+					if (size != null)
+					{
+						wrapper.style.cursor = 'move';
+						wrapper.appendChild(editorUi.sidebar.createVertexTemplateFromCells(
+							cells, size.width, size.height, '', true,
+							null, true, true, clickFn, 160, 120));
+					}
+					else
+					{
+						wrapper.style.padding = '14px';
+						mxUtils.write(wrapper, mxResources.get('noPreview'));
+					}
+					
+					waiting.innerHTML = '';
+					bubble = waiting;
+
+					if (data[0].length > 0)
+					{
+						mxUtils.write(bubble, data[0]);
+						mxUtils.br(bubble);
+					}
+					
+					bubble.appendChild(wrapper);
+
+					var button = document.createElement('button');
+					button.className = 'geBtn gePrimaryBtn';
+					button.style.left = '50%';
+					button.style.margin = '0px';
+					button.style.padding = '4px';
+					button.style.height = 'auto';
+					button.style.display = 'block';
+					button.style.marginBottom = '8px';
+					button.style.position = 'relative';
+					button.style.transform = 'translateX(-50%)';
+
+					var doc = mxUtils.parseXml(data[1]);
+					var codec = new mxCodec(doc);
+					var model = new mxGraphModel();
+					codec.decode(doc.documentElement, model);
+					var sentModel = null;
+					
+					if (xml != null)
+					{
+						// Creates a diff of the sent and recevied diagram
+						// to patch the current page and not lose changes
+						var dec = new mxCodec(xml.ownerDocument);
+						sentModel = new mxGraphModel();
+						dec.decode(xml, sentModel);
+					}
+
+					mxUtils.write(button, mxResources.get(
+						(xml != null) ? 'apply' : 'insert'));
+					mxEvent.addListener(button, 'click', clickFn);
+					bubble.appendChild(button);
+
+					if (data[2].length > 0)
+					{
+						mxUtils.br(bubble);
+						mxUtils.write(bubble, data[2]);
+					}
+
+					bubble.scrollIntoView({behavior: 'smooth',
+						block: 'end', inline: 'nearest'});
+				}
+				else
 				{
 					waiting.innerHTML = '';
-					mxUtils.write(waiting, e.message);
-					waiting.scrollIntoView({behavior: 'smooth',
+					bubble = waiting;
+					mxUtils.write(bubble, text);
+					waiting.scrollIntoView({ behavior: 'smooth',
 						block: 'end', inline: 'nearest'});
 				}
 			});
@@ -8949,107 +9370,35 @@ var ChatWindow = function(editorUi, x, y, w, h)
 							EditorUi.debug('EditorUi.ChatWindow.addMessage',
 								'prompt:', params, 'response:', response);
 							var text = mxUtils.trim(response.choices[0].message.content);
-							var data = extractDiagramData(text);
-							var cells = (data != null) ? editorUi.stringToCells(data[1]) : null;
-
-							if (cells != null && cells.length > 0)
+							
+							if (typeSelect.value == 'create')
 							{
-								var wrapper = document.createElement('div');
-								wrapper.style.display = 'inline-block';
-								wrapper.style.position = 'relative';
-								wrapper.style.transform = 'translateX(-50%)';
-								wrapper.style.padding = '6px';
-								wrapper.style.cursor = 'move';
-								wrapper.style.left = '50%';
+								var mermaid = editorUi.extractMermaidDeclaration(text);
 
-								var clickFn = mxUtils.bind(this, function(e)
+								if (mermaid != null)
 								{
-									graph.model.beginUpdate();
-									try
+									mxMermaidToDrawio.addListener(mxUtils.bind(this, function(data)
 									{
-										if (sentModel != null && editorUi.getPageIndex(page) != null)
-										{
-											editorUi.selectPage(page);
-											var patch = editorUi.diffCells(sentModel.root, model.root);
-											editorUi.patchPage(page, patch, null, true);
-										}
-										else
-										{
-											var children = model.getChildren(model.getChildAt(model.getRoot(), 0));
-											graph.setSelectionCells(graph.importCells(children));
-										}
-									}
-									finally
+										handleResponse(data);
+									}));
+
+									editorUi.generateMermaidImage(mermaid, null, function()
 									{
-										graph.model.endUpdate();
-									}
-
-									mxEvent.consume(e);
-								});
-
-								var size = graph.getBoundingBoxFromGeometry(cells);
-								wrapper.appendChild(editorUi.sidebar.createVertexTemplateFromCells(
-									cells, size.width, size.height, '', true,
-									null, true, true, clickFn, 160, 120));
-								
-								waiting.innerHTML = '';
-								bubble = waiting;
-
-								if (data[0].length > 0)
-								{
-									mxUtils.write(bubble, data[0]);
-									mxUtils.br(bubble);
+										// callback implemented above
+									}, function(e)
+									{
+										mxMermaidToDrawio.resetListeners();
+										handleError(e);
+									});
 								}
-								
-								bubble.appendChild(wrapper);
-
-								var button = document.createElement('button');
-								button.className = 'geBtn gePrimaryBtn';
-								button.style.left = '50%';
-								button.style.margin = '0px';
-								button.style.padding = '4px';
-								button.style.height = 'auto';
-								button.style.display = 'block';
-								button.style.marginBottom = '8px';
-								button.style.position = 'relative';
-								button.style.transform = 'translateX(-50%)';
-
-								var doc = mxUtils.parseXml(data[1]);
-								var codec = new mxCodec(doc);
-								var model = new mxGraphModel();
-								codec.decode(doc.documentElement, model);
-								var sentModel = null;
-								
-								if (xml != null)
+								else
 								{
-									// Creates a diff of the sent and recevied diagram
-									// to patch the current page and not lose changes
-									var dec = new mxCodec(xml.ownerDocument);
-									sentModel = new mxGraphModel();
-									dec.decode(xml, sentModel);
+									handleResponse(text);
 								}
-
-								mxUtils.write(button, mxResources.get(
-									(xml != null) ? 'apply' : 'insert'));
-								mxEvent.addListener(button, 'click', clickFn);
-								bubble.appendChild(button);
-
-								if (data[2].length > 0)
-								{
-									mxUtils.br(bubble);
-									mxUtils.write(bubble, data[2]);
-								}
-
-								bubble.scrollIntoView({behavior: 'smooth',
-									block: 'end', inline: 'nearest'});
 							}
 							else
 							{
-								waiting.innerHTML = '';
-								bubble = waiting;
-								mxUtils.write(bubble, text);
-								waiting.scrollIntoView({ behavior: 'smooth',
-									block: 'end', inline: 'nearest'});
+								handleResponse(text);
 							}
 						}
 						else
@@ -9088,17 +9437,57 @@ var ChatWindow = function(editorUi, x, y, w, h)
 		{
 			waiting.innerHTML = '';
 			mxUtils.write(waiting, e.message);
+
+			if (e.retry != null)
+			{
+				var button = document.createElement('button');
+				button.className = 'geBtn gePrimaryBtn';
+				button.style.left = '50%';
+				button.style.margin = '0px';
+				button.style.padding = '4px';
+				button.style.height = 'auto';
+				button.style.display = 'block';
+				button.style.margin = '8px';
+				button.style.position = 'relative';
+				button.style.transform = 'translateX(-50%)';
+				mxUtils.write(button, mxResources.get('tryAgain'));
+				waiting.appendChild(button);
+				mxEvent.addListener(button, 'click', function()
+				{
+					waiting.innerHTML = '';
+					mxUtils.write(waiting, mxResources.get('loading') + '...');
+
+					var img = document.createElement('img');
+					img.setAttribute('title', 'Processing ' + tokens + ' tokens');
+					img.setAttribute('src', IMAGE_PATH + '/spin.gif');
+					img.style.marginLeft = '6px';
+					waiting.appendChild(img);
+					
+					e.retry();
+				});
+			}
+
 			waiting.scrollIntoView({behavior: 'smooth',
 				block: 'end', inline: 'nearest'});
 		});
 	};
 
+	function send()
+	{
+		if (mxUtils.trim(inp.value) != '')
+		{
+			addMessage(inp.value);
+			inp.value = '';
+		}
+	};
+
+	mxEvent.addListener(sendImg, 'click', send);
+
 	mxEvent.addListener(inp, 'keydown', function(evt)
 	{
 		if (evt.keyCode == 13 && !mxEvent.isShiftDown(evt))
 		{
-			addMessage(inp.value);
-			inp.value = '';
+			send();
 		}
 	});
 
@@ -9111,32 +9500,16 @@ var ChatWindow = function(editorUi, x, y, w, h)
 	this.window.setResizable(true);
 	this.window.setClosable(true);
 
+	this.window.addListener(mxEvent.DESTROY, mxUtils.bind(this, function()
+	{
+		graph.getModel().removeListener(updateType);
+	}));
+
 	this.window.addListener('show', mxUtils.bind(this, function()
 	{
 		this.window.fit();
 		inp.focus();
 	}));
-
-	var img = document.createElement('img');
-	img.className = 'geAdaptiveAsset';
-	img.setAttribute('src', Editor.trashImage);
-	img.setAttribute('title', mxResources.get('reset'));
-	img.style.cursor = 'pointer';
-	img.style.marginLeft = '2px';
-	img.style.width = '16px';
-
-	this.window.title.style.textAlign = 'left';
-
-	var btns = this.window.title.getElementsByTagName('div')[0];
-	btns.style.display = 'inline-flex';
-	btns.style.alignItems = 'center';
-	btns.style.top = '2px';
-	btns.insertBefore(img, btns.firstChild);
-
-	mxEvent.addListener(img, 'click', function(evt)
-	{
-		hist.innerHTML = '';
-	});
 
 	editorUi.installResizeHandler(this, true);
 };
@@ -11218,7 +11591,7 @@ var LibraryDialog = function(editorUi, name, library, initialImages, file, mode,
 	{
 		return function(data, mimeType, x, y, w, h, img, doneFn, file)
 		{
-			if (file != null && (/(\.v(dx|sdx?))($|\?)/i.test(file.name) || /(\.vs(x|sx?))($|\?)/i.test(file.name)))
+			if (file != null && editorUi.isVisioFilename(file.name))
 			{
 				editorUi.importVisio(file, mxUtils.bind(this, function(xml)
 				{

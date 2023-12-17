@@ -960,6 +960,14 @@ App.main = function(callback, createUi)
 				{
 					try
 					{
+						// Checks theme support
+						if (Editor.currentTheme != '' && Editor.currentTheme != 'kennedy' &&
+							Editor.currentTheme != 'dark' && mxUtils.indexOf(
+								Editor.themes, Editor.currentTheme) < 0)
+						{
+							Editor.currentTheme = 'kennedy';
+						}
+						
 						var ui = (createUi != null) ? createUi() : new App(new Editor(
 								urlParams['chrome'] == '0' || uiTheme == 'min',
 								null, null, null, urlParams['chrome'] != '0'));
@@ -4122,6 +4130,29 @@ App.prototype.pickFile = function(mode)
 App.prototype.pickLibrary = function(mode)
 {
 	mode = (mode != null) ? mode : this.mode;
+
+	var doLoadLibary = mxUtils.bind(this, function(file)
+	{
+		try
+		{
+			this.loadLibrary(file);
+			this.showSidebar();
+
+			try
+			{
+				this.sidebar.palettes[file.getHash()][0].
+					scrollIntoView({behavior: 'smooth'});
+			}
+			catch (e)
+			{
+				// ignore
+			}
+		}
+		catch (e)
+		{
+			this.handleError(e, mxResources.get('errorLoadingFile'));
+		}
+	});
 	
 	if (mode == App.MODE_GOOGLE || mode == App.MODE_DROPBOX || mode == App.MODE_ONEDRIVE ||
 		mode == App.MODE_GITHUB || mode == App.MODE_GITLAB || mode == App.MODE_TRELLO)
@@ -4139,15 +4170,7 @@ App.prototype.pickLibrary = function(mode)
 			{
 				if (optionalFile != null)
 				{
-					try
-					{
-						this.loadLibrary(optionalFile);
-						this.showSidebar();
-					}
-					catch (e)
-					{
-						this.handleError(e, mxResources.get('errorLoadingFile'));
-					}
+					doLoadLibary(optionalFile);
 				}
 				else
 				{
@@ -4156,16 +4179,7 @@ App.prototype.pickLibrary = function(mode)
 						peer.getLibrary(id, mxUtils.bind(this, function(file)
 						{
 							this.spinner.stop();
-							
-							try
-							{
-								this.loadLibrary(file);
-								this.showSidebar();
-							}
-							catch (e)
-							{
-								this.handleError(e, mxResources.get('errorLoadingFile'));
-							}
+							doLoadLibary(file);
 						}), mxUtils.bind(this, function(resp)
 						{
 							this.handleError(resp, (resp != null) ? mxResources.get('errorLoadingFile') : null);
@@ -4194,16 +4208,8 @@ App.prototype.pickLibrary = function(mode)
 						
 							reader.onload = mxUtils.bind(this, function(e)
 							{
-								try
-								{
-									this.loadLibrary(new LocalLibrary(this,
-										e.target.result, file.name));
-									this.showSidebar();
-								}
-								catch (e)
-								{
-									this.handleError(e, mxResources.get('errorLoadingFile'));
-								}
+								doLoadLibary(new LocalLibrary(this,
+									e.target.result, file.name));
 							});
 	
 							reader.readAsText(file);
@@ -4255,17 +4261,9 @@ App.prototype.pickLibrary = function(mode)
 		
 		window.openFile.setConsumer(mxUtils.bind(this, function(xml, filename)
 		{
-			try
-			{
-				this.loadLibrary((mode == App.MODE_BROWSER) ?
-					new StorageLibrary(this, xml, filename) :
-					new LocalLibrary(this, xml, filename));
-				this.showSidebar();
-			}
-			catch (e)
-			{
-				this.handleError(e, mxResources.get('errorLoadingFile'));
-			}
+			doLoadLibary((mode == App.MODE_BROWSER) ?
+				new StorageLibrary(this, xml, filename) :
+				new LocalLibrary(this, xml, filename));
 		}));
 
 		// Removes openFile if dialog is closed
@@ -4670,9 +4668,8 @@ App.prototype.loadTemplate = function(url, onload, onerror, templateFilename, as
 	var base64 = false;
 	var realUrl = url;
 	var filterFn = (templateFilename != null) ? templateFilename : url;
-	var isVisioFilename = /(\.v(dx|sdx?))($|\?)/i.test(filterFn) ||
-		/(\.vs(x|sx?))($|\?)/i.test(filterFn);
 	var binary = /\.png$/i.test(filterFn) || /\.pdf$/i.test(filterFn);
+	var isVisioFilename = this.isVisioFilename(filterFn);
 	
 	if (!this.editor.isCorsEnabledForUrl(realUrl))
 	{
@@ -4752,8 +4749,7 @@ App.prototype.loadTemplate = function(url, onload, onerror, templateFilename, as
 		{
 			onerror(e);
 		}
-	}), onerror, /(\.png)($|\?)/i.test(filterFn) || /(\.v(dx|sdx?))($|\?)/i.test(filterFn) ||
-		/(\.vs(x|sx?))($|\?)/i.test(filterFn), null, null, base64);
+	}), onerror, /(\.png)($|\?)/i.test(filterFn) || isVisioFilename, null, null, base64);
 };
 
 /**
@@ -5744,6 +5740,10 @@ App.prototype.loadLibraries = function(libs, done)
 									onerror();
 								}, null, true);
 							}
+							else
+							{
+								onerror(true);
+							}
 						}
 						else if (service == 'R')
 						{
@@ -6561,30 +6561,6 @@ App.prototype.exportFile = function(data, filename, mimeType, base64Encoded, mod
 		{
 			this.drive.insertFile(filename, data, folderId, mxUtils.bind(this, function(resp)
 			{
-				// TODO: Add callback with url param for clickable status message
-				// "File exported. Click here to open folder."
-//				this.editor.setStatus('<div class="geStatusMessage">' +
-//					mxResources.get('saved') + '</div>');
-//				
-//				// Installs click handler for opening
-//				if (this.statusContainer != null)
-//				{
-//					var links = this.statusContainer.getElementsByTagName('div');
-//					
-//					if (links.length > 0)
-//					{
-//						links[0].style.cursor = 'pointer';
-//
-//						mxEvent.addListener(links[0], 'click', mxUtils.bind(this, function()
-//						{
-//							if (resp != null && resp.id != null)
-//							{
-//								window.open('https://drive.google.com/open?id=' + resp.id);
-//							}
-//						}));
-//					}
-//				}
-				
 				this.spinner.stop();
 			}), mxUtils.bind(this, function(resp)
 			{
@@ -6656,18 +6632,38 @@ App.prototype.exportFile = function(data, filename, mimeType, base64Encoded, mod
 	}
 	else if (mode == App.MODE_BROWSER)
 	{
-		var fn = mxUtils.bind(this, function()
+		if (window.StorageFile != null && !base64Encoded &&
+			this.spinner.spin(document.body, mxResources.get('saving')))
 		{
-			localStorage.setItem(filename, data);
-		});
-		
-		if (localStorage.getItem(filename) == null)
-		{
-			fn();
+			var file = data.substring(0, 10) == '<mxlibrary' ?
+				new StorageLibrary(this, data, filename) :
+				new StorageFile(this, data, filename)
+
+			StorageFile.doInsertFile(file,
+				mxUtils.bind(this, function()
+				{
+					this.spinner.stop();
+				}), mxUtils.bind(this, function(resp)
+				{
+					this.spinner.stop();
+					this.handleError(resp);
+				}));
 		}
 		else
 		{
-			this.confirm(mxResources.get('replaceIt', [filename]), fn);
+			var fn = mxUtils.bind(this, function()
+			{
+				localStorage.setItem(filename, data);
+			});
+			
+			if (localStorage.getItem(filename) == null)
+			{
+				fn();
+			}
+			else
+			{
+				this.confirm(mxResources.get('replaceIt', [filename]), fn);
+			}
 		}
 	}
 };
