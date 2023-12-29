@@ -15,7 +15,7 @@ urlParams['sync'] = 'manual';
 // MONDRIAN CONFIGURATION
 
 let xhr = new XMLHttpRequest();
-xhr.open('GET', window.DRAWIO_BASE_URL + 'mondrian/mondrianDiagrams.configuration', false);
+xhr.open('GET', window.DRAWIO_SERVER_URL + 'mondrian/mondrianDiagrams.configuration', false);
 xhr.send();
 let mondrianConfig = JSON.parse(xhr.responseText);
 

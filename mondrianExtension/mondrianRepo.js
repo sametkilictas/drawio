@@ -117,7 +117,7 @@ class MondrianRepo {
             })
         }
 
-        const response = await fetch(window.DRAWIO_BASE_URL + url, fetchHeaders);
+        const response = await fetch(window.DRAWIO_SERVER_URL + url, fetchHeaders);
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
