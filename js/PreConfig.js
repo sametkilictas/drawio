@@ -12,6 +12,9 @@ window.DRAWIO_LIGHTBOX_URL = window.DRAWIO_BASE_URL; // Replace with your lightb
 window.DRAW_MATH_URL = 'math/es5';
 urlParams['sync'] = 'manual';
 
+
+window.DRAWIO_SERVER_URL = window.location.protocol + '//' + window.location.host + '/';
+//window.MONDRIAN_CONFIG_PATH = 'FAKE/';
 // MONDRIAN CONFIGURATION
 
 let xhr = new XMLHttpRequest();

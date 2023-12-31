@@ -6,7 +6,7 @@ mxscript("js/jquery/jquery-3.6.4.min.js", function()
 
 class MondrianRepo {
     static #CONFIG = {
-        PATH: 'mondrian/',
+        PATH: window.MONDRIAN_CONFIG_PATH || 'mondrian/',
         FILE: 'baseConfig.json',
         STENCIL_REPOSITORY: 'stencils/stencilRepository.json'
     }

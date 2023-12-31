@@ -1,4 +1,4 @@
-@import "../mondrian/styles/mondrian.css";
+@import "../mondrianExtension/styles/mondrian.css";
 :root {
 	--panel-color: #f1f3f4;
 	--border-color: #dadce0;
