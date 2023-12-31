@@ -1,9 +1,6 @@
 (function()
 {
 	Sidebar.prototype.mondrian = {
-		BASEURL: null,
-		SIDEBAR_PATH: 'mondrian/',
-
 		BASE_SHAPE : 'mxgraph.mondrian.base',
 		LEGEND_SHAPE : 'mxgraph.mondrian.legend',
 		DU_SHAPE : 'mxgraph.mondrian.du',
@@ -39,9 +36,6 @@
 
 	Sidebar.prototype.addMondrianPalette = function()
 	{
-		let MBS = Sidebar.prototype.mondrian;
-		MBS.BASEURL = (new RegExp(/^.*\//)).exec(window.location.href)[0];
-		
 		let mondrianConfig = window.MONDRIAN_REPO.CONFIG.JSON;
 
 		// SIDEBARS
@@ -52,7 +46,7 @@
 			if(sideBar.type === 'STENCIL')
 				sideBar.url = 'STENCIL:' + sideBar.uri;
 			else
-				sideBar.url = MBS.BASEURL + MBS.SIDEBAR_PATH + sideBar.uri;
+				sideBar.url = window.DRAWIO_SERVER_URL + window.MONDRIAN_REPO.CONFIG.PATH + sideBar.uri;
 
 			// Add Shape Side Bar
 			this.configuration.push({id: sideBar.id + sideBar.lib, prefix: sideBar.id, libs: [sideBar.lib]});
@@ -81,7 +75,6 @@
 		// load external stencil libraries
 		if(Editor.config != null && Editor.config[MBS.BASE_SHAPE])
 		{
-			console.log(Editor.config[MBS.BASE_SHAPE]);
 			let iconStencilLibraries = Editor.config[MBS.BASE_SHAPE].icon_stencil_libraries;
 			for (stencilLibrary in iconStencilLibraries) {
 				mxStencilRegistry.loadStencilSet(iconStencilLibraries[stencilLibrary]);
