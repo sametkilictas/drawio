@@ -126,7 +126,7 @@ class MondrianRepo {
     }
 
     #fetchJSONFromMultipeURLs(urls) {
-        const promises = urls.map(url => this.#fetchJSONFromURL(url));
+        const promises = urls.map(url => this.#fetchJSONFromURL(MondrianRepo.#CONFIG.PATH + url));
         return Promise.all(promises);
     }
 
