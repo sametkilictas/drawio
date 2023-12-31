@@ -23,6 +23,7 @@ class MondrianRepo {
 
     async initialize() {
         this.CONFIG = await this.#fetchJSONFromURL(MondrianRepo.#CONFIG.PATH + MondrianRepo.#CONFIG.FILE);
+        this.CONFIG.PATH = MondrianRepo.#CONFIG.PATH;
         let mondrianConfig = this.CONFIG.JSON;
 
         // ELEMENTS
@@ -30,7 +31,7 @@ class MondrianRepo {
 
         // STENCILS
 		for (let stencilKey in mondrianConfig.Stencils) {
-			mxStencilRegistry.loadStencilSet(mondrianConfig.Stencils[stencilKey].uri);
+			mxStencilRegistry.loadStencilSet(MondrianRepo.#CONFIG.PATH + mondrianConfig.Stencils[stencilKey].uri);
 		}
 
         await this.#buildStencilRepo(mxStencilRegistry.stencils);
@@ -80,11 +81,13 @@ class MondrianRepo {
 
     async #buildElementsRepo() {
         let elementFiles = this.#getElementFiles(this.CONFIG.JSON);
+        
         let fixedElementTypes = new Set(['ABB', 'SBB', 'LN', 'TN', 'ACT', 'IN']);
 
         await this.#fetchJSONFromMultipeURLs([...elementFiles.keys()])
         .then(results => {
             for (const result of results) {
+                
                 for (const client of elementFiles.get(result.URL)) {
                     for (let elementKey in result.JSON) {
                         let type = elementKey.split('-')[0];
@@ -126,7 +129,7 @@ class MondrianRepo {
     }
 
     #fetchJSONFromMultipeURLs(urls) {
-        const promises = urls.map(url => this.#fetchJSONFromURL(MondrianRepo.#CONFIG.PATH + url));
+        const promises = urls.map(url => this.#fetchJSONFromURL(url));
         return Promise.all(promises);
     }
 
@@ -136,13 +139,13 @@ class MondrianRepo {
         for (let elementsKey in mondrianConfig.Elements) {
             if (mondrianConfig.Elements[elementsKey].uri != undefined) {
                 elementFiles.set(
-                    mondrianConfig.Elements[elementsKey].uri,
+                    MondrianRepo.#CONFIG.PATH + mondrianConfig.Elements[elementsKey].uri,
                     mondrianConfig.Elements[elementsKey].client.split(',').map(item => item.trim()))
             }
             else {
                 for (let fileKey in mondrianConfig.Elements[elementsKey].files) {
                     elementFiles.set(
-                        mondrianConfig.Elements[elementsKey].basePath + mondrianConfig.Elements[elementsKey].files[fileKey],
+                        MondrianRepo.#CONFIG.PATH + mondrianConfig.Elements[elementsKey].basePath + mondrianConfig.Elements[elementsKey].files[fileKey],
                         mondrianConfig.Elements[elementsKey].client.split(',').map(item => item.trim()))
                 }
             }
@@ -247,7 +250,7 @@ class MondrianRepo {
 		}
 
 		// add the repository to get the alias
-		let stencilRepo = await this.#fetchJSONFromURL(MondrianRepo.#CONFIG.PATH + MondrianRepo.#CONFIG.STENCIL_REPOSITORY);;
+		let stencilRepo = await this.#fetchJSONFromURL(MondrianRepo.#CONFIG.PATH + MondrianRepo.#CONFIG.STENCIL_REPOSITORY);
         
 		for(let stencil in stencilRepo)
 		{
