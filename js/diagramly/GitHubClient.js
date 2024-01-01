@@ -186,7 +186,7 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 					var win = window.open(this.baseHostUrl + '/login/oauth/authorize?client_id=' +
 						this.clientId +  
 						'&state=' + encodeURIComponent('cId=' + this.clientId + //To identify which app/domain is used
-							'&domain=' + window.location.host + '&token=' + state), 'ghauth');
+							'&domain=' + window.location.host + '&token=' + state + '&redirect_url=' + windown.DRAWIO_SERVER_URL + '/github2'), 'ghauth');
 					
 					if (win != null)
 					{
