@@ -2302,8 +2302,8 @@
 	/**
 	 * Specifies the app name. Default is document.title.
 	 */
-	Editor.prototype.appName = 'draw.io';
-		
+	Editor.prototype.appName = 'Mondrian Diagrams'//'draw.io';
+	
 	/**
 	 * Known file types.
 	 */

@@ -6080,7 +6080,7 @@
 			params.push('open=' + data.substring(1));
 			data = '';
 		}
-		console.log(this.getFileData(true, null, null, null, null, null, null, true, null, false));
+		
 		return ((lightbox && urlParams['dev'] != '1') ? EditorUi.lightboxHost :
 			(((mxClient.IS_CHROMEAPP || EditorUi.isElectronApp ||
 			!(/.*\.draw\.io$/.test(window.location.hostname))) ?
@@ -18745,7 +18745,7 @@
 	//===========Adding methods to find the service running draw.io and allowing calling draw.io remote services
 	EditorUi.prototype.getServiceName = function()
 	{
-		return 'draw.io';
+		return 'Mondrian Diagrams';//'draw.io';
 	};
 	
 	EditorUi.prototype.addRemoteServiceSecurityCheck = function(xhr)

@@ -3952,6 +3952,8 @@ App.prototype.showSaveFilePicker = function(success, error, opts)
 	});
 	
 	opts = (opts != null) ? opts : this.createFileSystemOptions();
+	if(opts.fileName && !opts.suggestedName) //MONDRIAN: to fill the showSaveFilePicker box with the current fileName
+		opts.suggestedName = opts.fileName;
 	
 	window.showSaveFilePicker(opts).then(mxUtils.bind(this, function(fileHandle)
 	{
@@ -4493,7 +4495,7 @@ App.prototype.saveFile = function(forceDialog, success)
 		{
 			this.save(file.getTitle(), done);
 		}
-		else if (file != null && file.constructor == LocalFile && file.fileHandle != null)
+		else if (file != null && file.constructor == LocalFile && file.fileHandle != null && false) //MONDRIAN: Disabled by adding '&& false' to allow for change of storage
 		{
 			this.showSaveFilePicker(mxUtils.bind(this, function(fileHandle, desc)
 			{
@@ -4537,7 +4539,7 @@ App.prototype.saveFile = function(forceDialog, success)
 					else
 					{
 						this.hideDialog();
-						
+
 						if (prev == null && mode == App.MODE_DEVICE)
 						{
 							if (file != null && EditorUi.nativeFileSupport)
