@@ -125,7 +125,7 @@ GitHubClient.prototype.createUser = function(userInfo)
 GitHubClient.prototype.authenticate = function(success, error)
 {
 	var req = new mxXmlRequest(this.redirectUri + '?getState=1', null, 'GET');
-	console.log(req);
+
 	req.send(mxUtils.bind(this, function(req)
 	{
 		if (req.getStatus() >= 200 && req.getStatus() <= 299)
@@ -141,7 +141,6 @@ GitHubClient.prototype.authenticate = function(success, error)
 
 GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 {
-	console.log(state, success, error);
 	if (window.onGitHubCallback == null)
 	{
 		var auth = mxUtils.bind(this, function()
@@ -149,10 +148,11 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 			var acceptAuthResponse = true;
 			
 			var authRemembered = this.getPersistentToken(true);
+			let githubParams = 'state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state) + '&redirect_uri=' + encodeURIComponent(window.DRAWIO_SERVER_URL + 'github2');
 			
 			if (authRemembered != null)
 			{
-				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state), null, 'GET'); //To identify which app/domain is used
+				var req = new mxXmlRequest(this.redirectUri + '?' + githubParams, null, 'GET'); //To identify which app/domain is used
 				
 				req.send(mxUtils.bind(this, function(req)
 				{
@@ -184,9 +184,7 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 				this.ui.showAuthDialog(this, true, mxUtils.bind(this, function(remember, authSuccess)
 				{		
 					var win = window.open(this.baseHostUrl + '/login/oauth/authorize?client_id=' +
-						this.clientId +  
-						'&state=' + encodeURIComponent('cId=' + this.clientId + //To identify which app/domain is used
-							'&domain=' + window.location.host + '&token=' + state + '&redirect_url=' + windown.DRAWIO_SERVER_URL + '/github2'), 'ghauth');
+						this.clientId + '&' + githubParams, 'ghauth');
 					
 					if (win != null)
 					{
