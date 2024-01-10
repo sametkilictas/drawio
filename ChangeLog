@@ -1,3 +1,25 @@
+09-JAN-2023: 21.1.18
+
+- Fixes overridden configurations [drawio-desktop-1564]
+- Removes multiple javascript protocol prefixes
+- Adds exit menu and fixed isModified detection [drawio-desktop-1222]
+- Fixed text replace when search query is " or ' [drawio-desktop-1152]
+- Fixes error messages of new files in offline mode [drawio-nextcloud-62]
+- Experimental support for vertical writing mode [drawio-4068]
+- Fixes relative links in SVG export
+
+04-JAN-2023: 21.1.17
+
+- Adds copyAsText in Edit drop down [drawio-3949]
+- Replaces clearWaypoints button with drop down
+- Fixes clipping, replaces hint in filename dialog [drawio-4074]
+- Adds support for using the same URL in DRAWIO_LIGHTBOX_URL [docker-drawio-137]
+- Fixes selection propagation for current root
+- Fixes cursor for immediate edge handling in groups
+- Fixes cursor for immediate edge handling in selected ancestors
+- Fixes scrollbar positions after enter-/exitGroup
+- Fixes move of selected edges in groups
+
 29-DEC-2023: 21.1.16
 
 - Adds simple theme to atlas.min.js
