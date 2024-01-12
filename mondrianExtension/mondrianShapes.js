@@ -685,7 +685,7 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
 }
 
-mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defaultStyles) {
+mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defaultStyles, doBeginUpdate = true) {
 	if (thisState != null)
 	{ 
 		let newStyles = (thisState != null) ? thisState.cell.style : undefined;
@@ -740,20 +740,27 @@ mxMondrianBase.prototype.updateStyle = function(thisState, mandatoryStyles, defa
 
 		if(newStyles != currentStyles)
 		{
-			thisState.view.graph.model.beginUpdate();
+			if (doBeginUpdate)
+				thisState.view.graph.model.beginUpdate();
 			try
 			{
 				thisState.view.graph.model.setStyle(thisState.cell, newStyles);	
 			}
 			finally
 			{
-				thisState.view.graph.model.endUpdate();
+				if(doBeginUpdate)
+					thisState.view.graph.model.endUpdate();
 			}
 		}
 	}
 }
 
-mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedID)
+mxMondrianBase.prototype.getAttributesFromRepo = function(thisState, predefinedID)
+{
+	return mxMondrianBase.prototype.setAttributesFromRepo(thisState, predefinedID, true);
+}
+
+mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedID, noSet = false)
 {
 	let predefinedElements = ['undefined'];
 	let formatSettings = undefined;
@@ -788,13 +795,13 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedI
 					let attributeValue = element[attributeInRepo];
 					newRepoAttributes.push(attributeInRepo);
 	
-					if(attributeValue != '')
+					if(attributeValue != '' && !noSet)
 					{
 						thisState.cell.setAttribute(attributeInRepo, element[attributeInRepo]);
 					}
 					else
 					{
-						if(!thisState.cell.hasAttribute(attributeInRepo))
+						if(!thisState.cell.hasAttribute(attributeInRepo) && !noSet)
 							thisState.cell.setAttribute(attributeInRepo, '');
 					}	
 				}
@@ -810,16 +817,20 @@ mxMondrianBase.prototype.setAttributesFromRepo = function(thisState, predefinedI
 				dropAttributes.push(attributeName);
 		}
 
-		for(let attributeName in dropAttributes)
+		if(!noSet)
 		{
-			thisState.cell.value.attributes.removeNamedItem(dropAttributes[attributeName]);
+			for(let attributeName in dropAttributes)
+			{
+				thisState.cell.value.attributes.removeNamedItem(dropAttributes[attributeName]);
+			}
+			
+			thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());	
 		}
-		
-		thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());
 	}
 	else
 	{
-		thisState.cell.setAttribute('repoAttributes', '');
+		if(!noSet)
+			thisState.cell.setAttribute('repoAttributes', '');
 	}
 
 	return {repoAttributes: newRepoAttributes.join(), repoFormatSettings: formatSettings}
@@ -2612,7 +2623,7 @@ mxMondrianBaseDeploymentUnit.prototype.getShapeVisualDefinition = function (this
  */
 function mxMondrianBaseConnector()
 {
-	mxArrowConnector.call(this);
+	mxConnector.call(this);
 	this.defaultStyleString = 'jumpStyle=line;jumpSize=8;endArrow=none;startArrow=none;metaEdit=1';
 };
 
@@ -2637,102 +2648,44 @@ mxMondrianBaseConnector.prototype.init = function(container)
 {
 	if(this.state != null)
 	{
-		let graph = this.state.view.graph;
-		let cell = this.state.cell;
-		let cellState = this.state.view.getState(this.state.cell);
-
-		graph.model.beginUpdate();
-
-		try
-		{
-			// DATA ATTRIBUTES
-			if (!mxUtils.isNode(cell.value)) 
-				cell.setValue(mxUtils.createXmlDocument().createElement('UserObject'));
-
-			let mondrianAttributes = ['Interface-ID', 'Interface-Name'];
-			for (attributeIndex = 0; attributeIndex < mondrianAttributes.length; attributeIndex++ ) {
-				if(!this.state.cell.hasAttribute(mondrianAttributes[attributeIndex]))
-					this.state.cell.setAttribute(mondrianAttributes[attributeIndex],'')
-			}
-
-			this.state.cell.setAttribute('label',
-				mxMondrianBase.prototype.defineLabel(
-					mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
-					mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
-					this.state.cell, 'defaultSettingsConnector'));
-
-			this.state.cell.setAttribute('placeholders','1');
-
-			let el1Child = mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
-			let el2Child = mxMondrianBase.prototype.getStyleValue(this.state.cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
-
-			let el1ChildFound = false;
-			let el2ChildFound = false;
-
-			if(cellState.cell.children != undefined && (el1Child != 'undefined' || el2Child != 'undefined'))
-			{
-				for (let c = 0; c < cellState.cell.children.length; c++)
-				{
-					let child = cellState.cell.children[c];
-					el1ChildFound = (child.id === el1Child) || (el1ChildFound);
-					el2ChildFound = (child.id === el2Child) || (el2ChildFound);
-				}
-
-				if(!el1ChildFound && el1Child != 'undefined')
-				{
-					graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, null, [cellState.cell]);
-					graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1_ATTRIBUTES, null, [cellState.cell]);
-				}
-	
-				if(!el2ChildFound && el2Child != 'undefined')
-				{
-					graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, null, [cellState.cell]);
-					graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2_ATTRIBUTES, null, [cellState.cell]);
-				}	
-			}
-
-			if(cellState.cell.children != undefined && (el1Child != 'undefined' || el2Child != 'undefined'))
-			{
-				for (let c = 0; c < cellState.cell.children.length; c++)
-				{
-					let child = cellState.cell.children[c];
-					if(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES] != undefined)
-					{
-						child.setAttribute('label', 
-							mxMondrianBase.prototype.defineLabel(
-								mxMondrianBaseConnector.prototype.getEdgeLabelFormat(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES]),
-								child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES],
-								child,
-								'defaultSettingsConnector'));	
-					}
-				}
-			}
-		}
-		catch(err)
-		{
-			console.log('try init', err);
-		}
-		finally
-		{
-			try
-			{
-				graph.model.endUpdate();
-			}
-			catch(err)
-			{
-				console.log('endupdate', err);
-			}
-		}
-	}
-
-	mxConnector.prototype.init.apply(this, arguments);
-
-	if(this.state != null)
-	{
 		this.cellID = this.state.cell.id;
 		this.installListeners();	
 	}
-};
+	mxConnector.prototype.init.apply(this, arguments);
+}
+
+mxMondrianBaseConnector.prototype.installListeners = function()
+{
+	if (this.changeListener == null)
+	{
+		this.changeListener = mxUtils.bind(this, function(sender, evt)
+		{
+			try
+			{
+				if(evt.properties.change.constructor.name === 'ChangePageSetup')
+				{
+					this.paintLine();
+				}
+				else if(
+					(evt.properties.change.constructor.name === 'mxValueChange' || evt.properties.change.constructor.name === 'mxStyleChange')
+					&& (evt.properties.change.cell.id === this.cellID))
+				{
+					if(this.state != null)
+					{
+						mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
+						this.paintLine();
+					}				
+				}
+			}
+			catch(err)
+			{
+				// do nothing
+			}
+		});
+
+		this.state.view.graph.model.addListener(mxEvent.EXECUTED, this.changeListener);
+	}
+}
 
 mxMondrianBaseConnector.prototype.getEdgeLabel = function(graph, cell, edgeChild)
 {
@@ -2794,52 +2747,119 @@ mxMondrianBaseConnector.prototype.getEdgeLabelFormat = function(edgeLabelAttribu
 	return edgeLabelFormat;
 }
 
-mxMondrianBaseConnector.prototype.installListeners = function()
-{
-	if (this.changeListener == null)
-	{
-		this.changeListener = mxUtils.bind(this, function(sender, evt)
-		{
-			try
-			{
-				if(evt.properties.change.constructor.name === 'ChangePageSetup')
-				{
-					this.paintLine();
-				}
-				else if(	(evt.properties.change.constructor.name === 'mxValueChange' || evt.properties.change.constructor.name === 'mxStyleChange')
-					&& (evt.properties.change.cell.id === this.cellID))
-				{
-					if(this.state != null)
-					{
-						let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
-						mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);	
-					}				
-				}
-			}
-			catch(err)
-			{
-				// do nothing
-			}
-		});
+mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts)
+{	
+	mxMondrianBaseConnector.prototype.addAttributes(this);
+	mxMondrianBaseConnector.prototype.addEdgeLabels(this);
 
-		this.state.view.graph.model.addListener(mxEvent.EXECUTED, this.changeListener);
-	}
+	mxConnector.prototype.paintEdgeShape.apply(this, arguments);
 }
 
 mxMondrianBaseConnector.prototype.paintLine = function(c, pts)
 {
 	if(this.state != null)
-	{
-		let repoAttributes = mxMondrianBase.prototype.setAttributesFromRepo(this.state, 'Interface-ID');
+	{ 
+		let repoAttributes = mxMondrianBase.prototype.getAttributesFromRepo(this.state, 'Interface-ID');
 		mxMondrianBase.prototype.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);	
 	}
 
 	mxConnector.prototype.paintLine.apply(this, arguments);
 }
 
-mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts)
+const mondrianBaseConnectorAttributes = ['Interface-ID', 'Interface-Name'];
+const mondrianBaseConnectorDefaultVersionAttribute = 'mondrianVersion';
+const mondrianBaseConnectorDefaultVersion = '1.0.0';
+mxMondrianBaseConnector.prototype.addAttributes = function(connector)
 {
-	mxConnector.prototype.paintEdgeShape.apply(this, arguments);
+	if(connector.state != null)
+	{
+		let cell = connector.state.cell;
+
+		// Set UserObject
+		if (!mxUtils.isNode(cell.value)) {
+			let obj = mxUtils.createXmlDocument().createElement('UserObject');
+			obj.setAttribute('label', cell.value);			
+			cell.value = obj;
+		}
+
+		// Set Default Attributes
+		let connectorVersion = cell.value.getAttribute(mondrianBaseConnectorDefaultVersionAttribute);
+		if(connectorVersion != mondrianBaseConnectorDefaultVersion)
+		{
+			cell.value.setAttribute(mondrianBaseConnectorDefaultVersionAttribute, mondrianBaseConnectorDefaultVersion);
+			cell.value.setAttribute('placeholders', '1');
+
+			for (attributeIndex = 0; attributeIndex < mondrianBaseConnectorAttributes.length; attributeIndex++ )
+			{
+				if(!cell.value.hasAttribute(mondrianBaseConnectorAttributes[attributeIndex]))
+					cell.value.setAttribute(mondrianBaseConnectorAttributes[attributeIndex], '');
+			}
+		}
+
+		// Set Repo Attributes
+		mxMondrianBase.prototype.setAttributesFromRepo(connector.state, 'Interface-ID');
+
+		// Set Label Value
+		cell.value.setAttribute('label',
+				mxMondrianBase.prototype.defineLabel(
+					mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
+					mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
+					cell, 'defaultSettingsConnector'));
+	}
+}
+
+mxMondrianBaseConnector.prototype.addEdgeLabels = function(connector)
+{
+	if(connector.state != null)
+	{
+		let cell = connector.state.cell;
+		let cellState = connector.state.view.getState(cell);
+
+		let el1Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
+		let el2Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
+
+		let el1ChildFound = false;
+		let el2ChildFound = false;
+
+		if(cellState.cell.children != undefined && (el1Child != 'undefined' || el2Child != 'undefined'))
+		{
+			for (let c = 0; c < cellState.cell.children.length; c++)
+			{
+				let child = cellState.cell.children[c];
+				el1ChildFound = (child.id === el1Child) || (el1ChildFound);
+				el2ChildFound = (child.id === el2Child) || (el2ChildFound);
+			}
+
+			if(!el1ChildFound && el1Child != 'undefined')
+			{
+				graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, null, [cellState.cell]);
+				graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1_ATTRIBUTES, null, [cellState.cell]);
+			}
+
+			if(!el2ChildFound && el2Child != 'undefined')
+			{
+				graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, null, [cellState.cell]);
+				graph.setCellStyles(mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2_ATTRIBUTES, null, [cellState.cell]);
+			}	
+		}
+
+		if(cellState.cell.children != undefined && (el1Child != 'undefined' || el2Child != 'undefined'))
+		{
+			for (let c = 0; c < cellState.cell.children.length; c++)
+			{
+				let child = cellState.cell.children[c];
+				if(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES] != undefined)
+				{
+					child.value.setAttribute('label', 
+						mxMondrianBase.prototype.defineLabel(
+							mxMondrianBaseConnector.prototype.getEdgeLabelFormat(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES]),
+							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES],
+							child,
+							'defaultSettingsConnector'));	
+				}
+			}
+		}	
+	}
 }
 
 mxMondrianBaseConnector.prototype.customProperties = [
@@ -2848,7 +2868,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 		onChange: function(graph, newValue)
 		{
 			let selectedCells = graph.getSelectionCells();
-
+			console.log(graph, newValue, selectedCells);
 			for (let i = 0; i < selectedCells.length; i++)
 			{			
 				let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(

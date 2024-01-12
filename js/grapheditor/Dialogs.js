@@ -1689,7 +1689,7 @@ var EditDataDialog = function(ui, cell)
 	for (var i = 0; i < attrs.length; i++)
 	{
 		if ((attrs[i].nodeName != 'label' || Graph.translateDiagram ||
-			isLayer) && attrs[i].nodeName != 'placeholders' && attrs[i].nodeName != 'repoAttributes') // MONDRIAN; hide repoAttributes)
+			isLayer) && attrs[i].nodeName != 'placeholders' && attrs[i].nodeName != 'repoAttributes' && attrs[i].nodeName != 'mondrianVersion') // MONDRIAN; hide repoAttributes)
 		{
 			temp.push({name: attrs[i].nodeName, value: attrs[i].nodeValue});
 		}

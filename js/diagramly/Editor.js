@@ -5071,7 +5071,7 @@
                         if(enumSource == undefined)
                         {
                             let selectedCells = graph.getSelectionCells();
-                            let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes'];
+                            let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes', 'mondrianVersion'];
     
                             for (let selectedCellIdx in selectedCells)
                             {

@@ -5625,6 +5625,10 @@ StyleFormatPanel.prototype.addStroke = function(container)
 			{
 				edgeShapeDiv.className = 'geSprite geSprite-simplearrow';
 			}
+			else if (ss.style.shape == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+			{
+				edgeShapeDiv.className = 'geSprite geSprite-mondrian';
+			}			
 			else
 			{
 				edgeShapeDiv.className = 'geSprite geSprite-connection';
