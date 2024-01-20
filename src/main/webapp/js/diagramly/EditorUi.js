@@ -660,13 +660,37 @@
 
 		// Extends spin method to include an optional label
 		var oldSpin = spinner.spin;
+		var thread = null;
+		var retry = null;
+
+		var resume = mxUtils.bind(this, function(fn)
+		{
+			if (fn != null)
+			{
+				fn();
+			}
+		});
 		
-		spinner.spin = function(container, label)
+		spinner.spin = function(container, label, error, timeout)
 		{
 			var result = false;
 			
 			if (!this.active)
 			{
+				var start = Date.now();
+
+				if (error != null)
+				{
+					thread = window.setTimeout(function()
+					{
+						spinner.stop();
+						thread = null;
+						error({code: App.ERROR_TIMEOUT,
+							message: mxResources.get('timeout'),
+							retry: retry});
+					}, (timeout != null) ? timeout : this.timeout);
+				}
+
 				oldSpin.call(this, container);
 				this.active = true;
 				
@@ -714,13 +738,50 @@
 				// Pause returns a function to resume the spinner
 				this.pause = mxUtils.bind(this, function()
 				{
-					var fn = function() { };
+					var fn = resume;
 					
 					if (this.active)
 					{
-						fn = mxUtils.bind(this, function()
+						// Reduces timeout by used time
+						timeout = Math.max(0, timeout - (Date.now() - start));
+
+						fn = mxUtils.bind(this, function(continueFn)
 						{
-							this.spin(container, label);
+							this.spin(container, label, error, timeout);
+
+							// Continue is called after spinner was paused and is
+							// used as the new retry function from here on
+							if (continueFn != null)
+							{
+								try
+								{
+									continueFn();
+
+									retry = mxUtils.bind(this, function()
+									{
+										this.spin(container, label, error, timeout);
+
+										try
+										{
+											continueFn();
+										}
+										catch (e)
+										{
+											if (error != null)
+											{
+												error(e);
+											}
+										}
+									});
+								}
+								catch (e)
+								{
+									if (error != null)
+									{
+										error(e);
+									}
+								}
+							}
 						});
 					}
 					
@@ -741,19 +802,29 @@
 		spinner.stop = function()
 		{
 			oldStop.call(this);
-			this.active = false;
 			
-			if (spinner.status != null && spinner.status.parentNode != null)
+			if (this.active)
 			{
-				spinner.status.parentNode.removeChild(spinner.status);
-			}
+				this.active = false;
 
-			spinner.status = null;
+				if (thread != null)
+				{
+					window.clearTimeout(thread);
+					thread = null;
+				}
+				
+				if (spinner.status != null && spinner.status.parentNode != null)
+				{
+					spinner.status.parentNode.removeChild(spinner.status);
+				}
+
+				spinner.status = null;
+			}
 		};
 		
 		spinner.pause = function()
 		{
-			return function() {};
+			return resume;
 		};
 		
 		return spinner;
@@ -14456,7 +14527,7 @@
 											}
 											else
 											{
-												window.openWindow(((mxClient.IS_CHROMEAPP) ?
+												window.geOpenWindow(((mxClient.IS_CHROMEAPP) ?
 													(EditorUi.drawHost + '/') : 'https://' + location.host + '/') +
 													window.location.search + '#U' + encodeURIComponent(data));
 											}
@@ -14823,7 +14894,7 @@
 				});
 				
 				window.openFile.setData(data, name);
-				window.openWindow(this.getUrl(), null, mxUtils.bind(this, function()
+				window.geOpenWindow(this.getUrl(), null, mxUtils.bind(this, function()
 				{
 					if (currentFile != null && currentFile.isModified())
 					{
