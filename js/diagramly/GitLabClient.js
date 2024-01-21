@@ -765,10 +765,10 @@ GitLabClient.prototype.pickFile = function(fn)
 GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesError)
 {
 	// Mondrian Heights / Widths:
-	let windowHeight =  		  542; 		// 420
+	let windowHeight =  		  542; 		// 370
 	let windowHeightDivContent =  '480px';  // 304px
 	let windowHeightDivFolders =  '450px';  // 274px
-	let windowWidth =  			  702; 		// 370
+	let windowWidth =  			  702; 		// 420
 	
 	var org = null;
 	var repo = null;
@@ -806,7 +806,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 	{
 		fn(org + '/' + repo + '/' + encodeURIComponent(ref) + '/' + path);
 	}));
-	this.ui.showDialog(dlg.container, windowHeight, windowWidth, true, true);
+	this.ui.showDialog(dlg.container, windowWidth, windowHeight, true, true);
 	
 	if (showFiles)
 	{

@@ -895,10 +895,10 @@ GitHubClient.prototype.pickFile = function(fn)
 GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesError)
 {
 	// Mondrian Heights / Widths:
-	let windowHeight =  		  542; 		// 420
+	let windowHeight =  		  542; 		// 370
 	let windowHeightDivContent =  '480px';  // 320px
 	let windowHeightDivFolders =  '450px';  // 290px
-	let windowWidth =  			  702; 		// 370
+	let windowWidth =  			  702; 		// 420
 
 	var org = null;
 	var repo = null;
@@ -961,7 +961,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 				'https://github.com/apps/draw-io-app');
 			}
 		})]], '16px');
-	this.ui.showDialog(dlg.container, windowHeight, windowWidth, true, true); //420, 370
+	this.ui.showDialog(dlg.container, windowWidth, windowHeight, true, true); //420, 370
 
 	if (showFiles)
 	{
