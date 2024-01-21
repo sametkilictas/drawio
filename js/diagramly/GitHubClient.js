@@ -894,6 +894,12 @@ GitHubClient.prototype.pickFile = function(fn)
  */
 GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesError)
 {
+	// Mondrian Heights / Widths:
+	let windowHeight =  		  542; 		// 420
+	let windowHeightDivContent =  '480px';  // 320px
+	let windowHeightDivFolders =  '450px';  // 290px
+	let windowWidth =  			  702; 		// 370
+
 	var org = null;
 	var repo = null;
 	var ref = null;
@@ -902,7 +908,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 	var content = document.createElement('div');
 	content.style.whiteSpace = 'nowrap';
 	content.style.overflow = 'hidden';
-	content.style.height = '320px';
+	content.style.height = windowHeightDivContent;
 
 	var hd = document.createElement('h3');
 	mxUtils.write(hd, mxResources.get((showFiles) ? 'selectFile' : 'selectFolder'));
@@ -927,7 +933,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 	div.style.padding = '4px';
 	div.style.overflow = 'auto';
 	div.style.lineHeight = '1.2em';
-	div.style.height = '290px';
+	div.style.height = windowHeightDivFolders;
 	content.appendChild(div);
 	
 	var listItem = document.createElement('div');
@@ -955,7 +961,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 				'https://github.com/apps/draw-io-app');
 			}
 		})]], '16px');
-	this.ui.showDialog(dlg.container, 420, 370, true, true);
+	this.ui.showDialog(dlg.container, windowHeight, windowWidth, true, true); //420, 370
 
 	if (showFiles)
 	{

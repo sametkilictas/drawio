@@ -764,6 +764,12 @@ GitLabClient.prototype.pickFile = function(fn)
  */
 GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesError)
 {
+	// Mondrian Heights / Widths:
+	let windowHeight =  		  542; 		// 420
+	let windowHeightDivContent =  '480px';  // 304px
+	let windowHeightDivFolders =  '450px';  // 274px
+	let windowWidth =  			  702; 		// 370
+	
 	var org = null;
 	var repo = null;
 	var ref = null;
@@ -772,7 +778,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 	var content = document.createElement('div');
 	content.style.whiteSpace = 'nowrap';
 	content.style.overflow = 'hidden';
-	content.style.height = '304px';
+	content.style.height = windowHeightDivContent;
 
 	var hd = document.createElement('h3');
 	mxUtils.write(hd, mxResources.get((showFiles) ? 'selectFile' : 'selectFolder'));
@@ -786,7 +792,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 	div.style.padding = '4px';
 	div.style.overflow = 'auto';
 	div.style.lineHeight = '1.2em';
-	div.style.height = '274px';
+	div.style.height = windowHeightDivFolders;
 	content.appendChild(div);
 
 	var listItem = document.createElement('div');
@@ -800,7 +806,7 @@ GitLabClient.prototype.showGitLabDialog = function(showFiles, fn, hideNoFilesErr
 	{
 		fn(org + '/' + repo + '/' + encodeURIComponent(ref) + '/' + path);
 	}));
-	this.ui.showDialog(dlg.container, 420, 370, true, true);
+	this.ui.showDialog(dlg.container, windowHeight, windowWidth, true, true);
 	
 	if (showFiles)
 	{

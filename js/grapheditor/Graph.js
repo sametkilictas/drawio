@@ -5689,7 +5689,7 @@ Graph.prototype.foldCells = function(collapse, recurse, cells, checkFoldable, ev
 				{
 					var state = this.view.getState(cells[i]);
 					var geo = this.getCellGeometry(cells[i]);
-					
+
 					if (state != null && geo != null)
 					{
 						var dx = 0;

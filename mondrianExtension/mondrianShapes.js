@@ -179,7 +179,7 @@ mxMondrianBase.prototype.getColorIntensity = function(colorIntensity, shapePart,
 	}
 }
 
-mxMondrianBase.prototype.getShapeDimensions = function (shapeType, shapeLayout, shapeSubLayout, width, height)
+mxMondrianBase.prototype.getShapeDimensions = function (shapeType, shapeLayout, width, height)
 {
 		let minRectWidth = 0;
 		let minRectHeight = 0;
@@ -276,6 +276,8 @@ mxMondrianBase.prototype.getShapeDimensions = function (shapeType, shapeLayout, 
 			iconSpacing = 0;
 		}
 
+		shapeHeight = (minRectHeight > shapeHeight) ? minRectHeight : shapeHeight;
+
 		return {
 			minRectWidth, minRectHeight, 
 			shapeWidth, shapeHeight, shapeRadius, shapeLeftOffSet,
@@ -343,7 +345,8 @@ mxMondrianBase.prototype.getShapeVisualDefinition = function (
 	shapeVD.shape.visible = (shapeLayout === 'expanded' || shapeLayout === 'collapsed' || (shapeLayout === 'legend' && (shapeSubLayout != 'tag' && shapeSubLayout != 'icon')));
 
 	//shape dimensions
-	let dimensions = mxMondrianBase.prototype.getShapeDimensions(shapeVD.shape.type, shapeLayout, shapeSubLayout, width, height);
+	let dimensions = mxMondrianBase.prototype.getShapeDimensions(shapeVD.shape.type, shapeLayout, width, height);
+
 	shapeVD.shape.width = dimensions.shapeWidth;
 	shapeVD.shape.height = dimensions.shapeHeight;
 	shapeVD.shape.radius = dimensions.shapeRadius;
@@ -643,25 +646,20 @@ mxMondrianBase.prototype.init = function(container)
 	this.installListeners();
 };
 
-mxMondrianBase.prototype.refreshView = function(someText)
-{
-	console.log('Check: ', someText);
-}
-
-mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, currentCell, settings)
+mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, currentCell, settings, labelDefaultAttributesOverride)
 {
 	let currentLabelValue = currentCell.getAttribute('label');
 	currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
 
 	let elementDefaultSettings = window.MONDRIAN_REPO.getElement(['default'],(settings != undefined) ? settings : 'defaultSettings');
 	let labelFormats = elementDefaultSettings.labelFormats;
-	let labelDefaults = elementDefaultSettings.labelDefaultAttributes;
+	let labelDefaults = (labelDefaultAttributesOverride) || elementDefaultSettings.labelDefaultAttributes;
 
 	let attributes = (attributesText == 'undefined' || attributesText == undefined) ? labelDefaults : attributesText.split(',');
 				
 	let labelFormatFilter = (formatText == 'undefined' || formatText == undefined) ? elementDefaultSettings.labelDefaultFormat : formatText;
 	let labelAttributes = [];
-
+	
 	for(let textAttributeIDX in attributes)
 	{
 		let textAttribute = attributes[textAttributeIDX];
@@ -675,7 +673,7 @@ mxMondrianBase.prototype.defineLabel = function(formatText, attributesText, curr
 	}
 
 	let labelValue = (labelFormats[labelFormatFilter] != undefined) ? labelFormats[labelFormatFilter] : labelFormats['default'];
-
+	
 	for (let i = 0; i < labelAttributes.length; i++)
 	{
 		labelValue = labelValue.replace('@'+i,labelAttributes[i]);
@@ -1056,7 +1054,7 @@ mxMondrianBase.prototype.installListeners = function()
 							const geoCurrent = evt.properties.change.cell.geometry;
 							var newRect = mxMondrianBase.prototype.getRectangle(
 								new mxRectangle(geoCurrent.x, geoCurrent.y, geoCurrent.width, geoCurrent.height), 
-									shapeTypeCurrent, shapeLayoutCurrent, shapeSubLayoutCurrent);
+									shapeTypeCurrent, shapeLayoutCurrent);
 					
 							geoMustUpdate = mxMondrianBase.prototype.cellMustResize(geoCurrent, newRect);
 						}
@@ -1403,6 +1401,7 @@ mxMondrianBase.prototype.paintCorner = function(c)
 mxMondrianBase.prototype.paintShape = function(c)
 {
 	let svd = this.shapeVisualDefinition;
+
 	if(svd.shape.visible)
 	{
 		let doRestore = false;
@@ -2068,11 +2067,11 @@ mxMondrianBase.prototype.getStyle = function(style, shapeType, shapeLayout, posi
  * 
  * Returns the rectangle based on shapeType & shapeLayout.
  */
-mxMondrianBase.prototype.getRectangle = function(rect, shapeType, shapeLayout, shapeSubLayout)
+mxMondrianBase.prototype.getRectangle = function(rect, shapeType, shapeLayout)
 {
 	if(shapeType != null)
 	{
-		let dimensions = mxMondrianBase.prototype.getShapeDimensions(shapeType, shapeLayout, shapeSubLayout, rect.width, rect.height);
+		let dimensions = mxMondrianBase.prototype.getShapeDimensions(shapeType, shapeLayout, rect.width, rect.height);
 
 		if(shapeLayout === 'collapsed')
 		{
@@ -2202,8 +2201,7 @@ mxVertexHandler.prototype.union = function(bounds, dx, dy, index, gridEnabled, s
 	{
 		const shapeType = mxUtils.getValue(this.state.style, mxMondrianBase.prototype.cst.SHAPE_TYPE, mxMondrianBase.prototype.cst.SHAPE_TYPE_DEFAULT);
 		const shapeLayout = mxUtils.getValue(this.state.style, mxMondrianBase.prototype.cst.SHAPE_LAYOUT, mxMondrianBase.prototype.cst.SHAPE_LAYOUT_DEFAULT).split(':')[0];
-		const shapeSubLayout = mxUtils.getValue(this.state.style, mxMondrianBase.prototype.cst.SHAPE_LAYOUT, mxMondrianBase.prototype.cst.SHAPE_LAYOUT_DEFAULT).split(':')[1];
-		rect = mxMondrianBase.prototype.getRectangle(rect, shapeType, shapeLayout, shapeSubLayout);
+		rect = mxMondrianBase.prototype.getRectangle(rect, shapeType, shapeLayout);
 	}
 
 	return rect;
@@ -2637,6 +2635,8 @@ mxMondrianBaseConnector.prototype.cst =
 	COLOR_INTENSITY_LINE : 'colorIntensityLine',
 	COLOR_INTENSITY_LINE_DEFAULT : 'medium',
 
+	ATTRIBUTES_TEXT : 'attributesText',
+
 	EDGE_LABEL_1: 'edgeLabel1',
 	EDGE_LABEL_2: 'edgeLabel2',
 	EDGE_LABEL_ATTRIBUTES: 'edgeLabelAttributes',
@@ -2649,7 +2649,7 @@ mxMondrianBaseConnector.prototype.init = function(container)
 	if(this.state != null)
 	{
 		this.cellID = this.state.cell.id;
-		this.installListeners();	
+		this.installListeners();
 	}
 	mxConnector.prototype.init.apply(this, arguments);
 }
@@ -2717,9 +2717,9 @@ mxMondrianBaseConnector.prototype.createEdgeLabel = function(graph, cellState, e
 	return edgeLabel;
 }
 
-mxMondrianBaseConnector.prototype.getEdgeLabelFormat = function(edgeLabelAttributes)
+mxMondrianBaseConnector.prototype.getLabelFormat = function(labelAttributes)
 {
-	let attributes = edgeLabelAttributes.split(',');
+	let attributes = labelAttributes.split(',');
 
 	let highestKeyWithAttribute = -1;
 
@@ -2728,23 +2728,23 @@ mxMondrianBaseConnector.prototype.getEdgeLabelFormat = function(edgeLabelAttribu
 			highestKeyWithAttribute = key;
 	}
 
-	let edgeLabelFormat = undefined;
+	let labelFormat = undefined;
 
 	switch(highestKeyWithAttribute) {
 		case -1:
-			edgeLabelFormat = 'nolabel';
+			labelFormat = 'nolabel';
 			break;
 		case 0:
-			edgeLabelFormat = 'default:1';
+			labelFormat = 'default:1';
 			break;
 		case 1:
-			edgeLabelFormat = 'default:1,2';
+			labelFormat = 'default:1,2';
 			break;
 		default:
-			edgeLabelFormat = 'default:1,2,3';
+			labelFormat = 'default:1,2,3';
 	}
 
-	return edgeLabelFormat;
+	return labelFormat;
 }
 
 mxMondrianBaseConnector.prototype.paintEdgeShape = function(c, pts)
@@ -2769,6 +2769,8 @@ mxMondrianBaseConnector.prototype.paintLine = function(c, pts)
 const mondrianBaseConnectorAttributes = ['Interface-ID', 'Interface-Name'];
 const mondrianBaseConnectorDefaultVersionAttribute = 'mondrianVersion';
 const mondrianBaseConnectorDefaultVersion = '1.0.0';
+const mondrianBaseConnectorDefaultAttributes = ["Interface-ID","Interface-Name","noText"];
+
 mxMondrianBaseConnector.prototype.addAttributes = function(connector)
 {
 	if(connector.state != null)
@@ -2800,21 +2802,64 @@ mxMondrianBaseConnector.prototype.addAttributes = function(connector)
 		mxMondrianBase.prototype.setAttributesFromRepo(connector.state, 'Interface-ID');
 
 		// Set Label Value
+		let attributesText = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.ATTRIBUTES_TEXT, undefined);
+		let attributesChanged = false;
+		let attributes = [];
+
+		if(attributesText === undefined || attributesText === 'undefined')
+		{
+			attributes = mondrianBaseConnectorDefaultAttributes;
+			attributesChanged = true;
+		}
+		else
+		{
+			let formatText = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT, 'default:1');
+			let attributesCount = 0;
+
+			// to support transition away from separate value to control textFormat
+			if(formatText === 'default:1')
+				attributesCount = 1;
+			else if(formatText === 'default' || formatText === 'default:1,2')
+				attributesCount = 2;
+			else if(formatText === 'default:1,2,3')
+				attributesCount = 3;
+
+			attributes = attributesText.split(',');
+			for (let i = 0; i < attributes.length; i++)
+			{
+				if(attributes[i] === 'default')
+				{
+					if(i < attributesCount)
+						attributes[i] = mondrianBaseConnectorDefaultAttributes[i];
+					else
+						attributes[i] = 'noText';
+
+					attributesChanged = true;
+				}
+			}
+		}
+
+		if(attributesChanged)
+		{
+			attributesText = attributes.join(",");
+			cell.style = mxUtils.setStyle(cell.style, mxMondrianBaseConnector.prototype.cst.ATTRIBUTES_TEXT, attributesText);
+		}
+		
+
 		cell.value.setAttribute('label',
-				mxMondrianBase.prototype.defineLabel(
-					mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBase.prototype.cst.FORMAT_TEXT),
-					mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBase.prototype.cst.ATTRIBUTES_TEXT),
-					cell, 'defaultSettingsConnector'));
+			mxMondrianBase.prototype.defineLabel(
+				mxMondrianBaseConnector.prototype.getLabelFormat(attributesText), attributesText,
+				cell, 'defaultSettingsConnector'));
 	}
 }
 
 mxMondrianBaseConnector.prototype.addEdgeLabels = function(connector)
 {
-	if(connector.state != null)
+	if(connector.state != null && connector.state.cell != null && connector.state.view.getState(connector.state.cell) != null)
 	{
 		let cell = connector.state.cell;
 		let cellState = connector.state.view.getState(cell);
-
+		
 		let el1Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
 		let el2Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
 
@@ -2852,7 +2897,7 @@ mxMondrianBaseConnector.prototype.addEdgeLabels = function(connector)
 				{
 					child.value.setAttribute('label', 
 						mxMondrianBase.prototype.defineLabel(
-							mxMondrianBaseConnector.prototype.getEdgeLabelFormat(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES]),
+							mxMondrianBaseConnector.prototype.getLabelFormat(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES]),
 							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES],
 							child,
 							'defaultSettingsConnector'));	
@@ -2868,7 +2913,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 		onChange: function(graph, newValue)
 		{
 			let selectedCells = graph.getSelectionCells();
-			console.log(graph, newValue, selectedCells);
+			
 			for (let i = 0; i < selectedCells.length; i++)
 			{			
 				let colorIntensityLine = mxMondrianBase.prototype.getStyleValue(
@@ -2927,7 +2972,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 		}
 	},
 	// Label
-	{name:'formatText', dispName:'Label (Format)', type:'enum', defVal:'default:1',
+	/*{name:'formatText', dispName:'Label (Format)', type:'enum', defVal:'default:1',
 	enumList:[
 		{val:'nolabel', dispName: 'None'},
 		{val:'default:1', dispName: 'Default: Attribute 1'},
@@ -2945,17 +2990,16 @@ mxMondrianBaseConnector.prototype.customProperties = [
 				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(newValue,attributesText,selectedCells[i],'defaultSettingsConnector'));
 			}
 		}
-	},
-	{name: 'attributesText', dispName: 'Label (Attributes)', type: 'staticArr', subType: 'dynamicEnum', size: '3', subDefVal: 'default',
-		enumList:[{val:'noText', dispName: 'None'}, {val:'default', dispName: 'Default'}],
+	},*/
+	{name: 'attributesText', dispName: 'Label (Center)', type: 'staticArr', subType: 'dynamicEnum', size: '3', subDefVal: 'noText',
+		enumList:[{val:'noText', dispName: 'None'}],
 		onChange: function(graph, newValue)
 		{
 			let selectedCells = graph.getSelectionCells();
 			
 			for (let i = 0; i < selectedCells.length; i++)
 			{			
-				let formatText = mxMondrianBase.prototype.getStyleValue(selectedCells[i].style, mxMondrianBase.prototype.cst.FORMAT_TEXT);
-				selectedCells[i].setAttribute('label', mxMondrianBase.prototype.defineLabel(formatText,newValue,selectedCells[i],'defaultSettingsConnector'));
+				selectedCells[i][mxMondrianBaseConnector.prototype.cst.ATTRIBUTES_TEXT] = newValue;
 			}
 		}
 	},
