@@ -1664,16 +1664,7 @@ EditorUi.prototype.convertDarkModeColors = function(cells, keys)
 
 								if (result == null)
 								{
-									ctx.fillStyle = value;
-									ctx.fillRect(0, 0, 1, 1);
-									var imgData = ctx.getImageData(0, 0, 1, 1);
-
-									var r = imgData.data[0];
-									var g = imgData.data[1];
-									var b = imgData.data[2];
-
-									var rgb = b | (g << 8) | (r << 16);
-									result = '#' + (0x1000000 | rgb).toString(16).substring(1);
+									result = Graph.invertColor(value, ctx);
 									colorCache[value] = result;
 								}
 
@@ -6802,6 +6793,38 @@ EditorUi.prototype.createKeyHandler = function(editor)
 	}
 	
 	return keyHandler;
+};
+
+/**
+ * Creates the keyboard event handler for the current graph and history.
+ */
+EditorUi.prototype.createHelpIcon = function(href)
+{
+	var link = document.createElement('div');
+	link.setAttribute('title', mxResources.get('help'));
+	link.style.display = 'inline';
+	link.style.marginLeft = '8px';
+	link.style.cursor = 'help';
+
+	var icon = document.createElement('img');
+	icon.setAttribute('src', Editor.helpImage);
+	icon.setAttribute('valign', 'middle');
+	icon.setAttribute('border', '0');
+	icon.className = 'geAdaptiveAsset';
+	mxUtils.setOpacity(icon, 60);
+	icon.style.marginTop = '-4px';
+	icon.style.height = '16px';
+	icon.style.width = '16px';
+	link.appendChild(icon);
+
+	mxEvent.addListener(link, 'click', mxUtils.bind(this, function(evt)
+	{
+		this.hideCurrentMenu();
+		this.openLink(href);
+		mxEvent.consume(evt);
+	}));
+
+	return link;
 };
 
 /**

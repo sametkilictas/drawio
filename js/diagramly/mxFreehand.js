@@ -111,6 +111,16 @@ function mxFreehand(graph)
 		return perfectFreehandOptions.size;
 	};
 
+	this.setOptions = function(value)
+	{
+		perfectFreehandOptions = value;
+	};
+
+	this.getOptions = function()
+	{
+		return perfectFreehandOptions;
+	};
+
 	var setEnabled = function(isEnabled)
 	{
 		enabled = isEnabled;

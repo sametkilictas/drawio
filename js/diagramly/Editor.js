@@ -253,18 +253,6 @@
 	Editor.globalVars = null;
 
 	/**
-	 * Reference to the config object passed to <configure>.
-	 */
-	Editor.config = null;
-
-	/**
-	 * Reference to the version of the last config object in
-	 * <configure>. If this is different to the last version in
-	 * mxSettings.parse, then the settings are reset.
-	 */
-	Editor.configVersion = null;
-
-	/**
 	 * Default border for image export (to allow for sketch style).
 	 */
 	Editor.defaultBorder = 5;
@@ -289,6 +277,40 @@
 		decodeURIComponent(urlParams['gpt-url']) :
 		'https://api.openai.com/v1/chat/completions';
 	
+	/**
+	 * Specifies if data URIs should be replaced with SVG sub-trees in SVG export.
+	 * Default is true.
+	 */
+	Editor.replaceSvgDataUris = true;
+	
+	/**
+	 * Specifies if foreignObject alternate content should be replaced with an image
+	 * of the HTML text. Default is true.
+	 */
+	Editor.foreignObjectImages = true;
+		
+	/**
+	 * Specifies the scale used to rasterize SVG images. Default is 4.
+	 */
+	Editor.svgRasterScale = 4;
+			
+	/**
+	 * Specifies the scale used to rasterize HTML markup. Default is 4.
+	 */
+	Editor.htmlRasterScale = 4;
+	
+	/**
+	 * Reference to the config object passed to <configure>.
+	 */
+	Editor.config = null;
+
+	/**
+	 * Reference to the version of the last config object in
+	 * <configure>. If this is different to the last version in
+	 * mxSettings.parse, then the settings are reset.
+	 */
+	Editor.configVersion = null;
+
 	/**
 	 * Common properties for all edges.
 	 */
@@ -2187,6 +2209,16 @@
 			{
 				DrawioFile.RESTRICT_EXPORT = config.restrictExport;
 			}
+			
+			if (config.replaceSvgDataUris != null)
+			{
+				Editor.replaceSvgDataUris = config.replaceSvgDataUris;
+			}
+
+			if (config.foreignObjectImages != null)
+			{
+				Editor.foreignObjectImages = config.foreignObjectImages;
+			}
 
 			if (config.gptApiKey != null)
 			{
@@ -2834,20 +2866,16 @@
 		
 		converter.convert = function(src)
 		{
-			if (src != null)
+			if (src != null && navigator.onLine)
 			{
 				var remote = src.substring(0, 7) == 'http://' || src.substring(0, 8) == 'https://';
 				
-				if (remote && !navigator.onLine)
-				{
-					src = Editor.svgBrokenImage.src;
-				}
-				else if (remote && src.substring(0, converter.baseUrl.length) != converter.baseUrl &&
+				if (remote && src.substring(0, converter.baseUrl.length) != converter.baseUrl &&
 						(!self.crossOriginImages || !self.isCorsEnabledForUrl(src)))
 				{
 					src = PROXY_URL + '?url=' + encodeURIComponent(src);
 				}
-				else if (src.substring(0, 19) != 'chrome-extension://' && !mxClient.IS_CHROMEAPP)
+				else if (src.substring(0, 19) != 'chrome-extension://')
 				{
 					src = convert.apply(this, arguments);
 				}
@@ -2870,7 +2898,7 @@
 	/**
 	 * 
 	 */
-	Editor.prototype.convertImageToDataUri = function(url, callback, error)
+	Editor.prototype.convertImageToDataUri = function(url, callback, error, convertScale, forceConvert)
 	{
 		try
 		{
@@ -2879,29 +2907,51 @@
 			var timeoutThread = window.setTimeout(mxUtils.bind(this, function()
 			{
 				acceptResponse = false;
-				callback(Editor.svgBrokenImage.src);
+				callback(url);
 			}), this.timeout);
+
+			// Fallback to raster image if SVG cannot be loaded
+			var svgError = mxUtils.bind(this, function()
+			{
+				if (convertScale != null)
+				{
+					this.convertImageToDataUri(url, callback, error, convertScale, true);
+				}
+				else
+				{
+					callback(url);
+				}
+			});
 	
-			if (/(\.svg)$/i.test(url))
+			if (/(\.svg)$/i.test(url) && !forceConvert)
 			{
 				mxUtils.get(url, mxUtils.bind(this, function(req)
 				{
 			    	window.clearTimeout(timeoutThread);
-					
+
 					if (acceptResponse)
 					{
-						callback(Editor.createSvgDataUri(req.getText()));
+						if (req.getStatus() < 200 || req.getStatus() > 299)
+						{
+							svgError();
+						}
+						else
+						{
+							callback(Editor.createSvgDataUri(req.getText()));
+						}
+
+						
 					}
 				}),
-				function()
+				mxUtils.bind(this, function()
 				{
 			    	window.clearTimeout(timeoutThread);
-					
+
 					if (acceptResponse)
 					{
-						callback(Editor.svgBrokenImage.src);
+						svgError();
 					}
-				});
+				}));
 			}
 			else
 			{
@@ -2920,17 +2970,21 @@
 					{
 				        try
 				        {
+							convertScale = (convertScale != null &&
+								forceConvert) ? convertScale : 1;
+
 					        var canvas = document.createElement('canvas');
 					        var ctx = canvas.getContext('2d');
-					        canvas.height = img.height;
-					        canvas.width = img.width;
+							ctx.scale(convertScale, convertScale);
+					        canvas.height = img.height * convertScale;
+					        canvas.width = img.width * convertScale;
 					        ctx.drawImage(img, 0, 0);
-
+							
 				        	callback(canvas.toDataURL());
 				        }
 				        catch (e)
 				        {
-			        		callback(Editor.svgBrokenImage.src);
+			        		callback(url);
 				        }
 					}
 			    };
@@ -2947,7 +3001,7 @@
 						}
 						else
 						{
-							callback(Editor.svgBrokenImage.src);
+							callback(url);
 						}
 					}
 			    };
@@ -2963,11 +3017,10 @@
 			}
 			else
 			{
-				callback(Editor.svgBrokenImage.src);
+				callback(url);
 			}
 		}
 	};
-	
 	
 	/**
 	 * Converts all images in the SVG output to data URIs for immediate rendering
@@ -2980,19 +3033,16 @@
 			converter = this.createImageUrlConverter();
 		}
 		
-		// Barrier for asynchronous image loading
-		var counter = 0;
-		
-		function inc()
+		// Queues image conversion and executes in order
+		var pending = [];
+
+		function next()
 		{
-			counter++;
-		};
-		
-		function dec()
-		{
-			counter--;
-			
-			if (counter == 0)
+			if (pending.length > 0)
+			{
+				pending.shift()();
+			}
+			else
 			{
 				callback(svgRoot);
 			}
@@ -3008,47 +3058,52 @@
 			{
 				(mxUtils.bind(this, function(img)
 				{
-					try
+					pending.push(mxUtils.bind(this, function()
 					{
-						if (img != null)
+						try
 						{
-							var src = converter.convert(img.getAttribute(srcAttr));
-				        	
-							// Data URIs are pass-through
-							if (src != null && src.substring(0, 5) != 'data:')
+							if (img != null)
 							{
-								var tmp = cache[src];
-								
-								if (tmp == null)
+								var src = converter.convert(img.getAttribute(srcAttr));
+
+								// Data URIs are pass-through
+								if (src != null && src.substring(0, 5) != 'data:')
 								{
-									inc();
-									
-									this.convertImageToDataUri(src, function(uri)
+									var tmp = cache[src];
+
+									if (tmp == null)
 									{
-										if (uri != null)
+										this.convertImageToDataUri(src, function(uri)
 										{
-											cache[src] = uri;
-											img.setAttribute(srcAttr, uri);
-										}
-										
-										dec();
-									});
+											if (uri != null)
+											{
+												cache[src] = uri;
+												img.setAttribute(srcAttr, uri);
+											}
+											
+											next();
+										}, null, Editor.svgRasterScale);
+									}
+									else
+									{
+										img.setAttribute(srcAttr, tmp);
+
+										next();
+									}
 								}
-								else
+								else if (src != null)
 								{
-									img.setAttribute(srcAttr, tmp);
+									img.setAttribute(srcAttr, src);
+
+									next();
 								}
-							}
-							else if (src != null)
-							{
-								img.setAttribute(srcAttr, src);
 							}
 						}
-					}
-					catch (e)
-					{
-						// ignore
-					}
+						catch (e)
+						{
+							next();
+						}
+					}));
 				}))(images[i]);
 			}
 		});
@@ -3057,14 +3112,9 @@
 		// LATER: Add support for images in CSS
 		convertImages('image', 'xlink:href');
 		convertImages('img', 'src');
-		
-		// All from cache or no images
-		if (counter == 0)
-		{
-			callback(svgRoot);
-		}
+		next();
 	};
-
+		
 	/**
 	 * Base64 encodes the given string. This method seems to be more
 	 * robust for encoding PNG from binary AJAX responses.
@@ -3500,7 +3550,6 @@
 		                        googleCssDone();
 		                    }), mxUtils.bind(this, function(err)
 		                    {
-		                        // LATER: handle error
 		                        waiting--;
 								content.push('@import url(' + fontUrl + ');\n');
 		                        googleCssDone();
@@ -3587,12 +3636,40 @@
 				defsElt = defs[0];
 			}
 
+			// Moves imports to separate style element
+			var lines = fontCss.split('\n');
+			var imports = [];
+			var other = [];
+
+			for (var i = 0; i < lines.length; i++)
+			{
+				if (lines[i].substring(0, 7) == '@import')
+				{
+					imports.push(lines[i]);
+				}
+				else
+				{
+					other.push(lines[i]);
+				}
+			}
+			
 			var style = (svgDoc.createElementNS != null) ?
 				svgDoc.createElementNS(mxConstants.NS_SVG, 'style') :
 				svgDoc.createElement('style');
 			style.setAttribute('type', 'text/css');
-			mxUtils.setTextContent(style, fontCss);
-			defsElt.appendChild(style);
+
+			if (imports.length > 0)
+			{
+				mxUtils.setTextContent(style, imports.join('\n'));
+				defsElt.appendChild(style);
+			}
+
+			if (other.length > 0)
+			{
+				style = style.cloneNode(false);
+				mxUtils.setTextContent(style, other.join('\n'));
+				defsElt.appendChild(style);
+			}
 		}
 	};
 	
@@ -6796,7 +6873,7 @@
 				result.setAttribute('class', cssClass);
 			}
 
-			var style = Graph.createSvgDarkModeStyle(result.ownerDocument, theme, cssClass);
+			var style = Graph.createSvgDarkModeStyle(result.ownerDocument, theme, cssClass, background);
 			result.getElementsByTagName('defs')[0].appendChild(style);
 		}
 		

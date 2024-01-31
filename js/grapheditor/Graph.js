@@ -1465,7 +1465,7 @@ Graph.createOffscreenGraph = function(stylesheet)
 
 	return graph;
 };
- 
+
 /**
  * Helper function for creating SVG data URI.
  */
@@ -1486,17 +1486,18 @@ Graph.createSvgDarkModeCss = function(cssClass)
 {
 	cssClass = (cssClass != null) ? '.' + cssClass : '';
 
-	return 'svg' + cssClass + ' > * { filter: invert(100%) hue-rotate(180deg); }\n' +
-		'svg' + cssClass + ' image { filter: invert(100%) hue-rotate(180deg) }';
+	return 'svg' + cssClass + ' { filter: invert(100%) hue-rotate(180deg); }\n' +
+		'svg' + cssClass + ' foreignObject img,\n' +
+		'svg' + cssClass + ' image:not(svg' + cssClass + ' switch image),\n' +
+		'svg' + cssClass + ' svg { filter: invert(100%) hue-rotate(180deg) }';
 };
 
 /**
  * 
  */
-Graph.createSvgDarkModeStyle = function(svgDoc, theme, cssClass)
+Graph.createSvgDarkModeStyle = function(svgDoc, theme, cssClass, bg)
 {
-	var style = (svgDoc.createElementNS != null) ?
-		svgDoc.createElementNS(mxConstants.NS_SVG, 'style') : svgDoc.createElement('style');
+	var style = mxUtils.createElementNs(svgDoc, mxConstants.NS_SVG, 'style');
 	svgDoc.setAttributeNS != null? style.setAttributeNS('type', 'text/css') :
 		style.setAttribute('type', 'text/css');
 	var css = Graph.createSvgDarkModeCss(cssClass);
@@ -1504,15 +1505,48 @@ Graph.createSvgDarkModeStyle = function(svgDoc, theme, cssClass)
 	if (theme == 'auto')
 	{
 		cssClass = (cssClass != null) ? '.' + cssClass : '';
-		css = '@media (prefers-color-scheme: dark) {' + css + '\n' +
-		'	svg' + cssClass + '[style^="background-color: rgb(255, 255, 255);"] {' +
-		'		background-color: ' + Editor.darkColor + ' !important;' +
-		'	}}';
+		css = '@media (prefers-color-scheme: dark) {\n' + css + '\n';
+
+		if (bg != null)
+		{
+			css += 'svg' + cssClass + ' { background-color: ' +
+				Graph.invertColor(bg) + ' !important; }\n';
+		}
+		
+		css += '}';
 	}
 
 	style.appendChild(svgDoc.createTextNode(css));
 
 	return style;
+};
+
+/**
+ * Returns information about the current selection.
+ */
+Graph.invertColor = function(value, ctx)
+{
+	if (ctx == null)
+	{
+		var canvas = document.createElement('canvas');
+		canvas.width = 1;
+		canvas.height = 1;
+
+		var ctx = canvas.getContext('2d');
+		ctx.filter = 'invert(100%) hue-rotate(180deg)';
+	}
+
+	ctx.fillStyle = value;
+	ctx.fillRect(0, 0, 1, 1);
+	var imgData = ctx.getImageData(0, 0, 1, 1);
+
+	var r = imgData.data[0];
+	var g = imgData.data[1];
+	var b = imgData.data[2];
+
+	var rgb = b | (g << 8) | (r << 16);
+
+	return '#' + (0x1000000 | rgb).toString(16).substring(1);
 };
 
 /**
@@ -1573,27 +1607,53 @@ Graph.createSvgNode = function(x, y, w, h, background)
 
 	return root;
 };
- 
+
 /**
  * Helper function for creating an SVG node.
  */
-Graph.htmlToPng = function(html, w, h, fn)
+Graph.htmlToPng = function(html, w, h, fn, css, scale)
 {
+	css = (css != null) ? css : '';
+	scale = (scale != null) ? scale : Editor.htmlRasterScale;
+
 	var canvas = document.createElement('canvas');
-	canvas.width = w;
-	canvas.height = h;
+	canvas.width = w * scale;
+	canvas.height = h * scale;
 
 	var img = document.createElement('img');
 	img.onload = mxUtils.bind(this, function()
 	{
-		var ctx = canvas.getContext('2d');
-		ctx.drawImage(img, 0, 0)
+		try
+		{
+			var ctx = canvas.getContext('2d');
+			ctx.scale(scale, scale);
+			ctx.drawImage(img, 0, 0)
 
-		fn(canvas.toDataURL());
+			fn(canvas.toDataURL());
+		}
+		catch (e)
+		{
+			fn(null);
+		}
 	});
 
-	img.src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">' +
-		'<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml"><style>em{color:red;}</style><em>I</em> lick <span>cheese</span></div></foreignObject></svg>');
+	// Converts HTML to XHTML
+	var svgDoc = mxUtils.createXmlDocument();
+	var root = (svgDoc.createElementNS != null) ?
+		svgDoc.createElementNS(mxConstants.NS_SVG, 'svg') : svgDoc.createElement('svg');
+	var svgCanvas = new mxSvgCanvas2D(root);
+	html = svgCanvas.convertHtml(html);
+
+	var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '">' +
+		((css != '') ? '<defs xmlns="http://www.w3.org/2000/svg"><style type="text/css">' + css + '</style></defs>' : '') +
+		'<foreignObject width="100%" height="100%"><div xmlns="http://www.w3.org/1999/xhtml">' + html + '</div></foreignObject></svg>';
+	
+	img.onerror = function(err)
+	{
+		fn(null);
+	};
+
+	img.src = 'data:image/svg+xml,' + encodeURIComponent(svg);
 };
 
 /**
@@ -2703,7 +2763,8 @@ Graph.prototype.defaultThemes = {};
  * Base URL for relative links.
  */
 Graph.prototype.baseUrl = (urlParams['base'] != null) ?
-	decodeURIComponent(urlParams['base']) :
+	mxUtils.removeJavascriptProtocol(
+		decodeURIComponent(urlParams['base'])) :
 	(((window != window.top) ? document.referrer :
 	document.location.toString()).split('#')[0]);
 
@@ -4334,7 +4395,6 @@ Graph.prototype.sanitizeHtml = function(value, editing)
  */
 Graph.prototype.updatePlaceholders = function()
 {
-	var model = this.model;
 	var validate = false;
 	
 	for (var key in this.model.cells)
@@ -5471,7 +5531,8 @@ Graph.prototype.convertValueToString = function(cell)
 			{
 				if (current.value != null && typeof(current.value) == 'object')
 				{
-					result = (current.hasAttribute(name)) ? ((current.getAttribute(name) != null) ?
+					result = (current.hasAttribute(name)) ?
+						((current.getAttribute(name) != null) ?
 							current.getAttribute(name) : '') : null;
 				}
 				
@@ -5508,29 +5569,32 @@ Graph.prototype.getLinksForState = function(state)
 	{
 		return state.text.node.getElementsByTagName('a');
 	}
-	
-	return null;
+	else
+	{
+		return null;
+	}
 };
 
 /**
  * Returns the link for the given cell.
  */
-Graph.prototype.getLinkForCell = function(cell)
+Graph.prototype.getLinkForCell = function(cell, allowUnsafe)
 {
 	if (cell.value != null && typeof(cell.value) == 'object')
 	{
 		var link = cell.value.getAttribute('link');
-		
-		// Removes javascript protocol
-		while (link != null && link.toLowerCase().substring(0, 11) === 'javascript:')
+
+		if (!allowUnsafe)
 		{
-			link = link.substring(11);
+			link = mxUtils.removeJavascriptProtocol(link);
 		}
-		
+
 		return link;
 	}
-	
-	return null;
+	else
+	{
+		return null;
+	}
 };
 
 /**
@@ -5542,8 +5606,10 @@ Graph.prototype.getLinkTargetForCell = function(cell)
 	{
 		return cell.value.getAttribute('linkTarget');
 	}
-
-	return null;
+	else
+	{
+		return null;
+	}
 };
 
 /**
@@ -6084,11 +6150,17 @@ Graph.prototype.fitWindow = function(bounds, border)
 
 	if (mxUtils.hasScrollbars(this.container))
 	{
-		var t = this.view.translate;
-		this.container.scrollLeft = (bounds.x + t.x) * this.view.scale -
-			Math.max((cw - bounds.width * this.view.scale) / 2 + border / 2, 0);
-		this.container.scrollTop = (bounds.y + t.y) * this.view.scale -
-			Math.max((ch - bounds.height * this.view.scale) / 2 + border / 2, 0);
+		// Call to zoom above may trigger an asynchronous update of the scrollbars
+		// as setting scrollTop/-Left is executed asynchronously so the code below
+		// ensures that the final state of the scrollbars is as intended.
+		window.setTimeout(mxUtils.bind(this, function()
+		{
+			var t = this.view.translate;
+			this.container.scrollLeft = (bounds.x + t.x) * this.view.scale -
+				Math.max((cw - bounds.width * this.view.scale) / 2 + border / 2, 0);
+			this.container.scrollTop = (bounds.y + t.y) * this.view.scale -
+				Math.max((ch - bounds.height * this.view.scale) / 2 + border / 2, 0);
+		}), 0);
 	}
 };
 
@@ -11372,7 +11444,16 @@ if (typeof mxVertexHandler !== 'undefined')
 				{
 					throw Error(mxResources.get('drawingEmpty'));
 				}
-	
+
+				// Converts CSS background color as it is excluded from the filter
+				var svgBackground = background;
+
+				if (svgBackground != null && theme == 'dark' &&
+					Editor.enableCssDarkMode)
+				{
+					svgBackground = Graph.invertColor(background);
+				}
+
 				// Prepares SVG document that holds the output
 				var s = scale / vs;
 				var w = Math.max(1, Math.ceil(bounds.width * s) + 2 * border) +
@@ -11380,13 +11461,27 @@ if (typeof mxVertexHandler !== 'undefined')
 				var h = Math.max(1, Math.ceil(bounds.height * s) + 2 * border) +
 					((hasShadow && border == 0) ? 5 : 0);
 				var tmp = (crisp) ? -0.5 : 0;
-				var root = Graph.createSvgNode(tmp, tmp, w, h, background);
+				var root = Graph.createSvgNode(tmp, tmp, w, h, svgBackground);
 				var svgDoc = root.ownerDocument;
+
+				// Adds background as an additional rectangle for
+				// compatiblity with MS Office and event handling
+				if (background != null)
+				{
+					var rect = mxUtils.createElementNs(
+						svgDoc, mxConstants.NS_SVG, 'rect');
+					rect.setAttribute('fill', background);
+					rect.setAttribute('width', '100%');
+					rect.setAttribute('height', '100%');
+					rect.setAttribute('x', '0');
+					rect.setAttribute('y', '0');
+					root.appendChild(rect);
+				}
 
 			    // Renders graph. Offset will be multiplied with state's scale when painting state.
 				// TextOffset only seems to affect FF output but used everywhere for consistency.
-				var group = (svgDoc.createElementNS != null) ?
-			    	svgDoc.createElementNS(mxConstants.NS_SVG, 'g') : svgDoc.createElement('g');
+				var group = mxUtils.createElementNs(
+					svgDoc, mxConstants.NS_SVG, 'g');
 			    root.appendChild(group);
 
 				var svgCanvas = this.createSvgCanvas(group);
