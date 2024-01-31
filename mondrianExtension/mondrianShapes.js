@@ -2689,18 +2689,25 @@ mxMondrianBaseConnector.prototype.installListeners = function()
 	}
 }
 
-mxMondrianBaseConnector.prototype.getEdgeLabel = function(graph, cell, edgeChild)
+mxMondrianBaseConnector.prototype.setEdgeLabel = function(graph, cell, edgeChild)
 {
-	let childID = mxMondrianBase.prototype.getStyleValue(cell.style, edgeChild, undefined);
+	let isChild1 = false;
+	let isChild2 = false;
 
-	if(childID === undefined || childID === 'undefined')
+	if(cell.children != undefined)
 	{
-		let childCell = mxMondrianBaseConnector.prototype.createEdgeLabel(graph, graph.view.getState(cell), edgeChild);
-		childID = childCell.id;
-		graph.setCellStyles(edgeChild, childID, [cell]);
+		for (let c = 0; c < cell.children.length; c++)
+		{
+			let child = cell.children[c];
+			let edgeChildNumber = mxMondrianBase.prototype.getStyleValue(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, undefined);
+
+			isChild1 = (isChild1 || (edgeChildNumber == 1));
+			isChild2 = (isChild2 || (edgeChildNumber == 2));
+		}
 	}
 
-	return childID;
+	if( (edgeChild === mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1 && !isChild1) || (edgeChild === mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2 && !isChild2))
+		mxMondrianBaseConnector.prototype.createEdgeLabel(graph, graph.view.getState(cell), edgeChild);
 }
 
 mxMondrianBaseConnector.prototype.createEdgeLabel = function(graph, cellState, edgeChild)
@@ -2857,7 +2864,6 @@ mxMondrianBaseConnector.prototype.addAttributes = function(connector)
 			cell.style = mxUtils.setStyle(cell.style, mxMondrianBaseConnector.prototype.cst.ATTRIBUTES_TEXT, attributesText);
 		}
 		
-
 		cell.value.setAttribute('label',
 			mxMondrianBase.prototype.defineLabel(
 				mxMondrianBaseConnector.prototype.getLabelFormat(attributesText), attributesText,
@@ -2871,53 +2877,56 @@ mxMondrianBaseConnector.prototype.addEdgeLabels = function(connector)
 	{
 		let cell = connector.state.cell;
 		let cellState = connector.state.view.getState(cell);
-		
-		let el1Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
-		let el2Child = mxMondrianBase.prototype.getStyleValue(cell.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
 
 		if(cellState.cell.children != undefined)
 		{
+			let parent = cellState.cell;
+
+			let el1Child = mxMondrianBase.prototype.getStyleValue(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
+			let el2Child = mxMondrianBase.prototype.getStyleValue(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
+
 			for (let c = 0; c < cellState.cell.children.length; c++)
 			{
 				let child = cellState.cell.children[c];
-				let parent = cellState.cell;
-				if(child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES] != undefined)
-				{
-					let edgeChild = mxMondrianBase.prototype.getStyleValue(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, undefined);
 
-					if(edgeChild === undefined || edgeChild === 'undefined') // old diagrams did not store the edgeChild
-					{
-						let edgeChild = 0;
-						if(child.id === el1Child)
-						{
-							edgeChild = 1;
-						}
-						else if(child.id === el2Child)
-						{
-							edgeChild = 2;
-						}
+				let isChild1 = false;
+				let isChild2 = false;
+
+				let edgeChild = mxMondrianBase.prototype.getStyleValue(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, undefined);
+
+				if(edgeChild == undefined || edgeChild == 'undefined') // CLEANUP OF OLD USAGE OF ATTRIBUTES
+				{		
+					isChild1 = (child.id == el1Child);
+					isChild2 = (child.id == el2Child);
 	
-						child.style = mxUtils.setStyle(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, edgeChild);
-					}
-					else  // temporary fix is to update parent with correct child id
+					if(isChild1)
 					{
-						if(edgeChild == 1 && (child.id != el1Child) )
-						{
-							parent.style = mxUtils.setStyle(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, child.id);
-						}
-						else if(edgeChild == 2 && (child.id != el2Child) )
-						{
-							parent.style = mxUtils.setStyle(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, child.id);
-						}
+						edgeChild = 1;
+						child.style = mxUtils.setStyle(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, edgeChild);
+						parent.style = mxUtils.setStyle(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1, undefined);
 					}
+					else if(isChild2)
+					{
+						edgeChild = 2;
+						child.style = mxUtils.setStyle(child.style, mxMondrianBaseConnector.prototype.cst.EDGE_CHILD, edgeChild);
+						parent.style = mxUtils.setStyle(parent.style, mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2, undefined);
+					}
+				}
+				else
+				{
+					isChild1 = (edgeChild == 1);
+					isChild2 = (edgeChild == 2);
+				}
 
+				let edgeLabelAttribute = (isChild1) ? mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1_ATTRIBUTES : ((isChild2) ? mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2_ATTRIBUTES : undefined);
+				let edgeLabelAttributes = (edgeLabelAttribute) ?  mxMondrianBase.prototype.getStyleValue(parent.style, edgeLabelAttribute, undefined) : undefined;
+
+				if(edgeLabelAttributes != undefined && edgeLabelAttributes != 'undefined')
+				{
 					child.value.setAttribute('label', 
-						mxMondrianBase.prototype.defineLabel(
-							mxMondrianBaseConnector.prototype.getLabelFormat(
-							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES]),
-							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES],
-							child,
-							'defaultSettingsConnector'));
+					mxMondrianBase.prototype.defineLabel(
+						mxMondrianBaseConnector.prototype.getLabelFormat(edgeLabelAttributes), edgeLabelAttributes,
+						child, 'defaultSettingsConnector'));
 				}
 			}
 		}	
@@ -3028,19 +3037,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 			
 			for (let i = 0; i < selectedCells.length; i++)
 			{	
-				let childID = mxMondrianBaseConnector.prototype.getEdgeLabel(graph, selectedCells[i],
-					mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1);
-
-				if(childID != undefined)
-				{
-					for (let c = 0; c < selectedCells[i].children.length; c++)
-					{
-						let child = selectedCells[i].children[c];
-
-						if(child.id === childID)
-							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES] = newValue;
-					}	
-				}
+				mxMondrianBaseConnector.prototype.setEdgeLabel(graph, selectedCells[i], mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_1);
 			}
 		}
 	},
@@ -3052,19 +3049,7 @@ mxMondrianBaseConnector.prototype.customProperties = [
 			
 			for (let i = 0; i < selectedCells.length; i++)
 			{	
-				let childID = mxMondrianBaseConnector.prototype.getEdgeLabel(graph, selectedCells[i],
-					mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2);
-
-				if(childID != undefined)
-				{
-					for (let c = 0; c < selectedCells[i].children.length; c++)
-					{
-						let child = selectedCells[i].children[c];
-						
-						if(child.id === childID)
-							child[mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_ATTRIBUTES] = newValue;
-					}	
-				}
+				mxMondrianBaseConnector.prototype.setEdgeLabel(graph, selectedCells[i], mxMondrianBaseConnector.prototype.cst.EDGE_LABEL_2);
 			}
 		}
 	},
