@@ -2957,6 +2957,25 @@ var mxUtils =
 	},
 	
 	/**
+	 * Function: removeJavascriptProtocol
+	 * 
+	 * Removes leading javascript: protocol from the given link.
+	 * 
+	 * Parameters:
+	 * 
+	 * link - String that represents the link.
+	 */
+	removeJavascriptProtocol: function(link)
+	{
+		while (link != null && mxUtils.ltrim(link.toLowerCase()).substring(0, 11) === 'javascript:')
+		{
+			link = link.substring(link.toLowerCase().indexOf(':') + 1);
+		}
+
+		return link;
+	},
+
+	/**
 	 * Function: ltrim
 	 * 
 	 * Strips all whitespaces from the beginning of the string. Without the
@@ -3279,6 +3298,36 @@ var mxUtils =
 		}
 	},
 
+	/**
+	 * Function: createElementNs
+	 * 
+	 * Helper function for creating an element in a namespace.
+	 * 
+	 * Parameters:
+	 * 
+	 * doc - Owner document of the new element.
+	 * ns - Namespace for the element.
+	 * tagName - Qualified name of the element.
+	 */
+	createElementNs: function(doc, ns, tagName)
+	{
+		if (doc.createElementNS != null)
+		{
+			return doc.createElementNS(ns, tagName);
+		}
+		else
+		{
+			var elt = doc.createElement(tagName);
+			
+			if (namespace != null)
+			{
+				elt.setAttribute('xmlns', ns);
+			}
+			
+			return elt;
+		}
+	},
+	
 	/**
 	 * Function: createImage
 	 * 

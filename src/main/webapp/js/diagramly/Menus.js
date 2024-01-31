@@ -22,24 +22,19 @@
 		link.setAttribute('title', mxResources.get('help'));
 		link.style.display = 'inline-flex';
 		link.style.alignItems = 'center';
+		link.style.marginLeft = '4px';
 		link.style.cursor = 'help';
 		link.style.color = 'blue';
-		link.style.textDecoration = 'underline';
-		link.style.marginLeft = '4px';
 		
 		var icon = document.createElement('img');
-		mxUtils.setOpacity(icon, 50);
+		icon.setAttribute('src', Editor.helpImage);
+		icon.setAttribute('valign', 'bottom');
+		icon.setAttribute('border', '0');
+		icon.className = 'geAdaptiveAsset';
+		mxUtils.setOpacity(icon, 60);
 		icon.style.height = '16px';
 		icon.style.width = '16px';
-		icon.setAttribute('border', '0');
-		icon.setAttribute('valign', 'bottom');
-		icon.setAttribute('src', Editor.helpImage);
 		link.appendChild(icon);
-
-		if (Editor.cssDarkMode)
-		{
-			icon.className = 'geAdaptiveAsset';
-		}
 
 		mxEvent.addGestureListeners(link, mxUtils.bind(this, function(evt)
 		{
@@ -835,24 +830,16 @@
 				'https://www.drawio.com/doc/faq/export-diagram',
 				mxUtils.bind(this, function(scale, transparentBackground, ignoreSelection,
 					addShadow, editable, embedImages, border, cropImage, currentPage,
-					linkTarget, grid, theme, exportType, embedFonts, lblToSvg)
+					linkTarget, grid, theme, exportType, embedFonts)
 				{
 					var val = parseInt(scale);
 					editorUi.lastExportSvgEditable = editable;
 					
 					if (!isNaN(val) && val > 0)
 					{
-						if (lblToSvg)
-						{
-							editorUi.downloadFile('remoteSvg', null, null, ignoreSelection, null, cropImage,
-								transparentBackground, scale, border, null, editable);
-						}
-						else
-						{
-							editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
-								addShadow, editable, embedImages, border, !cropImage, false,
-								linkTarget, theme, exportType, embedFonts);
-						}
+						editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
+							addShadow, editable, embedImages, border, !cropImage, false,
+							linkTarget, theme, exportType, embedFonts);
 					}
 				}), true, editorUi.lastExportSvgEditable, 'svg', true);
 		}));
@@ -1339,7 +1326,7 @@
 							}
 							else
 							{
-								elt.style.backgroundImage = 'url(' + ((Editor.isDarkMode()) ?
+								elt.style.backgroundImage = 'url(' + ((Editor.isDarkMode() || Editor.cssDarkMode) ?
 									Editor.darkModeImage : Editor.lightModeImage) + ')';
 							}
 						});
@@ -3879,8 +3866,10 @@
 
 				if (uiTheme == 'min' || Editor.currentTheme == 'simple')
 				{
-					this.addSubmenu('table', menu, parent);
 					this.addSubmenu('layout', menu, parent);
+					this.addSubmenu('insertLayout', menu, parent, mxResources.get('insert'));
+					menu.addSeparator(parent);
+					this.addSubmenu('table', menu, parent);
 				}
 				else
 				{
