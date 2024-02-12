@@ -18,6 +18,9 @@ class MondrianRepo {
     STENCILS = {};
 	ICONS = [];
 
+    MONDRIAN_BASE_STENCIL_REGISTRY = 'mondrianbase.';
+	MONDRIAN_ICONS_STENCIL_REGISTRY = 'mondrianicons.';
+
     constructor() {
     }
 
@@ -217,6 +220,87 @@ class MondrianRepo {
                 });
             }
         }
+    }
+
+    getAttributesFromRepo = function(thisState, predefinedID)
+    {
+        return this.setAttributesFromRepo(thisState, predefinedID, true);
+    }
+
+    setAttributesFromRepo = function(thisState, predefinedID, noSet = false)
+    {
+        let predefinedElements = ['undefined'];
+        let formatSettings = undefined;
+        let newRepoAttributes = [];
+
+        if(thisState != null)
+        {
+            let canvasCell = thisState.view.graph.model.root;
+
+            if(canvasCell != undefined && canvasCell.value != undefined)
+                predefinedElements = (canvasCell.hasAttribute('Predefined-Elements')) ? canvasCell.value.getAttribute('Predefined-Elements').split(',') : ['default'];
+        }
+
+        let elementID = thisState.cell.getAttribute((predefinedID != undefined) ? predefinedID : 'Element-ID');
+
+        if(window.MONDRIAN_REPO.hasElement(predefinedElements, elementID))
+        {
+            let element = window.MONDRIAN_REPO.getElement(predefinedElements, elementID);
+
+            for (let attributeInRepo in element) // set data attribute
+            {
+                if(attributeInRepo === 'format')
+                {
+                    formatSettings = element[attributeInRepo].mandatorySettings;
+                }
+                else
+                {
+                    let validAttribute = (!attributeInRepo.endsWith('_tabbed') && !attributeInRepo.endsWith('_raw')); // HACK TO REMOVE ATTRIBUTES INCORRECTLY GENERATED
+
+                    if(validAttribute)
+                    {
+                        let attributeValue = element[attributeInRepo];
+                        newRepoAttributes.push(attributeInRepo);
+        
+                        if(attributeValue != '' && !noSet)
+                        {
+                            thisState.cell.setAttribute(attributeInRepo, element[attributeInRepo]);
+                        }
+                        else
+                        {
+                            if(!thisState.cell.hasAttribute(attributeInRepo) && !noSet)
+                                thisState.cell.setAttribute(attributeInRepo, '');
+                        }	
+                    }
+                }
+            }
+
+            // HACK TO REMOVE ATTRIBUTES INCORRECTLY GENERATED
+            let dropAttributes = [];
+            for (let attributeIndex = 0; attributeIndex < thisState.cell.value.attributes.length; attributeIndex++) {
+                let attributeName = thisState.cell.value.attributes.item(attributeIndex).name;
+
+                if(attributeName.endsWith('_tabbed') || attributeName.endsWith('_raw'))
+                    dropAttributes.push(attributeName);
+            }
+
+            if(!noSet)
+            {
+                for(let attributeName in dropAttributes)
+                {
+                    thisState.cell.value.attributes.removeNamedItem(dropAttributes[attributeName]);
+                }
+                
+                thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());	
+            }
+        }
+        else
+        {
+            if(!noSet)
+                thisState.cell.setAttribute('repoAttributes', '');
+        }
+
+        return {repoAttributes: newRepoAttributes.join(), repoFormatSettings: formatSettings}
     }
 
     /* STENCILS */

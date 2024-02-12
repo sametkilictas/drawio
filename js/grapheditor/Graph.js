@@ -2995,7 +2995,7 @@ Graph.prototype.init = function(container)
 		var shape = mxUtils.getValue(state.style, mxConstants.STYLE_SHAPE, null);
 		var curved = mxUtils.getValue(state.style, mxConstants.STYLE_CURVED, false);
 		
-		return !curved && (shape == 'connector' || shape == 'filledEdge' || shape == 'wire' || shape == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR);
+		return !curved && (shape == 'connector' || shape == 'filledEdge' || shape == 'wire' || shape == mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR);
 	};
 	
 	/**

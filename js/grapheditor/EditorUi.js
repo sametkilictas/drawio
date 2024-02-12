@@ -992,7 +992,7 @@ EditorUi = function(editor, container, lightbox)
 					{
 						edgeShapeDiv.className = 'geSprite geSprite-simplearrow';
 					}
-					else if (graph.currentEdgeStyle['shape'] == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+					else if (graph.currentEdgeStyle['shape'] == mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR)
 					{
 						edgeShapeDiv.className = 'geSprite geSprite-mondrian';
 					}

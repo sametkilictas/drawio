@@ -4813,7 +4813,7 @@
 			if (this.defaultColorSchemes != null && this.defaultColorSchemes.length > 0 &&
 				sstate.style.shape != 'image' && !sstate.containsLabel &&
 				sstate.cells.length > 0 &&
-				sstate.style.shape != mxMondrianBase.prototype.cst.MONDRIAN_BASE_SHAPE && sstate.style.shape != mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+				sstate.style.shape != mxMondrianShape.prototype.cst.MONDRIAN_BASE_SHAPE && sstate.style.shape != mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR)
 			{
 				this.container.appendChild(this.addStyles(this.createPanel()));
 			}
@@ -5187,7 +5187,7 @@
                             pEnumList.push(enumItem);
                         }
                     }
-
+	
 					for (var i = 0; i < pEnumList.length; i++)
 					{
 						var op = pEnumList[i];
@@ -5207,10 +5207,25 @@
 						for (var i = 0; i < pEnumList.length; i++)
 						{
 							var op = pEnumList[i];
-							var opElem = document.createElement('option');
-							opElem.value = mxUtils.htmlEntities(op.val);
-							mxUtils.write(opElem, mxResources.get(op.dispName, null, op.dispName));
-							select.appendChild(opElem);
+							
+							// MONDRIAN EXTENSION TO FILTER
+							let showOption = true;
+							if(op.filter !== undefined)
+							{
+								let filterDefinition = op.filter.split(':');
+								let filterAttribute = filterDefinition[0];
+								let filterValues = filterDefinition[1].split(',');
+								//showOption = !(mxUtils.getValue(state.style, filterAttribute, undefined) === filter[1]);
+								showOption = !(filterValues.includes(mxUtils.getValue(state.style, filterAttribute, undefined)));
+							}
+
+							if(showOption)
+							{
+								var opElem = document.createElement('option');
+								opElem.value = mxUtils.htmlEntities(op.val);
+								mxUtils.write(opElem, mxResources.get(op.dispName, null, op.dispName));
+								select.appendChild(opElem);	
+							}
 						}
 						
 						select.value = pValue;

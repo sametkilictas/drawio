@@ -244,6 +244,13 @@
 		{
 			if (mxScriptsLoaded && mxWinLoaded)
 			{
+				mxscript('mondrianExtension/mondrianCore.js', 
+					async function()
+					{
+						window.MONDRIAN_CORE = await createMondrianCore();
+					}
+				);
+				
 				mxscript('mondrianExtension/mondrianRepo.js', 
 					async function()
 					{

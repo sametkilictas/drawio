@@ -15,7 +15,8 @@
 			PRESCRIBED_COMPONENT: 'pc',
 			PRESCRIBED_GROUP: 'pg',
 			LEGEND: 'legend',
-			DU: 'du'
+			DU: 'du',
+			BMS_ELLIPSE: 'bms_ellipse'
 		},
 
 		SHAPE_LAYOUT: {
@@ -378,9 +379,18 @@
 
 			if(shapeLayout === MBS.SHAPE_LAYOUT.EXPANDED)
 			{
-				shapeHeight = (shapeType == MBS.SHAPE_TYPE.LOGICAL_GROUP || shapeType == MBS.SHAPE_TYPE.PRESCRIBED_GROUP) ? 152 : 48;
-				shapeWidth = 240;
-				standardSettings = standardSettings + ';verticalAlign=middle;align=left;spacing=0;spacingLeft=16;spacingRight=16;spacingTop=0;spacingBottom=0';
+				if (shapeType == MBS.SHAPE_TYPE.BMS_ELLIPSE)
+				{
+					shapeWidth = 96;
+					shapeHeight = 24;
+					standardSettings = standardSettings + ';verticalAlign=middle;align=center;spacing=0;spacingLeft=0;spacingRight=0;spacingTop=0;spacingBottom=0';
+				}
+				else
+				{
+					shapeWidth = 240;
+					shapeHeight = (shapeType == MBS.SHAPE_TYPE.LOGICAL_GROUP || shapeType == MBS.SHAPE_TYPE.PRESCRIBED_GROUP) ? 152 : 48;
+					standardSettings = standardSettings + ';verticalAlign=middle;align=left;spacing=0;spacingLeft=16;spacingRight=16;spacingTop=0;spacingBottom=0';	
+				}
 			}
 			else if(shapeLayout === MBS.SHAPE_LAYOUT.COLLAPSED)
 			{

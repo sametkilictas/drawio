@@ -309,7 +309,7 @@ Menus.prototype.init = function()
 				this.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_ELBOW, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE],
 					['isometricEdgeStyle', 'vertical', null, null], 'geIcon geSprite geSprite-verticalisometric', parent, true).setAttribute('title', mxResources.get('isometric'));
 		
-				if (shape == 'connector' || shape == mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR)
+				if (shape == 'connector' || shape == mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR)
 				{
 					this.edgeStyleChange(menu, '', [mxConstants.STYLE_EDGE, mxConstants.STYLE_CURVED, mxConstants.STYLE_NOEDGESTYLE],
 						['orthogonalEdgeStyle', '1', null], 'geIcon geSprite geSprite-curved', parent, true).setAttribute('title', mxResources.get('curved'));
@@ -330,7 +330,7 @@ Menus.prototype.init = function()
 			this.styleChange(menu, '', [mxConstants.STYLE_SHAPE, mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE, 'width'],
 				['arrow', null, null, null], 'geIcon geSprite geSprite-simplearrow', parent, null, null, true).setAttribute('title', mxResources.get('simpleArrow'));
 			this.styleChange(menu, '', [mxConstants.STYLE_SHAPE, mxConstants.STYLE_STARTSIZE, mxConstants.STYLE_ENDSIZE, 'width'], 
-				[mxMondrianBaseConnector.prototype.cst.MONDRIAN_CONNECTOR, null, null, null], 'geIcon geSprite-mondrian', parent, true, null, true).setAttribute('title', 'Mondrian Connector');
+				[mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR, null, null, null], 'geIcon geSprite-mondrian', parent, true, null, true).setAttribute('title', 'Mondrian Connector');
 		}
 	})));
 	this.put('layout', new Menu(mxUtils.bind(this, function(menu, parent)
