@@ -6767,7 +6767,11 @@ App.prototype.descriptorChanged = function()
 			
 			if (newHash.length > 0)
 			{
-				window.location.hash = newHash;
+				if (newHash != this.getDiagramId())
+				{
+					window.location.hash = newHash;
+				}
+
 				this.updateHashObject();
 			}
 			else if (window.location.hash.length > 0)
