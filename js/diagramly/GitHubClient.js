@@ -124,7 +124,7 @@ GitHubClient.prototype.createUser = function(userInfo)
 GitHubClient.prototype.authenticate = function(success, error)
 {
 	var req = new mxXmlRequest(this.redirectUri + '?getState=1', null, 'GET');
-	
+
 	req.send(mxUtils.bind(this, function(req)
 	{
 		if (req.getStatus() >= 200 && req.getStatus() <= 299)
@@ -147,10 +147,11 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 			var acceptAuthResponse = true;
 			
 			var authRemembered = this.getPersistentToken(true);
+			let githubParams = 'state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state) + '&redirect_uri=' + encodeURIComponent(window.DRAWIO_SERVER_URL + 'github2');
 			
 			if (authRemembered != null)
 			{
-				var req = new mxXmlRequest(this.redirectUri + '?state=' + encodeURIComponent('cId=' + this.clientId + '&domain=' + window.location.host + '&token=' + state), null, 'GET'); //To identify which app/domain is used
+				var req = new mxXmlRequest(this.redirectUri + '?' + githubParams, null, 'GET'); //To identify which app/domain is used
 				
 				req.send(mxUtils.bind(this, function(req)
 				{
@@ -180,11 +181,9 @@ GitHubClient.prototype.authenticateStep2 = function(state, success, error)
 			else
 			{
 				this.ui.showAuthDialog(this, true, mxUtils.bind(this, function(remember, authSuccess)
-				{
+				{		
 					var win = window.open(this.baseHostUrl + '/login/oauth/authorize?client_id=' +
-						this.clientId +  
-						'&state=' + encodeURIComponent('cId=' + this.clientId + //To identify which app/domain is used
-							'&domain=' + window.location.host + '&token=' + state), 'ghauth');
+						this.clientId + '&' + githubParams, 'ghauth');
 					
 					if (win != null)
 					{
@@ -285,9 +284,16 @@ GitHubClient.prototype.showAuthorizeDialog = function(retryFn, cancelFn)
 			this.ui.openLink('https://www.drawio.com/blog/single-repository-diagrams');
 		}), retryFn, mxResources.get('authorize'), mxUtils.bind(this, function()
 		{
-			this.ui.openLink((window.location.hostname == 'test.draw.io') ?
+			if(DRAWIO_GITHUB_APP_MONDRIAN)
+			{
+				this.ui.openLink(DRAWIO_GITHUB_APP_MONDRIAN);
+			}
+			else
+			{
+				this.ui.openLink((window.location.hostname == 'test.draw.io') ?
 				'https://github.com/apps/diagrams-net-app-test' :
 				'https://github.com/apps/draw-io-app');
+			}
 		}), mxResources.get('cancel'), cancelFn, 480, null, false);
 };
 
@@ -887,6 +893,12 @@ GitHubClient.prototype.pickFile = function(fn)
  */
 GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesError)
 {
+	// Mondrian Heights / Widths:
+	let windowHeight =  		  542; 		// 370
+	let windowHeightDivContent =  '480px';  // 320px
+	let windowHeightDivFolders =  '450px';  // 290px
+	let windowWidth =  			  702; 		// 420
+
 	var org = null;
 	var repo = null;
 	var ref = null;
@@ -895,7 +907,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 	var content = document.createElement('div');
 	content.style.whiteSpace = 'nowrap';
 	content.style.overflow = 'hidden';
-	content.style.height = '320px';
+	content.style.height = windowHeightDivContent;
 
 	var hd = document.createElement('h3');
 	mxUtils.write(hd, mxResources.get((showFiles) ? 'selectFile' : 'selectFolder'));
@@ -920,7 +932,7 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 	div.style.padding = '4px';
 	div.style.overflow = 'auto';
 	div.style.lineHeight = '1.2em';
-	div.style.height = '290px';
+	div.style.height = windowHeightDivFolders;
 	content.appendChild(div);
 	
 	var listItem = document.createElement('div');
@@ -936,11 +948,19 @@ GitHubClient.prototype.showGitHubDialog = function(showFiles, fn, hideNoFilesErr
 		}), null, null, 'https://www.drawio.com/blog/single-repository-diagrams', null, null, null, null,
 		[[mxResources.get('authorize'), mxUtils.bind(this, function()
 		{
-			this.ui.openLink((window.location.hostname == 'test.draw.io') ?
+
+			if(DRAWIO_GITHUB_APP_MONDRIAN)
+			{
+				this.ui.openLink(DRAWIO_GITHUB_APP_MONDRIAN);
+			}
+			else
+			{
+				this.ui.openLink((window.location.hostname == 'test.draw.io') ?
 				'https://github.com/apps/diagrams-net-app-test' :
 				'https://github.com/apps/draw-io-app');
+			}
 		})]], '16px');
-	this.ui.showDialog(dlg.container, 420, 370, true, true);
+	this.ui.showDialog(dlg.container, windowWidth, windowHeight, true, true); //420, 370
 
 	if (showFiles)
 	{
