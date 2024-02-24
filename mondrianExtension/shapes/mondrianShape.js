@@ -411,6 +411,21 @@ mxMondrianShape.prototype.resetStyles()
 }
 
 mxMondrianShape.prototype.customProperties = [
+	{name:'template', dispName: 'Template', type:'dynamicEnum', enumSource:'shapeTemplate', defVal:'noTemplate',
+		enumList:[],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+
+			for (let i = 0; i < selectedCells.length; i++)
+			{	
+				graph.setCellStyles('initTemplate', '1', [selectedCells[i]]);
+
+				if(newValue === 'noTemplate')
+					graph.setCellStyles('template', null, [selectedCells[i]]);
+			}
+		}
+}	,
 	{name:'shapeType', dispName:'Shape', type:'enum', defVal:'pn',
 		enumList:[
 			{val:'actor', dispName: 'Actor'}, 

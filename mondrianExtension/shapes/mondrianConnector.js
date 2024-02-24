@@ -208,8 +208,23 @@ mxMondrianConnector.prototype.addEdgeLabels = function(connector)
 }
 
 mxMondrianConnector.prototype.customProperties = [
+	{name:'template', dispName: 'Template', type:'dynamicEnum', enumSource:'interfaceTemplate', defVal:'noTemplate',
+		enumList:[],
+		onChange: function(graph, newValue)
+		{
+			let selectedCells = graph.getSelectionCells();
+
+			for (let i = 0; i < selectedCells.length; i++)
+			{	
+				graph.setCellStyles('initTemplate', '1', [selectedCells[i]]);
+
+				if(newValue === 'noTemplate')
+					graph.setCellStyles('template', null, [selectedCells[i]]);
+			}
+		}
+	},
 	{name:'colorFamilyLine', dispName:'Color', type:'enum', defVal:'black',
-		enumList:[{val:'blue', dispName: 'Blue'}, {val:'black', dispName: 'Black'}, {val:'cyan', dispName: 'Cyan'}, {val:'green', dispName: 'Green'}, {val:'gray', dispName: 'Gray'}, {val:'magenta', dispName: 'Magenta'}, {val:'purple', dispName: 'Purple'}, {val:'red', dispName: 'Red'}, {val:'teal', dispName: 'Teal'}, {val:'yellow', dispName: 'Yellow'}, {val:'orange', dispName: 'Orange'}],
+		enumList:[{val:'blue', dispName: 'Blue'}, {val:'black', dispName: 'Black'}, {val:'cyan', dispName: 'Cyan'}, {val:'green', dispName: 'Green'}, {val:'limegreen', dispName: 'Lime Green'}, {val:'gray', dispName: 'Gray'}, {val:'magenta', dispName: 'Magenta'}, {val:'purple', dispName: 'Purple'}, {val:'red', dispName: 'Red'}, {val:'teal', dispName: 'Teal'}, {val:'yellow', dispName: 'Yellow'}, {val:'orange', dispName: 'Orange'}],
 		onChange: function(graph, newValue)
 		{
 			const CORE = window.MONDRIAN_CORE;
@@ -245,31 +260,6 @@ mxMondrianConnector.prototype.customProperties = [
 				let mondrianColor = CORE.getColor(colorFamilyLine, newValue);
 
 				graph.setCellStyles('strokeColor', mondrianColor, [selectedCells[i]]);
-			}
-		}
-	},
-	{name:'formatConnector', dispName: 'Connector (Format)', type:'dynamicEnum', enumSource:'connectorFormats', defVal:'Default',
-		enumList:[],
-		onChange: function(graph, newValue)
-		{
-			let selectedCells = graph.getSelectionCells();
-			let connectFormatString = window.MONDRIAN_REPO.getElement('default','connectorFormats').formats[newValue];
-			let connectFormat = connectFormatString.toString().split(';');
-
-			for (let i = 0; i < selectedCells.length; i++)
-			{	
-				for (let j = 0; j< connectFormat.length; j++)
-				{
-					let styleAttribute = connectFormat[j].toString().split('=');
-					graph.setCellStyles(styleAttribute[0], styleAttribute[1], [selectedCells[i]]);
-				}
-				
-				graph.setCellStyles('strokeColor', 
-					window.MONDRIAN_CORE.getStrokeColor([selectedCells[i]][0].style),
-					[selectedCells[i]]);
-
-				if(newValue === 'Default')
-					graph.setCellStyles('formatConnector', null, [selectedCells[i]]);
 			}
 		}
 	},

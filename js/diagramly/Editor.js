@@ -5151,7 +5151,7 @@
                         if(enumSource == undefined)
                         {
                             let selectedCells = graph.getSelectionCells();
-                            let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes', 'mondrianVersion'];
+                            let excludedAttributes = [undefined, 'undefined', 'label', 'placeholders', 'repoAttributes', 'mondrianVersion', 'templateAttributes', 'templateAttributesMandatory'];
     
                             for (let selectedCellIdx in selectedCells)
                             {
@@ -5168,6 +5168,18 @@
     
                             dynamicAttributes.sort();	
                         }
+						else if(enumSource == 'interfaceTemplate' || enumSource == 'shapeTemplate' )
+						{
+							pEnumList.push({val: 'noTemplate', dispName: 'None', isDynamic: true});
+
+							let templateType = (enumSource == 'interfaceTemplate') ? 'INTERFACE-TEMPLATE' : 'SHAPE-TEMPLATE';
+
+							let templates = window.MONDRIAN_REPO.getElementRepo('default',templateType);
+							for(let template of templates)
+							{
+								pEnumList.push({val: template.id, dispName: template.name, isDynamic: true});
+							}
+						}
                         else
                         {
                             Object.entries(window.MONDRIAN_REPO.getElement('default',enumSource).formats).forEach((entry) => {

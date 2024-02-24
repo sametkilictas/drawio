@@ -79,7 +79,76 @@ class MondrianRepo {
         }
     
         definedElement = this.ELEMENTS.get(id.toLowerCase());
-        return definedElement.element;
+        if(definedElement != undefined)
+            return definedElement.element;
+    }
+
+    getTemplate(id)
+    {
+        if(id != undefined)
+        {
+            let template = this.ELEMENTS.get(id.toLowerCase());
+
+            if(template != undefined)
+            {
+                let templateElement = template.element
+                if(templateElement.templateInherit != undefined)
+                {
+                    let baseTemplate = this.ELEMENTS.get(templateElement.templateInherit.toLowerCase());
+
+                    if(baseTemplate != undefined)
+                    {
+                        let baseTemplateElement = baseTemplate.element;
+
+                        if(baseTemplateElement.style != undefined && baseTemplateElement.style.initialSettings != undefined)
+                        {
+                            if(templateElement.style === undefined) templateElement.style = {};
+                            if(templateElement.style.initialSettings === undefined) templateElement.style.initialSettings = {};
+
+                            for (const setting in baseTemplateElement.style.initialSettings) {
+                                if(templateElement.style.initialSettings[setting] === undefined)
+                                    templateElement.style.initialSettings[setting] = baseTemplateElement.style.initialSettings[setting];
+                            }
+                        }
+
+                        if(baseTemplateElement.style != undefined && baseTemplateElement.style.mandatorySettings != undefined)
+                        {
+                            if(templateElement.style === undefined) templateElement.style = {};
+                            if(templateElement.style.mandatorySettings === undefined) templateElement.style.mandatorySettings = {};
+
+                            for (const setting in baseTemplateElement.style.mandatorySettings) {
+                                if(templateElement.style.mandatorySettings[setting] === undefined)
+                                    templateElement.style.mandatorySettings[setting] = baseTemplateElement.style.mandatorySettings[setting];
+                            }
+                        }
+
+                        if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.initialSettings != undefined)
+                        {
+                            if(templateElement.attributes === undefined) templateElement.attributes = {};
+                            if(templateElement.attributes.initialSettings === undefined) templateElement.attributes.initialSettings = {};
+
+                            for (const setting in baseTemplateElement.attributes.initialSettings) {
+                                if(templateElement.attributes.initialSettings[setting] === undefined)
+                                    templateElement.attributes.initialSettings[setting] = baseTemplateElement.attributes.initialSettings[setting];
+                            }
+                        }
+
+                        if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.mandatorySettings != undefined)
+                        {
+                            if(templateElement.attributes === undefined) templateElement.attributes = {};
+                            if(templateElement.attributes.mandatorySettings === undefined) templateElement.attributes.mandatorySettings = {};
+
+                            for (const setting in baseTemplateElement.attributes.mandatorySettings) {
+                                if(templateElement.attributes.mandatorySettings[setting] === undefined)
+                                    templateElement.attributes.mandatorySettings[setting] = baseTemplateElement.attributes.mandatorySettings[setting];
+                            }
+                        }
+                    }
+                }
+
+                return templateElement;
+            }
+        }
     }
 
     async #buildElementsRepo() {
@@ -95,9 +164,9 @@ class MondrianRepo {
                     for (let elementKey in result.JSON) {
                         let type = elementKey.split('-')[0];
                         type = (fixedElementTypes.has(type)) ? type : 'Other';
-                        type = (result.JSON[elementKey]['Element-Type-Full']) ? result.JSON[elementKey]['Element-Type-Full'] : type;
-
-                        this.#addElement(type, client, elementKey, result.JSON[elementKey]);
+                        type = (result.JSON[elementKey]['Element-Type-Full']) ? result.JSON[elementKey]['Element-Type-Full'] : type;    
+                        
+                        this.#addElement(result.JSON[elementKey]['elementType'], type, client, elementKey, result.JSON[elementKey]);
                     }
                 }
             }
@@ -157,23 +226,27 @@ class MondrianRepo {
         return elementFiles;
     }
 
-    #addElement(type, client, id, element) {
+    #addElement(elementType, type, client, id, element) {
         let elementKey = ((client === 'default') ? id : client + '.' + id).toLowerCase();
         this.ELEMENTS.set(elementKey, { element: element });
 
-        let elementType = undefined;
         let elementNameProperty = undefined;
         let elementNameFullProperty = undefined;
 
         if (element['Element-Name'] != undefined) {
-            elementType = 'SHAPE';
+            elementType = (elementType) ? elementType: 'SHAPE';
             elementNameProperty = 'Element-Name';
             elementNameFullProperty = 'Element-Name-Full';
         }
         else if (element['Interface-Name'] != undefined) {
-            elementType = 'INTERFACE';
+            elementType = (elementType) ? elementType: 'INTERFACE';
             elementNameProperty = 'Interface-Name';
             elementNameFullProperty = 'Interface-Name-Full';
+        }
+        else if (elementType === 'SHAPE-TEMPLATE' || elementType === 'INTERFACE-TEMPLATE')
+        {
+            elementNameProperty = 'templateName';
+            elementNameFullProperty = 'templateName';
         }
 
         // FOR Selectize type ahead search
@@ -194,7 +267,7 @@ class MondrianRepo {
     }
 
     #buildMergedElementRepos() {
-        let elementTypes = ['INTERFACE', 'SHAPE'];
+        let elementTypes = ['INTERFACE', 'SHAPE', 'INTERFACE-TEMPLATE', 'SHAPE-TEMPLATE'];
 
         for (const elementType of elementTypes) {
             if (this.ELEMENTS_BY_CLIENT[elementType] != undefined) {
@@ -291,7 +364,7 @@ class MondrianRepo {
                     thisState.cell.value.attributes.removeNamedItem(dropAttributes[attributeName]);
                 }
                 
-                thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());	
+                thisState.cell.setAttribute('repoAttributes', newRepoAttributes.join());
             }
         }
         else

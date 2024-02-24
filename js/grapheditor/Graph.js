@@ -2797,7 +2797,7 @@ Graph.prototype.editAfterInsert = false;
 /**
  * Defines the built-in properties to be ignored in tooltips.
  */
-Graph.prototype.builtInProperties = ['label', 'tooltip', 'placeholders', 'placeholder'];
+Graph.prototype.builtInProperties = ['label', 'tooltip', 'placeholders', 'placeholder', 'mondrianVersion', 'repoAttributes', 'templateAttributes', 'templateAttributesMandatory'];
 
 /**
  * Defines if the graph is part of an EditorUi. If this is false the graph can

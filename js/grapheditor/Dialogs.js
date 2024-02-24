@@ -1578,6 +1578,18 @@ var EditDataDialog = function(ui, cell)
 				meta[repoAttributes[repoAttribute]] = {editable: false};
 			}
 		}
+
+		let templateAttributesMandatoryItem = value.attributes.getNamedItem('templateAttributesMandatory');
+
+		if(templateAttributesMandatoryItem != null)
+		{
+			let templateAttributes = templateAttributesMandatoryItem.value.split(',');
+
+			for(let templateAttribute in templateAttributes)
+			{
+				meta[templateAttributes[templateAttribute]] = {editable: false};
+			}
+		}
 	}
 	catch (e)
 	{
@@ -1685,7 +1697,7 @@ var EditDataDialog = function(ui, cell)
 	for (var i = 0; i < attrs.length; i++)
 	{
 		if ((attrs[i].nodeName != 'label' || Graph.translateDiagram ||
-			isLayer) && attrs[i].nodeName != 'placeholders' && attrs[i].nodeName != 'repoAttributes' && attrs[i].nodeName != 'mondrianVersion') // MONDRIAN; hide repoAttributes)
+			isLayer) && attrs[i].nodeName != 'placeholders' && attrs[i].nodeName != 'repoAttributes' && attrs[i].nodeName != 'mondrianVersion' && attrs[i].nodeName != 'templateAttributes' && attrs[i].nodeName != 'templateAttributesMandatory') // MONDRIAN; hide repoAttributes)
 		{
 			temp.push({name: attrs[i].nodeName, value: attrs[i].nodeValue});
 		}
@@ -1888,14 +1900,24 @@ var EditDataDialog = function(ui, cell)
 
 		let mondrianAttributesDefault = [];
 		let mondrianAttributesPredefined = [];
+		let mondrianAttributesTemplate = [];
 		let mondrianAttributesCustom = [];
 
 		let attributesDefaultIndex = mondrianShape ? {'Element-ID': 0, 'Element-Name': 1, 'Icon-Name': 2, 'Tag-Text': 3} : {'Interface-ID': 0, 'Interface-Name': 1};
+
+		// repoAttributes
 		let repoAttributesItem = value.attributes.getNamedItem('repoAttributes');
 		let repoAttributes = [];
 
 		if(repoAttributesItem != null)
 			repoAttributes = repoAttributesItem.value.split(',');
+
+		// templateAttributes
+		let templateAttributesItem = value.attributes.getNamedItem('templateAttributes');
+		let templateAttributes = [];
+
+		if(templateAttributesItem != null)
+			templateAttributes = templateAttributesItem.value.split(',');
 
 		// Split all attributes into 3 different types (Default, Predefined, Custom)
 		for (let i = 0; i < temp.length; i++)
@@ -1910,6 +1932,12 @@ var EditDataDialog = function(ui, cell)
 					mondrianAttributesPredefined.push({header: 'Predefined'});
 				mondrianAttributesPredefined.push(temp[i]);
 			}
+			else if(templateAttributes.includes(temp[i].name))
+			{
+				if(mondrianAttributesTemplate.length === 0)
+					mondrianAttributesTemplate.push({header: 'Template'});
+				mondrianAttributesTemplate.push(temp[i]);
+			}
 			else
 			{
 				if(mondrianAttributesCustom.length === 0)
@@ -1919,7 +1947,7 @@ var EditDataDialog = function(ui, cell)
 			}
 		}
 		
-		temp = mondrianAttributesDefault.concat(mondrianAttributesPredefined, mondrianAttributesCustom);
+		temp = mondrianAttributesDefault.concat(mondrianAttributesPredefined, mondrianAttributesTemplate, mondrianAttributesCustom);
 
 		form.body.deleteRow(0); // remove the ID row
 		addHeaderRow(0, 0, 'Default');
