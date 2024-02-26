@@ -139,7 +139,14 @@ mxMondrianConnector.prototype.paintLine = function(c, pts)
 	if(this.state != null)
 	{ 
 		let repoAttributes = window.MONDRIAN_REPO.getAttributesFromRepo(this.state, 'Interface-ID');
-		window.MONDRIAN_CORE.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);	
+		window.MONDRIAN_CORE.updateStyle(this.state, repoAttributes.repoFormatSettings, this.defaultStyleString);
+
+		if(window.MONDRIAN_CORE.getStyleValue(this.state.cell.style, 'edgeLabel1Attributes', undefined) != undefined)
+			mxMondrianConnector.prototype.setEdgeLabel(this.state.view.graph, this.state.cell, mxMondrianConnector.prototype.cst.EDGE_LABEL_1);
+
+		if(window.MONDRIAN_CORE.getStyleValue(this.state.cell.style, 'edgeLabel2Attributes', undefined) != undefined)
+			mxMondrianConnector.prototype.setEdgeLabel(this.state.view.graph, this.state.cell, mxMondrianConnector.prototype.cst.EDGE_LABEL_2);
+
 	}
 
 	mxConnector.prototype.paintLine.apply(this, arguments);
