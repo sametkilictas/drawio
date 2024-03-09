@@ -1574,14 +1574,19 @@ ArrangePanel.prototype.init = function()
 	if (ss.containsLabel)
 	{
 		// Adds functions from hidden style format panel
-		var span = document.createElement('div');
-		span.style.width = '100%';
-		span.style.marginTop = '0px';
-		span.style.fontWeight = 'bold';
-		span.style.padding = '10px 0 0 14px';
-		mxUtils.write(span, mxResources.get('style'));
-		this.container.appendChild(span);
-			
+		// No title required for more than one selected cell
+		// as no actions are added in this case
+		if (ss.cells.length == 1)
+		{
+			var span = document.createElement('div');
+			span.style.width = '100%';
+			span.style.marginTop = '0px';
+			span.style.fontWeight = 'bold';
+			span.style.padding = '10px 0 0 14px';
+			mxUtils.write(span, mxResources.get('style'));
+			this.container.appendChild(span);
+		}
+		
 		new StyleFormatPanel(this.format, this.editorUi, this.container);
 	}
 };
@@ -1868,8 +1873,6 @@ ArrangePanel.prototype.addGroupOps = function(div)
 		{
 			var action = this.editorUi.actions.get(resetSelect.value);
 			resetSelect.value = 'reset';
-
-			console.log('here', action);
 
 			if (action != null)
 			{
@@ -4200,20 +4203,38 @@ TextFormatPanel.prototype.addFont = function(container)
 	
 	if (graph.cellEditor.isContentEditing())
 	{
+		var propertiesPanel = null;
 		var updating = false;
 		
-		var updateCssHandler = function()
+		var updateCssHandler = mxUtils.bind(this, function()
 		{
 			if (!updating)
 			{
 				updating = true;
 			
-				window.setTimeout(function()
+				window.setTimeout(mxUtils.bind(this, function()
 				{
 					var node = graph.getSelectedEditingElement();
 
 					if (node != null)
 					{
+						function getParentBlock(elt)
+						{
+							while (elt != null && elt != graph.cellEditor.textarea)
+							{
+								var css = mxUtils.getCurrentStyle(elt);
+
+								if (css.display == 'block')
+								{
+									return elt;
+								}
+
+								elt = elt.parentNode;
+							}
+
+							return null;
+						};
+
 						function getRelativeLineHeight(fontSize, css, elt)
 						{
 							if (elt.style != null && css != null)
@@ -4329,6 +4350,71 @@ TextFormatPanel.prototype.addFont = function(container)
 							setSelected(fontStyleItems[2], hasParentOrOnlyChild('U'));
 							setSelected(sup, hasParentOrOnlyChild('SUP'));
 							setSelected(sub, hasParentOrOnlyChild('SUB'));
+
+							// Adds editing for block CSS styles
+							var block = getParentBlock(node);
+							
+							if (block != null)
+							{
+								var blockCss = mxUtils.getCurrentStyle(block);
+
+								function checkUnit(value, unit, input, defaultValue)
+								{
+									if (parseInt(value) == value)
+									{
+										value += unit;
+
+										if (input != null)
+										{
+											input.value = value;
+										}
+									}
+
+									return value;
+								};
+
+								var cssProps = [];
+								
+								function addLengthProperty(name, dispName)
+								{
+									cssProps.push({name: name, dispName: dispName, type: 'string',
+										getValue: function()
+										{
+											return blockCss[name];
+										}, valueChanged: function(newValue, input)
+										{
+											block.style[name] = checkUnit(newValue, 'px', input);
+											
+											if (newValue == '' && input != null)
+											{
+												input.value = blockCss[name];
+											}
+										}});
+								};
+
+								addLengthProperty('paddingTop', 'Padding Top');
+								addLengthProperty('paddingRight', 'Padding Right');
+								addLengthProperty('paddingLeft', 'Padding Left');
+								addLengthProperty('paddingBottom', 'Padding Bottom');
+								addLengthProperty('marginTop', 'Margin Top');
+								addLengthProperty('marginRight', 'Margin Right');
+								addLengthProperty('marginLeft', 'Margin Left');
+								addLengthProperty('marginBottom', 'Margin Bottom');
+
+								var newPropertiesPanel = this.createPanel();
+								this.addProperties(newPropertiesPanel, cssProps, ss, true)
+
+								if (propertiesPanel != null)
+								{
+									propertiesPanel.parentNode.replaceChild(newPropertiesPanel, propertiesPanel);
+								}
+								else
+								{
+									container.appendChild(newPropertiesPanel);
+								}
+
+								propertiesPanel = newPropertiesPanel;
+							}
 							
 							if (!graph.cellEditor.isTableSelected())
 							{
@@ -4429,9 +4515,9 @@ TextFormatPanel.prototype.addFont = function(container)
 					}
 					
 					updating = false;
-				}, 0);
+				}), 0);
 			}
-		};
+		});
 		
 		if (mxClient.IS_FF || mxClient.IS_EDGE || mxClient.IS_IE || mxClient.IS_IE11)
 		{
@@ -7048,11 +7134,6 @@ DiagramFormatPanel.prototype.addGridOption = function(container)
  */
 DiagramFormatPanel.prototype.addDocumentProperties = function(div)
 {
-	// Hook for subclassers
-	var ui = this.editorUi;
-	var editor = ui.editor;
-	var graph = editor.graph;
-	
 	div.appendChild(this.createTitle(mxResources.get('options')));
 
 	return div;

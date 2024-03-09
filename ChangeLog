@@ -1,3 +1,33 @@
+09-MAR-2024: 24.0.4
+
+- [conf cloud] Fixes copied pages with embed upload macro editing [DID-11003]
+
+08-MAR-2024: 24.0.3
+
+- [conf cloud] Enables direct editing without custom content
+- [conf cloud] Fixed imported libraries name if end with ".xml" [DID-10920]
+- Adds block padding and margin properties to style panel [drawio-4198]
+- Uses default spacing for Textbox shape
+- Fixes default font for sketch mode [drawio-4216]
+- Fixes broken MathJax output after zoom [drawio-4242]
+- Fixes custom fonts and images in background pages [drawio-4239,drawio-3712,drawio-3281,drawio-2733,drawio-2367]
+
+05-MAR-2024: 24.0.2
+
+- Fixes DRAWIO_SERVER_URL if query string contains forward slash
+- Handles double-quotes in page URLs
+- Fixes waypoints for grouped edges [drawio-desktop-1646]
+- Fixes ignored null bytes in mxUtils.trim
+
+02-MAR-2024: 24.0.1
+
+- Updates DOMPurify from 3.0.8 to 3.0.9
+- Adds contrast URL parameter [drawio-3701]
+- Fixes preview of SVG export with embedded fonts
+- [conf cloud] Adds migration support for pageInfo parameter, templateUrl to re-indexing, improves tinyUrl parsing regex
+- [conf cloud] Adds support for templateUrl with pageInfo in viewer
+- [conf cloud] Shows custom contents based on macros in the page instead of page custom contents (easier deletion and no re-indexing)
+
 29-FEB-2024: 24.0.0
 
 - Adds shape shadow style option [drawio-1671]

@@ -462,8 +462,28 @@
         {name: 'perimeterSpacing', dispName: 'Terminal Spacing', type: 'float', defVal: 0},
         {name: 'anchorPointDirection', dispName: 'Anchor Direction', type: 'bool', defVal: true},
         {name: 'snapToPoint', dispName: 'Snap to Point', type: 'bool', defVal: false},
+        {name: 'dashPattern', dispName: 'Dash Pattern', type: 'numbers', defVal: ''},
         {name: 'fixDash', dispName: 'Fixed Dash', type: 'bool', defVal: false},
-        {name: 'editable', dispName: 'Editable', type: 'bool', defVal: true},
+		{name: 'flowAnimationDuration', dispName: 'Flow Duration', type: 'int', defVal: 500, isVisible: function(state)
+		{
+			return mxUtils.getValue(state.style, 'flowAnimation', null) == '1';
+		}},
+		{name: 'flowAnimationTimingFunction', dispName: 'Flow Timing', type: 'enum', defVal: 'linear',
+			enumList: [{val: 'linear', dispName: 'Linear'}, {val: 'ease', dispName: 'Ease'}, {val: 'ease-in', dispName: 'Ease-in'},
+			{val: 'ease-out', dispName: 'Ease-out'}, {val: 'ease-in-out', dispName: 'Ease-in-out'}], isVisible: function(state)
+			{
+				return mxUtils.getValue(state.style, 'flowAnimation', null) == '1';
+			}
+		},
+		{name: 'flowAnimationDirection', dispName: 'Flow Direction', type: 'enum', defVal: 'normal',
+			enumList: [{val: 'normal', dispName: 'Normal'}, {val: 'reverse', dispName: 'Reverse'},
+			{val: 'alternate', dispName: 'Alternate'}, {val: 'alternate-reverse', dispName: 'Alternate-Reverse'}],
+			isVisible: function(state)
+			{
+				return mxUtils.getValue(state.style, 'flowAnimation', null) == '1';
+			}
+		},
+		{name: 'editable', dispName: 'Editable', type: 'bool', defVal: true},
         {name: 'metaEdit', dispName: 'Edit Dialog', type: 'bool', defVal: false},
         {name: 'backgroundOutline', dispName: 'Background Outline', type: 'bool', defVal: false},
         {name: 'bendable', dispName: 'Bendable', type: 'bool', defVal: true},
@@ -4934,7 +4954,7 @@
 		/**
 		 * Create Properties Panel
 		 */
-		StyleFormatPanel.prototype.addProperties = function(div, properties, state)
+		BaseFormatPanel.prototype.addProperties = function(div, properties, state, hideId)
 		{
 			var that = this;
 			var graph = this.editorUi.editor.graph;
@@ -4945,98 +4965,105 @@
 				curElem.parentNode.insertBefore(newElem, curElem.nextSibling);
 			};
 			
-			function applyStyleVal(pName, newVal, prop, delIndex)
+			function applyStyleVal(pName, newVal, prop, delIndex, input)
 			{
-				graph.getModel().beginUpdate();
-				try
+				if (prop.valueChanged != null)
 				{
-					var changedProps = [];
-					var changedVals = [];
-
-					if (prop.index != null)
+					prop.valueChanged(newVal, input);
+				}
+				else
+				{
+					graph.getModel().beginUpdate();
+					try
 					{
-						var allVals = [];
-						var curVal = prop.parentRow.nextSibling;
-						
-						while(curVal && curVal.getAttribute('data-pName') == pName)
-						{
-							allVals.push(curVal.getAttribute('data-pValue'));
-							curVal = curVal.nextSibling;
-						}
-						
-						if (prop.index < allVals.length)
-						{
-							if (delIndex != null)
-							{
-								allVals.splice(delIndex, 1);
-							}
-							else
-							{
-								allVals[prop.index] = newVal;
-							}
-						}
-						else
-						{
-							allVals.push(newVal);
-						}
-						
-						if (prop.size != null && allVals.length > prop.size) //trim the array to the specifies size
-						{
-							allVals = allVals.slice(0, prop.size);
-						}
-						
-						newVal = allVals.join(',');
-						
-						if (prop.countProperty != null)
-						{
-							graph.setCellStyles(prop.countProperty, allVals.length, graph.getSelectionCells());
-							
-							changedProps.push(prop.countProperty);
-							changedVals.push(allVals.length);
-						}
-					}
+						var changedProps = [];
+						var changedVals = [];
 
-					graph.setCellStyles(pName, newVal, graph.getSelectionCells());
-					changedProps.push(pName);
-					changedVals.push(newVal);
-					
-					if (prop.dependentProps != null)
-					{
-						for (var i = 0; i < prop.dependentProps.length; i++)
+						if (prop.index != null)
 						{
-							var defVal = prop.dependentPropsDefVal[i];
-							var vals = prop.dependentPropsVals[i];
+							var allVals = [];
+							var curVal = prop.parentRow.nextSibling;
 							
-							if (vals.length > newVal)
+							while(curVal && curVal.getAttribute('data-pName') == pName)
 							{
-								vals = vals.slice(0, newVal);
+								allVals.push(curVal.getAttribute('data-pValue'));
+								curVal = curVal.nextSibling;
 							}
-							else
+							
+							if (prop.index < allVals.length)
 							{
-								for (var j = vals.length; j < newVal; j++)
+								if (delIndex != null)
 								{
-									vals.push(defVal);
+									allVals.splice(delIndex, 1);
+								}
+								else
+								{
+									allVals[prop.index] = newVal;
 								}
 							}
+							else
+							{
+								allVals.push(newVal);
+							}
 							
-							vals = vals.join(',');
-							graph.setCellStyles(prop.dependentProps[i], vals, graph.getSelectionCells());
-							changedProps.push(prop.dependentProps[i]);
-							changedVals.push(vals);
+							if (prop.size != null && allVals.length > prop.size) //trim the array to the specifies size
+							{
+								allVals = allVals.slice(0, prop.size);
+							}
+							
+							newVal = allVals.join(',');
+							
+							if (prop.countProperty != null)
+							{
+								graph.setCellStyles(prop.countProperty, allVals.length, graph.getSelectionCells());
+								
+								changedProps.push(prop.countProperty);
+								changedVals.push(allVals.length);
+							}
 						}
+
+						graph.setCellStyles(pName, newVal, graph.getSelectionCells());
+						changedProps.push(pName);
+						changedVals.push(newVal);
+						
+						if (prop.dependentProps != null)
+						{
+							for (var i = 0; i < prop.dependentProps.length; i++)
+							{
+								var defVal = prop.dependentPropsDefVal[i];
+								var vals = prop.dependentPropsVals[i];
+								
+								if (vals.length > newVal)
+								{
+									vals = vals.slice(0, newVal);
+								}
+								else
+								{
+									for (var j = vals.length; j < newVal; j++)
+									{
+										vals.push(defVal);
+									}
+								}
+								
+								vals = vals.join(',');
+								graph.setCellStyles(prop.dependentProps[i], vals, graph.getSelectionCells());
+								changedProps.push(prop.dependentProps[i]);
+								changedVals.push(vals);
+							}
+						}
+						
+						if (typeof(prop.onChange) == 'function')
+						{
+							prop.onChange(graph, newVal);
+						}
+						
+						that.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', changedProps,
+							'values', changedVals, 'cells', graph.getSelectionCells()));
 					}
-					
-					if (typeof(prop.onChange) == 'function')
+					finally
 					{
-						prop.onChange(graph, newVal);
+						graph.getModel().endUpdate();
 					}
-					
-					that.editorUi.fireEvent(new mxEventObject('styleChanged', 'keys', changedProps,
-						'values', changedVals, 'cells', graph.getSelectionCells()));
-				}
-				finally
-				{
-					graph.getModel().endUpdate();
 				}
 			}
 			
@@ -5299,11 +5326,13 @@
 						function setInputVal()
 						{
 							var inputVal = input.value;
-							inputVal = inputVal.length == 0 && pType != 'string'? 0 : inputVal;
+							inputVal = inputVal.length == 0 && pType != 'string' &&
+								pType != 'numbers'? 0 : inputVal;
 							
 							if (prop.allowAuto)
 							{
-								if (inputVal.trim != null && inputVal.trim().toLowerCase() == 'auto')
+								if (inputVal.trim != null && inputVal.trim().
+									toLowerCase() == 'auto')
 								{
 									inputVal = 'auto';
 									pType = 'string';
@@ -5324,9 +5353,19 @@
 								inputVal = prop.max;
 							}
 
-							var newVal = encodeURIComponent((pType == 'int'? parseInt(inputVal) : inputVal) + '');
+							var newVal = null;
+
+							try
+							{
+								newVal = (pType == 'numbers') ? inputVal.match(/\d+/g).map(Number).join(' ') :
+									encodeURIComponent((pType == 'int'? parseInt(inputVal) : inputVal) + '');
+							}
+							catch(e)
+							{
+								// ignores parsing errors
+							}
 							
-							applyStyleVal(pName, newVal, prop);
+							applyStyleVal(pName, newVal, prop, null, input);
 						}
 						
 						mxEvent.addListener(input, 'keypress', function(e)
@@ -5452,7 +5491,7 @@
 			}
 			
 			//Add it to top (always)
-			if (cellId != null)
+			if (cellId != null && !hideId)
 			{
 				grid.appendChild(createPropertyRow('id', mxUtils.htmlEntities(cellId), {dispName: 'ID', type: 'readOnly'}, true, false));
 			}
@@ -5466,8 +5505,8 @@
 					if (!prop.isVisible(state, this)) continue;
 				}
 				
-				var pValue = state.style[key] != null? mxUtils.htmlEntities(state.style[key] + '') :
-					((prop.getDefaultValue != null) ? prop.getDefaultValue(state, this) : prop.defVal); //or undefined if defVal is undefined
+				var pValue = (prop.getValue != null) ? prop.getValue() : (state.style[key] != null? mxUtils.htmlEntities(state.style[key] + '') :
+					((prop.getDefaultValue != null) ? prop.getDefaultValue(state, this) : prop.defVal)); //or undefined if defVal is undefined
 
 				if (prop.type == 'separator')
 				{
@@ -7068,46 +7107,6 @@
 				shape.value = value;
 				shape.scale = s;
 				shape.redraw();
-			}
-		}
-	};
-
-	/**
-	 * Adds workaround for math rendering in Chrome.
-	 * 
-	 * Workaround for https://bugs.webkit.org/show_bug.cgi?id=93358 in WebKit
-	 * 
-	 * Adding an absolute position DIV before the SVG seems to mitigate the problem.
-	 */
-	var graphViewValidateBackgroundPage = mxGraphView.prototype.validateBackgroundPage;
-	
-	mxGraphView.prototype.validateBackgroundPage = function()
-	{
-		graphViewValidateBackgroundPage.apply(this, arguments);
-		
-		if (mxClient.IS_GC && this.getDrawPane() != null)
-		{
-			var g = this.getDrawPane().parentNode;
-			
-			if (this.graph.mathEnabled && !mxClient.NO_FO &&
-				(this.webKitForceRepaintNode == null ||
-				this.webKitForceRepaintNode.parentNode == null) &&
-				this.graph.container.firstChild.nodeName == 'svg')
-			{
-				this.webKitForceRepaintNode = document.createElement('div');
-				this.webKitForceRepaintNode.style.cssText = 'position:absolute;';
-				g.ownerSVGElement.parentNode.insertBefore(this.webKitForceRepaintNode, g.ownerSVGElement);
-			}
-			else if (this.webKitForceRepaintNode != null && (!this.graph.mathEnabled ||
-					(this.graph.container.firstChild.nodeName != 'svg' &&
-					this.graph.container.firstChild != this.webKitForceRepaintNode)))
-			{
-				if (this.webKitForceRepaintNode.parentNode != null)
-				{
-					this.webKitForceRepaintNode.parentNode.removeChild(this.webKitForceRepaintNode);
-				}
-				
-				this.webKitForceRepaintNode = null;
 			}
 		}
 	};
