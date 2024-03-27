@@ -1343,8 +1343,16 @@
 		{
 			// Updates current page XML if selection is ignored
 			EditorUi.removeChildNodes(this.currentPage.node);
-			mxUtils.setTextContent(this.currentPage.node, Graph.compressNode(node));
 
+			if (Editor.internalCompression)
+			{
+				mxUtils.setTextContent(this.currentPage.node, Graph.compressNode(node));
+			}
+			else
+			{
+				this.currentPage.node.appendChild(node);
+			}
+			
 			// Creates a clone of the file node for processing
 			node = this.fileNode.cloneNode(false);
 
@@ -1357,8 +1365,7 @@
 				
 				if (modelNode == null && uncompressed)
 				{
-					var text = mxUtils.trim(mxUtils.getTextContent(pageNode));
-					clone = pageNode.cloneNode(false);
+					var text = mxUtils.getNodeValue(pageNode);
 					
 					if (text.length > 0)
 					{
@@ -1366,6 +1373,7 @@
 						
 						if (tmp != null && tmp.length > 0)
 						{
+							clone = pageNode.cloneNode(false);
 							clone.appendChild(mxUtils.parseXml(tmp).documentElement);
 						}
 					}
@@ -1404,7 +1412,15 @@
 							this.editor.graph.saveViewState(page.viewState,
 								temp, null, resolveReferences);
 							EditorUi.removeChildNodes(currNode);
-							mxUtils.setTextContent(currNode, Graph.compressNode(temp));
+
+							if (Editor.internalCompression)
+							{
+								mxUtils.setTextContent(currNode, Graph.compressNode(temp));
+							}
+							else
+							{
+								currNode.appendChild(temp);
+							}
 
 							// Marks the page as up-to-date
 							delete page.needsUpdate;
@@ -1437,7 +1453,15 @@
 								this.editor.graph.saveViewState(page.viewState,
 									temp, null, resolveReferences);
 								currNode = currNode.cloneNode(false);
-								mxUtils.setTextContent(currNode, Graph.compressNode(temp));
+
+								if (Editor.internalCompression)
+								{
+									mxUtils.setTextContent(currNode, Graph.compressNode(temp));
+								}
+								else
+								{
+									currNode.appendChild(temp);
+								}
 							}
 						}
 					}
@@ -3997,7 +4021,11 @@
 												{
 													var cells = this.stringToCells(Editor.getDiagramNodeXml(pages[i]));
 													var size = this.editor.graph.getBoundingBoxFromGeometry(cells);
-													addCells(cells, new mxRectangle(0, 0, size.width, size.height), evt);
+
+													if (size != null)
+													{
+														addCells(cells, new mxRectangle(0, 0, size.width, size.height), evt);
+													}
 												}
 												
 												done = true;
@@ -6049,12 +6077,15 @@
 
 				var svg = this.getSvgSubtree(href);
 
-				if (svg != null)
+				// Checks nodeName as parsers can get foreignObjects
+				// content to go before the SVG element
+				if (svg != null && svg.nodeName == 'svg')
 				{
 					svg.setAttribute('x', node.getAttribute('x'));
 					svg.setAttribute('y', node.getAttribute('y'));
 					svg.setAttribute('width', node.getAttribute('width'));
 					svg.setAttribute('height', node.getAttribute('height'));
+					svg.style.fontFamily = 'initial';
 
 					node.parentNode.replaceChild(svg, node);
 				}
@@ -6076,7 +6107,9 @@
 
 		if (data != null)
 		{
-			svg = mxUtils.parseXml(data).documentElement;
+			svg = Graph.sanitizeNode(mxUtils.parseXml(data).documentElement);
+
+			// Limits CSS rules to subtree
 			var styles = svg.getElementsByTagName('style');
 
 			if (styles.length > 0)
@@ -7957,6 +7990,24 @@
 	 */
 
 	/**
+	 * Adds the local page IDs to the given mapping.
+	 */
+	EditorUi.prototype.addLocalPagesToMapping = function(mapping)
+	{
+		mapping = (mapping != null) ? mapping : {};
+
+		if (this.pages != null)
+		{
+			for (var i = 0; i < this.pages.length; i++)
+			{
+				mapping[this.pages[i].getId()] = this.pages[i].getId();
+			}
+		}
+
+		return mapping;
+	};
+
+	/**
 	 * Imports the given XML into the existing diagram.
 	 */
 	EditorUi.prototype.importXml = function(xml, dx, dy, crop, noErrorHandling, addNewPage, applyDefaultStyles)
@@ -8051,6 +8102,8 @@
 						
 						if (cells != null)
 						{
+							this.addLocalPagesToMapping(mapping);
+
 							for (var i = 0; i < cells.length; i++)
 							{
 								this.updatePageLinksForCell(mapping, cells[i]);
@@ -10376,18 +10429,18 @@
 		else
 		{
 			this.showDialog(new ConfirmDialog(this, mxResources.get('resizeLargeImages'),
-			function(remember)
-			{
-				wrapper(remember, true);
-			},
-			function(remember)
-			{
-				wrapper(remember, false);
-			}, mxResources.get('resize'), mxResources.get('actualSize'),
-			'<img style="margin-top:8px;" src="' + Editor.loResImage + '"/>',
-			'<img style="margin-top:8px;" src="' + Editor.hiResImage + '"/>',
-			isLocalStorage || mxClient.IS_CHROMEAPP).container, 340,
-			(isLocalStorage || mxClient.IS_CHROMEAPP) ? 220 : 200, true, true);
+				function(remember)
+				{
+					wrapper(remember, true);
+				},
+				function(remember)
+				{
+					wrapper(remember, false);
+				}, mxResources.get('resize'), mxResources.get('actualSize'),
+				'<img style="margin-top:8px;" src="' + Editor.loResImage + '"/>',
+				'<img style="margin-top:8px;" src="' + Editor.hiResImage + '"/>',
+				isLocalStorage || mxClient.IS_CHROMEAPP).container, 340,
+				(isLocalStorage || mxClient.IS_CHROMEAPP) ? 226 : 200, true, true);
 		}
 	};
 	
@@ -19349,13 +19402,21 @@ var CommentsWindow = function(editorUi, x, y, w, h, saveCallback)
 	function showError(commentDiv)
 	{
 		commentDiv.style.border = '1px solid red';
-		commentDiv.removeChild(commentDiv.busyImg);
+
+		if (commentDiv.busyImg.parentNode == commentDiv)
+		{
+			commentDiv.removeChild(commentDiv.busyImg);
+		}
 	};
 	
 	function showDone(commentDiv)
 	{
 		commentDiv.style.border = '';
-		commentDiv.removeChild(commentDiv.busyImg);
+		
+		if (commentDiv.busyImg.parentNode == commentDiv)
+		{
+			commentDiv.removeChild(commentDiv.busyImg);
+		}
 	};
 
 	function addComment(comment, parentArr, parent, level, showResolved)
@@ -19383,7 +19444,9 @@ var CommentsWindow = function(editorUi, x, y, w, h, saveCallback)
 		
 		var userImg = document.createElement('img');
 		userImg.className = 'geCommentUserImg';
-		userImg.src = comment.user.pictureUrl || Editor.userImage;
+		userImg.src = (comment.user != null &&
+			comment.user.pictureUrl != null) ?
+			comment.user.pictureUrl : Editor.userImage;
 		headerDiv.appendChild(userImg);
 		
 		var headerTxt = document.createElement('div');
@@ -19392,7 +19455,8 @@ var CommentsWindow = function(editorUi, x, y, w, h, saveCallback)
 		
 		var usernameDiv = document.createElement('div');
 		usernameDiv.className = 'geCommentUsername';
-		mxUtils.write(usernameDiv, comment.user.displayName || '');
+		mxUtils.write(usernameDiv, (comment.user != null) ?
+			comment.user.displayName : '');
 		headerTxt.appendChild(usernameDiv);
 		
 		var dateDiv = document.createElement('div');
@@ -19523,7 +19587,9 @@ var CommentsWindow = function(editorUi, x, y, w, h, saveCallback)
 		
 		var user = editorUi.getCurrentUser();
 		
-		if (user != null && user.id == comment.user.id && !readOnly && !comment.isLocked)
+		if (user != null && comment.user != null &&
+			user.id == comment.user.id &&
+			!readOnly && !comment.isLocked)
 		{
 			addAction(mxResources.get('edit'), function()
 			{
