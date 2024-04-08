@@ -206,8 +206,10 @@ mxMondrianConnector.prototype.addEdgeLabels = function(connector)
 				if(edgeLabelAttributes != undefined && edgeLabelAttributes != 'undefined')
 				{
 					let labelColor = (isChild1) ? CORE.getStyleValue(parent.style, 'edgeLabel1Color', 'black') : CORE.getStyleValue(parent.style, 'edgeLabel2Color', 'black') ;
+					let labelFormat = (isChild1) ? CORE.getStyleValue(parent.style, 'edgeLabel1Template', 'default') : CORE.getStyleValue(parent.style, 'edgeLabel2Template', 'default') ;
+					
 					child.value.setAttribute('label', 
-						CORE.defineLabel(edgeLabelAttributes, child, 'defaultSettingsConnector', labelColor));
+						CORE.defineLabel(edgeLabelAttributes, child, 'defaultSettingsConnector', labelColor, false, labelFormat));
 				}
 			}
 		}	

@@ -339,8 +339,7 @@ class MondrianCore {
         }
     }    
 
-
-    getLabelFormat = function(labelAttributes)
+    getLabelFormat = function(labelAttributes, labelTemplate)
     {
         let attributes = labelAttributes.split(',');
 
@@ -358,21 +357,22 @@ class MondrianCore {
                 labelFormat = 'nolabel';
                 break;
             case 0:
-                labelFormat = 'default:1';
+                labelFormat = `${labelTemplate}:1`;
                 break;
             case 1:
-                labelFormat = 'default:1,2';
+                labelFormat = `${labelTemplate}:1,2`;
                 break;
             default:
-                labelFormat = 'default:1,2,3';
+                labelFormat = `${labelTemplate}:1,2,3`;
         }
 
         return labelFormat;
     }
 
-    defineLabel = function(attributesText, currentCell, settings, labelColor = 'black', labelOnDarkBackGround = false)
+    defineLabel = function(attributesText, currentCell, settings, labelColor = 'black', labelOnDarkBackGround = false, labelTemplate = 'default')
     {
-        let formatText = this.getLabelFormat(attributesText);
+        let formatText = this.getLabelFormat(attributesText, labelTemplate);
+
         let currentLabelValue = currentCell.getAttribute('label');
         currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
 
@@ -398,7 +398,7 @@ class MondrianCore {
         }
 
         let labelValue = (labelFormats[labelFormatFilter] != undefined) ? labelFormats[labelFormatFilter] : labelFormats['default'];
-        
+
         // data values
         for (let i = 0; i < labelAttributes.length; i++)
         {
