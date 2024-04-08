@@ -1603,7 +1603,7 @@
 		{
 			if (!mxClient.IS_CHROMEAPP && editorUi.isOffline())
 			{
-				this.addMenuItems(menu, ['about'], parent);
+				this.addMenuItems(menu, ['keyboardShortcuts', '-', 'about'], parent);
 			}
 			else
 			{
@@ -2862,13 +2862,27 @@
 		{
 			return Editor.enableCssDarkMode;
 		});
-		
+
+		if (window.matchMedia && document.getElementById('high-contrast-stylesheet') != null)
+		{
+			var action = editorUi.actions.addAction('highContrast', function()
+			{
+				editorUi.setAndPersistHighContrast(!editorUi.isHighContrast());
+			});
+			
+			action.setToggleAction(true);
+			action.setSelectedCallback(function()
+			{
+				return editorUi.isHighContrast();
+			});
+		}
+
 		var action = editorUi.actions.addAction('search', function()
 		{
 			var visible = editorUi.sidebar.isEntryVisible('search');
 			editorUi.sidebar.showPalette('search', !visible);
 			
-			if (isLocalStorage)
+			if (Editor.isSettingsEnabled())
 			{
 				mxSettings.settings.search = !visible;
 				mxSettings.save();
@@ -3370,6 +3384,13 @@
 			if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
 			{
 				editorUi.menus.addLinkToItem(item, 'https://github.com/jgraph/drawio/discussions/3701');
+			}
+
+			var item = editorUi.menus.addMenuItem(menu, 'highContrast', parent);
+
+			if (!editorUi.isOffline() || mxClient.IS_CHROMEAPP || EditorUi.isElectronApp)
+			{
+				editorUi.menus.addLinkToItem(item, 'https://github.com/jgraph/drawio/issues/4296');
 			}
 		})));
 
