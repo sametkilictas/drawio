@@ -67,6 +67,14 @@ function mxShape(stencil)
 };
 
 /**
+ * Variable: forceFilledPointerEvents
+ *
+ * Specifies if pointerEvents should be forced for filled shapes. Default is
+ * false.
+ */
+mxShape.forceFilledPointerEvents = true;
+
+/**
  * Variable: dialect
  *
  * Holds the dialect in which the shape is to be painted.
@@ -1040,6 +1048,19 @@ mxShape.prototype.configureCanvas = function(c, x, y, w, h)
 		c.setFillStyle(this.fillStyle);
 	}
 
+	if (this.style != null)
+	{
+		if (this.style['linecap'] != null)
+		{
+			c.setLineCap(this.style['linecap']);
+		}
+
+		if (this.style['linejoin'] != null)
+		{
+			c.setLineJoin(this.style['linejoin']);
+		}
+	}
+
 	c.setStrokeColor(this.stroke);
 	this.configurePointerEvents(c);
 };
@@ -1051,10 +1072,10 @@ mxShape.prototype.configureCanvas = function(c, x, y, w, h)
  */
 mxShape.prototype.configurePointerEvents = function(c)
 {
-	if (this.style != null && (this.fill == null ||
-		this.fill == mxConstants.NONE || this.opacity == 0 ||
-		this.fillOpacity == 0) && mxUtils.getValue(this.style,
-		mxConstants.STYLE_POINTER_EVENTS, '1') == '0')
+	if (this.style != null && (!mxShape.forceFilledPointerEvents ||
+		(this.fill == null || this.fill == mxConstants.NONE ||
+		this.opacity == 0 || this.fillOpacity == 0)) &&
+		mxUtils.getValue(this.style, mxConstants.STYLE_POINTER_EVENTS, '1') == '0')
 	{
 		c.pointerEvents = false;
 	}

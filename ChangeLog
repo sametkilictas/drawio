@@ -1,3 +1,67 @@
+26-APR-2024: 24.3.1
+
+- Fixes breadcrumb trail after refresh in OneDrive picker [drawio-4339]
+- Fixes diagrams in Google Add ons [drawio-4349]
+- Fixes diagram size in Google Add ons [drawio-4351]
+- Removes margin for cropped PDF export [drawio-4353]
+- [conf cloud] Fixes AP.navigator.getLocation returning incorrect pageId in drafts [DID-11399]
+
+24-APR-2024: 24.3.0
+
+- Enable internal links in PDF export [drawio-722]
+
+24-APR-2024: 24.2.9
+
+- Adds support for PDF+XML files in OneDrive picker [drawio-4339]
+- Adds autosize and resizable to style clipboard [drawio-4285]
+- Fixes PWA for iOS and iPadOS [drawio-4342]
+- Adds support for iframe sandbox attribute [drawio-4340]
+- Skips getStoredMode in embed mode [drawio-4340]
+
+22-APR-2024: 24.2.8
+
+- Adds experimental read-only mode [drawio-desktop-1380]
+- [conf cloud] Adds support for server lightbox links [DID-11348]
+- Enables crop option in PDF export dialog
+- Fixes background images, page IDs in print preview
+
+19-APR-2024: 24.2.7
+
+- Simplifies print dialog
+- Adds linecap and linejoin style [drawio-4200]
+- Removes test.draw.io domain for development
+- Adds Open Library option in Edit dropdown [drawio-3499,1357]
+- Adds support for stencils in Open Library option
+- Fixes dynamic loading of stencils in Firefox [DID-11328]
+- Fixes possible scrollbars, all pages label in print dialog
+- Changes font size unit label to px [drawio-3615,drawio-desktop-1448]
+
+18-APR-2024: 24.2.6
+
+- Build failure
+
+12-APR-2024: 24.2.5
+
+- [conf cloud] Improves embedding from URL and CSV via proxy and confluence attachments [DID-11234]
+- Fixes possible DOM error in mxGraph.panGraph
+- Sorts files and folders in OneDrive picker [drawio-2870]
+- Checks size in Graph.clipSvgDataUri [drawio-desktop-1686]
+- Fixes C4 shape container names [drawio-4312]
+
+10-APR-2024: 24.2.4
+
+- Release skipped
+
+08-APR-2024: 24.2.3
+
+- Adds Editor.fontSizeUnit, fixes possible unhandled font element
+- Disables dots fillStyle in sketch mode
+- Updates Rough.js from 4.4.1 to 4.6.6
+- Enables rubberband on locked shapes [drawio-desktop-1684]
+- Fixes saving of embed HTML in desktop [drawio-4301]
+- Updates DOMPurify from 3.0.11 to 3.1.0
+- Fixes ignored anchor links in SVG for Chrome PDF export
+
 03-APR-2024: 24.2.2
 
 - [conf cloud] Fixes timeout error fetching custom libraries when libraries page not found [DID-11193]

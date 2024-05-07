@@ -53,7 +53,7 @@ mxStencilRegistry.allowEval = false;
 	PrintDialog.previewEnabled = false;
 	
 	PrintDialog.electronPrint = function(editorUi, allPages, pagesFrom, pagesTo, 
-			fit, sheetsAcross, sheetsDown, zoom, pageScale, pageFormat)
+			fit, sheetsAcross, sheetsDown, zoom, pageScale)
 	{
 		var xml = '', title = '';
 		var file = editorUi.getCurrentFile();
@@ -80,8 +80,6 @@ mxStencilRegistry.allowEval = false;
 			from: pagesFrom - 1,
 			to: pagesTo - 1,
 			allPages: allPages,
-			pageWidth: pageFormat.width,
-			pageHeight: pageFormat.height,
 			pageScale: pageScale,
 			fit: fit,
 			sheetsAcross: sheetsAcross,
@@ -1118,7 +1116,7 @@ mxStencilRegistry.allowEval = false;
 						this.hideDialog();
 						fn(fileEntry, drafts[index].data, stat, null, true);
 						await requestSync({action: 'deleteFile', file: drafts[index].path});
-					}), mxUtils.bind(this, function(index)
+					}), mxUtils.bind(this, async function(index)
 					{
 						index = index || 0;
 						await requestSync({action: 'deleteFile', file: drafts[index].path});
@@ -1583,7 +1581,9 @@ mxStencilRegistry.allowEval = false;
 	{
 		try
 		{
-			var lastDir = localStorage.getItem('.lastSaveDir');
+			var lastDir = (this.fileObject != null && this.fileObject.path != null) ?
+				await requestSync({action: 'dirname', path: this.fileObject.path}) :
+				localStorage.getItem('.lastSaveDir');
 			var name = this.ui.normalizeFilename(this.getTitle(),
 				this.constructor == LocalLibrary ? 'xml' : null);
 			var ext = null;
@@ -2091,6 +2091,11 @@ mxStencilRegistry.allowEval = false;
 				          { name: 'XML Documents', extensions: ['xml'] }
 				       ];
 				break;
+				case 'txt':
+					filters = [
+				          { name: 'Plain Text', extensions: ['txt'] }
+				       ];
+				break;
 			};
 			
 			dlgConfig['filters'] = filters;
@@ -2117,10 +2122,10 @@ mxStencilRegistry.allowEval = false;
 					}, mxUtils.bind(this, function ()
 				    {
 						this.spinner.stop();
-		        	}), mxUtils.bind(this, function ()
+		        	}), mxUtils.bind(this, function (e)
 				    {
 						this.spinner.stop();
-						this.handleError({message: mxResources.get('errorSavingFile')});
+						this.handleError(e, mxResources.get('errorSavingFile'));
 		        	}));
 				}
 			}
