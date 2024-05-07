@@ -125,6 +125,7 @@ Format.prototype.init = function()
 	graph.addListener(mxEvent.ROOT, this.update);
 	ui.addListener('styleChanged', this.update);
 	ui.addListener('darkModeChanged', this.update);
+	ui.addListener('lockedChanged', this.update);
 	
 	this.refresh();
 };
@@ -450,81 +451,88 @@ BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValu
 	
 	var selState = null;
 	var updating = false;
+	var lastValue = null;
 	
 	var update = mxUtils.bind(this, function(evt)
 	{
 		var value = (isFloat) ? parseFloat(input.value) : parseInt(input.value);
 
-		// Special case: angle mod 360
-		if (!isNaN(value) && key == mxConstants.STYLE_ROTATION)
+		if (value != lastValue)
 		{
-			// Workaround for decimal rounding errors in floats is to
-			// use integer and round all numbers to two decimal point
-			value = mxUtils.mod(Math.round(value * 100), 36000) / 100;
-		}
-		
-		value = Math.min(max, Math.max(min, (isNaN(value)) ? defaultValue : value));
-		
-		if (graph.cellEditor.isContentEditing() && textEditFallback)
-		{
-			if (!updating)
+			lastValue = value;
+
+			// Special case: angle mod 360
+			if (!isNaN(value) && key == mxConstants.STYLE_ROTATION)
 			{
-				updating = true;
-				
-				if (selState != null)
-				{
-					graph.cellEditor.restoreSelection(selState);
-					selState = null;
-				}
-				
-				textEditFallback(value);
-				input.value = value + unit;
-	
-				// Restore focus and selection in input
-				updating = false;
-			}
-		}
-		else if (value != mxUtils.getValue(ui.getSelectionState().style, key, defaultValue))
-		{
-			if (graph.isEditing())
-			{
-				graph.stopEditing(true);
+				// Workaround for decimal rounding errors in floats is to
+				// use integer and round all numbers to two decimal point
+				value = mxUtils.mod(Math.round(value * 100), 36000) / 100;
 			}
 			
-			graph.getModel().beginUpdate();
-			try
+			value = Math.min(max, Math.max(min, (isNaN(value)) ? defaultValue : value));
+			
+			if (graph.cellEditor.isContentEditing() && textEditFallback)
 			{
-				var cells = ui.getSelectionState().cells;
-				graph.setCellStyles(key, value, cells);
-
-				// Handles special case for fontSize where HTML labels are parsed and updated
-				if (key == mxConstants.STYLE_FONTSIZE)
+				if (!updating)
 				{
-					graph.updateLabelElements(cells, function(elt)
+					updating = true;
+					
+					if (selState != null)
 					{
-						elt.style.fontSize = value + 'px';
-						elt.removeAttribute('size');
-					});
-				}
-				
-				for (var i = 0; i < cells.length; i++)
-				{
-					if (graph.model.getChildCount(cells[i]) == 0)
-					{
-						graph.autoSizeCell(cells[i], false);
+						graph.cellEditor.restoreSelection(selState);
+						selState = null;
 					}
+					
+					textEditFallback(value);
+					input.value = value + unit;
+		
+					// Restore focus and selection in input
+					updating = false;
+				}
+			}
+			else if (value != mxUtils.getValue(ui.getSelectionState().style, key, defaultValue))
+			{
+				if (graph.isEditing())
+				{
+					graph.stopEditing(true);
 				}
 				
-				ui.fireEvent(new mxEventObject('styleChanged', 'keys', [key],
-						'values', [value], 'cells', cells));
+				graph.getModel().beginUpdate();
+				try
+				{
+					var cells = ui.getSelectionState().cells;
+					graph.setCellStyles(key, value, cells);
+
+					// Handles special case for fontSize where HTML labels are parsed and updated
+					if (key == mxConstants.STYLE_FONTSIZE)
+					{
+						graph.updateLabelElements(cells, function(elt)
+						{
+							elt.style.fontSize = value + 'px';
+							elt.removeAttribute('size');
+						});
+					}
+					
+					for (var i = 0; i < cells.length; i++)
+					{
+						if (graph.model.getChildCount(cells[i]) == 0)
+						{
+							graph.autoSizeCell(cells[i], false);
+						}
+					}
+					
+					ui.fireEvent(new mxEventObject('styleChanged', 'keys', [key],
+							'values', [value], 'cells', cells));
+				}
+				finally
+				{
+					graph.getModel().endUpdate();
+				}
 			}
-			finally
-			{
-				graph.getModel().endUpdate();
-			}
+			
+			input.value = value + unit;
 		}
-		
-		input.value = value + unit;
+
 		mxEvent.consume(evt);
 	});
 
@@ -551,7 +559,7 @@ BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValu
 	
 	mxEvent.addListener(input, 'change', update);
 	mxEvent.addListener(input, 'blur', update);
-	
+
 	return update;
 };
 
@@ -3349,8 +3357,8 @@ TextFormatPanel.prototype.addFont = function(container)
 	// after first character was entered (as the font element is lazy created)
 	var pendingFontSize = null;
 
-	var inputUpdate = this.installInputHandler(input, mxConstants.STYLE_FONTSIZE, Menus.prototype.defaultFontSize, 1, 999, ' pt',
-	function(fontSize)
+	var inputUpdate = this.installInputHandler(input, mxConstants.STYLE_FONTSIZE,
+		Menus.prototype.defaultFontSize, 1, 999, ' ' + Editor.fontSizeUnit, function(fontSize)
 	{
 		// IE does not support containsNode
 		// KNOWN: Fixes font size issues but bypasses undo
@@ -3415,9 +3423,21 @@ TextFormatPanel.prototype.addFont = function(container)
 				{
 					updateSize(elts[i]);
 				}
+
+				// Handles font element inserted before selection text
+				if (selection.rangeCount > 0)
+				{
+					var container = selection.getRangeAt(0).commonAncestorContainer;
+
+					if (container != graph.cellEditor.textarea &&
+						graph.cellEditor.textarea.contains(container))
+					{
+						updateSize(container.parentNode);
+					}
+				}
 			}
 
-			input.value = fontSize + ' pt';
+			input.value = fontSize + ' ' + Editor.fontSizeUnit;
 		}
 		else if (window.getSelection || document.selection)
 		{
@@ -3473,7 +3493,7 @@ TextFormatPanel.prototype.addFont = function(container)
 						// for potential fontSize values of parent elements that don't match
 						window.setTimeout(function()
 						{
-							input.value = pendingFontSize + ' pt';
+							input.value = pendingFontSize + ' ' + Editor.fontSizeUnit;
 							pendingFontSize = null;
 						}, 0);
 						
@@ -4096,7 +4116,7 @@ TextFormatPanel.prototype.addFont = function(container)
 		if (force || document.activeElement != input)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_FONTSIZE, Menus.prototype.defaultFontSize));
-			input.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			input.value = (isNaN(tmp)) ? '' : tmp + ' ' + Editor.fontSizeUnit;
 		}
 		
 		var align = mxUtils.getValue(ss.style, mxConstants.STYLE_ALIGN, mxConstants.ALIGN_CENTER);
@@ -4478,7 +4498,7 @@ TextFormatPanel.prototype.addFont = function(container)
 								}
 								else
 								{
-									input.value = (isNaN(fontSize)) ? '' : fontSize + ' pt';
+									input.value = (isNaN(fontSize)) ? '' : fontSize + ' ' + Editor.fontSizeUnit;
 								}
 								
 								var lh = parseFloat(lineHeight);
@@ -4584,7 +4604,8 @@ StyleFormatPanel.prototype.init = function()
 	if (!ss.containsLabel && ss.cells.length > 0)
 	{
 		if (ss.containsImage && ss.vertices.length == 1 && ss.style.shape == 'image' &&
-			ss.style.image != null && ss.style.image.substring(0, 19) == 'data:image/svg+xml;')
+			ss.style.image != null && String(ss.style.image).
+				substring(0, 19) == 'data:image/svg+xml;')
 		{
 			this.container.appendChild(this.addSvgStyles(this.createPanel()));
 		}
@@ -4782,7 +4803,28 @@ StyleFormatPanel.prototype.addEditOps = function(div)
 		var ops = ['edit', 'copyAsText', 'editLink', 'editShape', 'editImage',
 			'editData', 'copyData', 'pasteData', 'editConnectionPoints',
 			'editGeometry', 'editTooltip', 'editStyle'];
-		
+		var libs = null;
+
+		if (this.editorUi.sidebar != null)
+		{
+			var keyStyle = this.editorUi.sidebar.getKeyStyle(ss.cells[0].style);
+			libs = this.editorUi.sidebar.getLibsForStyle(keyStyle);
+
+			// Adds open library action and updates search index when invoked
+			// if no libs were found but the shape name is likely to be known
+			if (libs == null && !this.editorUi.sidebar.isSearchIndexLoaded() &&
+				ss.style.shape != null && String(ss.style.shape).
+					substring(0, 8) == 'mxgraph.')
+			{
+				libs = [];
+			}
+		}
+
+		if (libs != null)
+		{
+			ops.push('openLibrary');
+		}
+
 		for (var i = 0; i < ops.length; i++)
 		{
 			var action = this.editorUi.actions.get(ops[i]);
@@ -4810,16 +4852,40 @@ StyleFormatPanel.prototype.addEditOps = function(div)
 
 			mxEvent.addListener(editSelect, 'change', mxUtils.bind(this, function(evt)
 			{
-				var action = this.editorUi.actions.get(editSelect.value);
-				editSelect.value = 'edit';
-
-				if (action != null)
+				if (editSelect.value == 'openLibrary')
 				{
-					action.funct();
+					if (libs.length == 0)
+					{
+						// Updates search index and tries again
+						this.editorUi.sidebar.updateSearchIndex();
+						var keyStyle = this.editorUi.sidebar.getKeyStyle(ss.cells[0].style);
+						libs = this.editorUi.sidebar.getLibsForStyle(keyStyle);
+					}
+
+					if (libs != null && libs.length > 0)
+					{
+						this.editorUi.sidebar.openLibraries(libs);
+					}
+					else
+					{
+						this.editorUi.handleError({message: mxResources.get('objectNotFound')});
+					}
+
+					editSelect.value = 'edit';
+				}
+				else
+				{
+					var action = this.editorUi.actions.get(editSelect.value);
+					editSelect.value = 'edit';
+
+					if (action != null)
+					{
+						action.funct();
+					}
 				}
 			}));
 			
-			if (ss.image && ss.cells.length > 0)
+			if (ss.image)
 			{
 				var graph = this.editorUi.editor.graph;
 				var state = graph.view.getState(graph.getSelectionCell());
@@ -6125,24 +6191,27 @@ DiagramStylePanel.prototype.getGlobalStyleButtons = function()
 
 	mxEvent.addListener(sketchDiv, 'click', function(evt)
 	{
-		var value = !Editor.sketchMode;
-
-		// Temporary overrides sketch mode to avoid flickering
-		// for the first async update after updating cells
-		Editor.sketchMode = value;
-
-		graph.updateCellStyles({'sketch': (value) ? '1' : null,
-			'curveFitting': (value) ? Editor.sketchDefaultCurveFitting : null,
-			'jiggle': (value) ? Editor.sketchDefaultJiggle : null},
-			graph.getVerticesAndEdges());
-		mxEvent.consume(evt);
-
-		// Restores and udpates sketch mode asynchronously
-		window.setTimeout(function()
+		if (graph.isEnabled())
 		{
-			Editor.sketchMode = !value;
-			ui.setSketchMode(value);
-		});
+			var value = !Editor.sketchMode;
+
+			// Temporary overrides sketch mode to avoid flickering
+			// for the first async update after updating cells
+			Editor.sketchMode = value;
+
+			graph.updateCellStyles({'sketch': (value) ? '1' : null,
+				'curveFitting': (value) ? Editor.sketchDefaultCurveFitting : null,
+				'jiggle': (value) ? Editor.sketchDefaultJiggle : null},
+				graph.getVerticesAndEdges());
+			mxEvent.consume(evt);
+
+			// Restores and udpates sketch mode asynchronously
+			window.setTimeout(function()
+			{
+				Editor.sketchMode = !value;
+				ui.setSketchMode(value);
+			});
+		}
 	});
 
 
@@ -6185,6 +6254,26 @@ DiagramStylePanel.prototype.getGlobalStyleButtons = function()
 		}
 	))];
 
+	if (!graph.isEnabled())
+	{
+		for (var i = 0; i < buttons.length; i++)
+		{
+			if (buttons[i].nodeName == 'BUTTON')
+			{
+				buttons[i].setAttribute('disabled', 'disabled');
+			}
+			else
+			{
+				var inp = buttons[i].getElementsByTagName('input');
+
+				if (inp.length > 0)
+				{
+					inp[0].setAttribute('disabled', 'disabled');
+				}
+			}
+		}
+	}
+
 	return buttons;
 };
 
@@ -6196,8 +6285,6 @@ DiagramStylePanel.prototype.addView = function(div)
 	var ui = this.editorUi;
 	var editor = ui.editor;
 	var graph = editor.graph;
-	var model = graph.getModel();
-	var gridColor = graph.view.gridColor;
 
 	div.style.paddingTop = '2px';
 	div.style.whiteSpace = 'normal';
@@ -6251,6 +6338,25 @@ DiagramStylePanel.prototype.addView = function(div)
 	opts.appendChild(table);
 	div.appendChild(opts);
 
+	if (graph.isEnabled())
+	{
+		this.addGraphStyles(div);
+	}
+
+	return div;
+};
+
+
+/**
+ * Adds the label menu items to the given menu and parent.
+ */
+DiagramStylePanel.prototype.addGraphStyles = function(div)
+{
+	var ui = this.editorUi;
+	var editor = ui.editor;
+	var graph = editor.graph;
+	var model = graph.getModel();
+	var gridColor = graph.view.gridColor;
 	var defaultStyles = ['fillColor', 'strokeColor', 'fontColor', 'gradientColor'];
 	
 	div.style.whiteSpace = 'normal';

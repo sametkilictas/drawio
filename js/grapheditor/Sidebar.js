@@ -22,6 +22,8 @@ function Sidebar(editorUi, container)
 	// Uses the initial default style for rendering the sidebars
 	this.initialDefaultVertexStyle = mxUtils.clone(editorUi.editor.graph.defaultVertexStyle);
 	this.initialDefaultEdgeStyle = mxUtils.clone(editorUi.editor.graph.defaultEdgeStyle);
+	this.ignoredStyles = ['html', 'whiteSpace', 'aspect', 'points', 'verticalLabelPosition',
+		'labelPosition', 'outlineConnect'].concat(Graph.cellStyles);
 	
 	// Wrapper for entries and footer
 	this.container.style.overflow = 'visible';
@@ -219,6 +221,16 @@ Sidebar.prototype.moreShapesHeight = 52;
  * Whether live preview should be enabled. Default is true.
  */
 Sidebar.prototype.livePreview = true;
+
+/**
+ * Whether closed libraries should be searched. Default is true.
+ */
+Sidebar.prototype.searchClosedLibraries = true;
+
+/**
+ * Opacity for search results from closed libraries. Default is null.
+ */
+Sidebar.prototype.closedLibraryOpacity = null;
 
 /*
  * Experimental smaller sidebar entries
@@ -795,8 +807,79 @@ Sidebar.prototype.setCurrentSearchEntryLibrary = function(id, lib)
 /**
  * Hides the current tooltip.
  */
+Sidebar.prototype.getKeyStyle = function(style)
+{
+	var newStyle = [];
+
+	if (style != null)
+	{
+		var tokens = style.split(';');
+
+		for (var i = 0; i < tokens.length; i++)
+		{
+			var tmp = tokens[i].split('=');
+
+			if (tmp.length > 1 && mxUtils.indexOf(this.ignoredStyles, tmp[0]) < 0)
+			{
+				newStyle.push(tmp[0] + '=' + tmp[1]);
+			}
+		}
+	}
+
+	return newStyle.join(';');
+};
+
+/**
+ * Hides the current tooltip.
+ */
+Sidebar.prototype.addLibForStyle = function(style, lib)
+{
+	if (style != '')
+	{
+		if (this.styleToLibs == null)
+		{
+			this.styleToLibs = {};
+		}
+
+		if (this.styleToLibs[style] == null)
+		{
+			this.styleToLibs[style] = [];
+		}
+
+		this.styleToLibs[style].push(lib);
+	}
+};
+
+/**
+ * Hides the current tooltip.
+ */
+Sidebar.prototype.getLibsForStyle = function(style)
+{
+	return (this.styleToLibs != null) ? this.styleToLibs[style] : null;
+};
+
+/**
+ * Hides the current tooltip.
+ */
 Sidebar.prototype.addEntry = function(tags, fn)
 {
+	// Collects shape names for reverse lookup
+	if (this.currentSearchEntryLibrary != null)
+	{
+		var self = this;
+		var createVertexTemplateFromCells = this.createVertexTemplateFromCells;
+		this.createVertexTemplateFromCells = function(cells, width, height, title, allowCellsInserted)
+		{
+			for (var i = 0; i < cells.length; i++)
+			{
+				self.addLibForStyle(self.getKeyStyle(cells[i].style),
+					this.currentSearchEntryLibrary);
+			}
+		};
+		fn();
+		this.createVertexTemplateFromCells = createVertexTemplateFromCells;
+	}
+	
 	if (this.taglist != null && tags != null && tags.length > 0)
 	{
 		if (this.currentSearchEntryLibrary != null)
@@ -858,11 +941,33 @@ Sidebar.prototype.addEntryForTag = function(tag, fn)
 		entry.entries.push(fn);
 	}
 };
+/**
+ * Returns true if the entry should be ignored in search results.
+ */
+Sidebar.prototype.isEntryIgnored = function(entry, searchClosedLibraries)
+{
+	var ignored = !searchClosedLibraries;
+
+	if (entry.parentLibraries != null && ignored)
+	{
+		for (var j = 0; j < entry.parentLibraries.length; j++)
+		{
+			if (this.isEntryVisible(entry.parentLibraries[j].id))
+			{
+				ignored = false;
+
+				break;
+			}
+		}
+	}
+
+	return ignored;
+};
 
 /**
  * Adds shape search UI.
  */
-Sidebar.prototype.searchEntries = function(searchTerms, count, page, success, error)
+Sidebar.prototype.searchEntries = function(searchTerms, count, page, success, error, searchClosedLibraries)
 {
 	if (this.taglist != null && searchTerms != null)
 	{
@@ -901,13 +1006,17 @@ Sidebar.prototype.searchEntries = function(searchTerms, count, page, success, er
 							tmpDict.get(entry) == null)
 						{
 							tmpDict.put(entry, entry);
-							results.push(entry);
-							
-							if (i == tmp.length - 1 && results.length == max)
+
+							if (!this.isEntryIgnored(entry, searchClosedLibraries))
 							{
-								success(results.slice(page * count, max), max, true, tmp);
-								
-								return;
+								results.push(entry);
+							
+								if (i == tmp.length - 1 && results.length == max)
+								{
+									success(results.slice(page * count, max), max, true, tmp);
+									
+									return;
+								}
 							}
 						}
 					}
@@ -1127,97 +1236,112 @@ Sidebar.prototype.addSearchPalette = function(expand)
 					var current = new Object();
 					this.currentSearch = current;
 					
-					this.searchEntries(searchTerm, count, page, mxUtils.bind(this, function(results, len, more, terms)
+					try
 					{
-						if (this.currentSearch == current)
+						this.searchEntries(searchTerm, count, page, mxUtils.bind(this, function(results, len, more, terms)
 						{
-							results = (results != null) ? results : [];
-							active = false;
-							page++;
-							this.insertSearchHint(div, searchTerm, count, page, results, len, more, terms);
-							
-							// Allows to repeat the search
-							if (results.length == 0 && page == 1)
+							if (this.currentSearch == current)
 							{
-								searchTerm = '';
-							}
-
-							if (center.parentNode != null)
-							{
-								center.parentNode.removeChild(center);
-							}
-							
-							for (var i = 0; i < results.length; i++)
-							{
-								(mxUtils.bind(this, function(result)
+								results = (results != null) ? results : [];
+								active = false;
+								page++;
+								this.insertSearchHint(div, searchTerm, count, page, results, len, more, terms);
+								
+								// Allows to repeat the search
+								if (results.length == 0 && page == 1)
 								{
-									try
-									{
-										var elt = result();
-										
-										// Avoids duplicates in results
-										if (hash[elt.innerHTML] == null)
-										{
-											hash[elt.innerHTML] = (result.parentLibraries != null) ?
-												result.parentLibraries.slice() : [];
-											div.appendChild(elt);
-										}
-										else if (result.parentLibraries != null)
-										{
-											hash[elt.innerHTML] = hash[elt.innerHTML].concat(result.parentLibraries);
-										}
+									searchTerm = '';
+								}
 
-										mxEvent.addGestureListeners(elt, null, null, mxUtils.bind(this, function(evt)
-										{
-											var libs = hash[elt.innerHTML];
-	
-											if (mxEvent.isPopupTrigger(evt))
-											{
-												this.showPopupMenuForEntry(elt, libs, evt);
-											}
-										}));
-										
-										// Disables the built-in context menu
-										mxEvent.disableContextMenu(elt);
-									}
-									catch (e)
+								if (center.parentNode != null)
+								{
+									center.parentNode.removeChild(center);
+								}
+								
+								for (var i = 0; i < results.length; i++)
+								{
+									(mxUtils.bind(this, function(result)
 									{
-										if (urlParams['test'] == '1')
+										try
 										{
-											if (window.console != null && !EditorUi.isElectronApp)
+											var elt = result();
+											
+											if (this.closedLibraryOpacity != null &&
+												this.searchClosedLibraries)
 											{
-												console.error(e);
+												if (this.isEntryIgnored(result, false))
+												{
+													elt.style.opacity = this.closedLibraryOpacity;
+												}
 											}
-											else
+											
+											// Avoids duplicates in results
+											if (hash[elt.innerHTML] == null)
 											{
-												mxLog.show();
-												mxLog.debug(e.stack);
+												hash[elt.innerHTML] = (result.parentLibraries != null) ?
+													result.parentLibraries.slice() : [];
+												div.appendChild(elt);
+											}
+											else if (result.parentLibraries != null)
+											{
+												hash[elt.innerHTML] = hash[elt.innerHTML].concat(result.parentLibraries);
+											}
+
+											mxEvent.addGestureListeners(elt, null, null, mxUtils.bind(this, function(evt)
+											{
+												var libs = hash[elt.innerHTML];
+		
+												if (mxEvent.isPopupTrigger(evt))
+												{
+													this.showPopupMenuForEntry(elt, libs, evt);
+												}
+											}));
+											
+											// Disables the built-in context menu
+											mxEvent.disableContextMenu(elt);
+										}
+										catch (e)
+										{
+											if (urlParams['test'] == '1')
+											{
+												if (window.console != null && !EditorUi.isElectronApp)
+												{
+													console.error(e);
+												}
+												else
+												{
+													mxLog.show();
+													mxLog.debug(e.stack);
+												}
 											}
 										}
-									}
-								}))(results[i]);
+									}))(results[i]);
+								}
+								
+								if (more)
+								{
+									button.removeAttribute('disabled');
+									button.innerHTML = mxResources.get('moreResults');
+								}
+								else
+								{
+									button.innerHTML = mxResources.get('reset');
+									button.style.display = 'none';
+									complete = true;
+								}
+								
+								button.style.cursor = '';
+								div.appendChild(center);
 							}
-							
-							if (more)
-							{
-								button.removeAttribute('disabled');
-								button.innerHTML = mxResources.get('moreResults');
-							}
-							else
-							{
-								button.innerHTML = mxResources.get('reset');
-								button.style.display = 'none';
-								complete = true;
-							}
-							
+						}), mxUtils.bind(this, function()
+						{
 							button.style.cursor = '';
-							div.appendChild(center);
-						}
-					}), mxUtils.bind(this, function()
+						}), this.searchClosedLibraries);
+					}
+					catch (e)
 					{
-						// TODO: Error handling
-						button.style.cursor = '';
-					}));
+						this.editorUi.handleError(e);
+					}
 				}
 			}
 		}
@@ -4154,7 +4278,6 @@ Sidebar.prototype.removePalette = function(id)
  */
 Sidebar.prototype.addImagePalette = function(id, title, prefix, postfix, items, titles, tags)
 {
-	var showTitles = titles != null;
 	var fns = [];
 	
 	for (var i = 0; i < items.length; i++)
