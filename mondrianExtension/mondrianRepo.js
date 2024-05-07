@@ -94,56 +94,63 @@ class MondrianRepo {
                 let templateElement = template.element
                 if(templateElement.templateInherit != undefined)
                 {
-                    let baseTemplate = this.ELEMENTS.get(templateElement.templateInherit.toLowerCase());
-
-                    if(baseTemplate != undefined)
+                    let templatesToInherit = templateElement.templateInherit.split(',');
+                    
+                    for (let templateToInherit of templatesToInherit)
                     {
-                        let baseTemplateElement = baseTemplate.element;
+                        let baseTemplate = this.ELEMENTS.get(templateToInherit.toLowerCase());
 
-                        if(baseTemplateElement.style != undefined && baseTemplateElement.style.initialSettings != undefined)
+                        if(baseTemplate != undefined)
                         {
-                            if(templateElement.style === undefined) templateElement.style = {};
-                            if(templateElement.style.initialSettings === undefined) templateElement.style.initialSettings = {};
-
-                            for (const setting in baseTemplateElement.style.initialSettings) {
-                                if(templateElement.style.initialSettings[setting] === undefined)
-                                    templateElement.style.initialSettings[setting] = baseTemplateElement.style.initialSettings[setting];
+                            let baseTemplateElement = baseTemplate.element;
+    
+                            if(baseTemplateElement.style != undefined && baseTemplateElement.style.initialSettings != undefined)
+                            {
+                                if(templateElement.style === undefined) templateElement.style = {};
+                                if(templateElement.style.initialSettings === undefined) templateElement.style.initialSettings = {};
+    
+                                for (const setting in baseTemplateElement.style.initialSettings) {
+                                    if(templateElement.style.initialSettings[setting] === undefined)
+                                        templateElement.style.initialSettings[setting] = baseTemplateElement.style.initialSettings[setting];
+                                }
+                            }
+    
+                            if(baseTemplateElement.style != undefined && baseTemplateElement.style.mandatorySettings != undefined)
+                            {
+                                if(templateElement.style === undefined) templateElement.style = {};
+                                if(templateElement.style.mandatorySettings === undefined) templateElement.style.mandatorySettings = {};
+    
+                                for (const setting in baseTemplateElement.style.mandatorySettings) {
+                                    if(templateElement.style.mandatorySettings[setting] === undefined)
+                                        templateElement.style.mandatorySettings[setting] = baseTemplateElement.style.mandatorySettings[setting];
+                                }
+                            }
+    
+                            if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.initialSettings != undefined)
+                            {
+                                if(templateElement.attributes === undefined) templateElement.attributes = {};
+                                if(templateElement.attributes.initialSettings === undefined) templateElement.attributes.initialSettings = {};
+    
+                                for (const setting in baseTemplateElement.attributes.initialSettings) {
+                                    if(templateElement.attributes.initialSettings[setting] === undefined)
+                                        templateElement.attributes.initialSettings[setting] = baseTemplateElement.attributes.initialSettings[setting];
+                                }
+                            }
+    
+                            if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.mandatorySettings != undefined)
+                            {
+                                if(templateElement.attributes === undefined) templateElement.attributes = {};
+                                if(templateElement.attributes.mandatorySettings === undefined) templateElement.attributes.mandatorySettings = {};
+    
+                                for (const setting in baseTemplateElement.attributes.mandatorySettings) {
+                                    if(templateElement.attributes.mandatorySettings[setting] === undefined)
+                                        templateElement.attributes.mandatorySettings[setting] = baseTemplateElement.attributes.mandatorySettings[setting];
+                                }
                             }
                         }
-
-                        if(baseTemplateElement.style != undefined && baseTemplateElement.style.mandatorySettings != undefined)
-                        {
-                            if(templateElement.style === undefined) templateElement.style = {};
-                            if(templateElement.style.mandatorySettings === undefined) templateElement.style.mandatorySettings = {};
-
-                            for (const setting in baseTemplateElement.style.mandatorySettings) {
-                                if(templateElement.style.mandatorySettings[setting] === undefined)
-                                    templateElement.style.mandatorySettings[setting] = baseTemplateElement.style.mandatorySettings[setting];
-                            }
-                        }
-
-                        if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.initialSettings != undefined)
-                        {
-                            if(templateElement.attributes === undefined) templateElement.attributes = {};
-                            if(templateElement.attributes.initialSettings === undefined) templateElement.attributes.initialSettings = {};
-
-                            for (const setting in baseTemplateElement.attributes.initialSettings) {
-                                if(templateElement.attributes.initialSettings[setting] === undefined)
-                                    templateElement.attributes.initialSettings[setting] = baseTemplateElement.attributes.initialSettings[setting];
-                            }
-                        }
-
-                        if(baseTemplateElement.attributes != undefined && baseTemplateElement.attributes.mandatorySettings != undefined)
-                        {
-                            if(templateElement.attributes === undefined) templateElement.attributes = {};
-                            if(templateElement.attributes.mandatorySettings === undefined) templateElement.attributes.mandatorySettings = {};
-
-                            for (const setting in baseTemplateElement.attributes.mandatorySettings) {
-                                if(templateElement.attributes.mandatorySettings[setting] === undefined)
-                                    templateElement.attributes.mandatorySettings[setting] = baseTemplateElement.attributes.mandatorySettings[setting];
-                            }
-                        }
+    
                     }
+
                 }
 
                 return templateElement;
