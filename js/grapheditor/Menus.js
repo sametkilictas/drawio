@@ -416,6 +416,7 @@ Menus.prototype.init = function()
 			var layout = new mxCompactTreeLayout(graph, true);
 			layout.edgeRouting = false;
 			layout.levelDistance = 30;
+			layout.sortEdges = true;
 
 			promptSpacing(layout.levelDistance, mxUtils.bind(this, function(spacing)
 			{
@@ -431,6 +432,7 @@ Menus.prototype.init = function()
 			var layout = new mxCompactTreeLayout(graph, false);
 			layout.edgeRouting = false;
 			layout.levelDistance = 30;
+			layout.sortEdges = true;
 
 			promptSpacing(layout.levelDistance, mxUtils.bind(this, function(spacing)
 			{
