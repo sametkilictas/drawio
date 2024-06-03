@@ -2146,13 +2146,28 @@ var ParseDialog = function(editorUi, title, defaultType)
 					k++;
 				}
 
+				if (lines[k].trim() == '---')
+				{
+					do
+					{
+						k++;
+					}
+					while (k < lines.length && lines[k].trim() != '---');
+					
+					k++;
+				}
+
 				var diagramType = lines[k].trim().toLowerCase();
 				var sp = diagramType.indexOf(' ');
 				diagramType = diagramType.substring(0, sp > 0 ? sp : diagramType.length);
+				// TODO Better to add only what we support?
 				var inDrawioFormat = typeof mxMermaidToDrawio !== 'undefined' && 
 					type == 'mermaid2drawio' && diagramType != 'gantt' &&
 					diagramType != 'pie' && diagramType != 'timeline' &&
-					diagramType != 'quadrantchart' && diagramType != 'c4context';
+					diagramType != 'quadrantchart' && diagramType != 'c4context' &&
+					diagramType != 'block-beta' && diagramType != 'zenuml' &&
+					diagramType != 'xychart-beta' && diagramType != 'sankey-beta';
+
 
 				var graph = editorUi.editor.graph;
 				
@@ -3910,7 +3925,8 @@ var NewDialog = function(editorUi, compact, showName, callback, createOnly, canc
 	
 	if (editorUi.isExternalDataComms() &&
 		editorUi.getServiceName() == 'draw.io' &&
-		typeof mxMermaidToDrawio !== 'undefined')
+		typeof mxMermaidToDrawio !== 'undefined' &&
+		window.isMermaidEnabled)
 	{
 		categories['smartTemplate'] = {content: createSmartTemplateContent()};
 	}
@@ -6982,28 +6998,36 @@ var RevisionDialog = function(editorUi, revs, restoreFn)
 	mxEvent.addGestureListeners(compareBtn, function(e)
 	{
 		// Gets current state of page with given ID
-		var curr = (diagrams[currentPage] != null) ? currentDiagrams[
-			diagrams[currentPage].getAttribute('id')] : null;
-		mxUtils.setOpacity(compareBtn, 20);
-		errorNode.innerText = '';
-
-		if (curr == null)
+		try
 		{
-			mxUtils.write(errorNode, mxResources.get('pageNotFound'));
+			var curr = (diagrams[currentPage] != null) ? currentDiagrams[
+				diagrams[currentPage].getAttribute('id')] : null;
+			mxUtils.setOpacity(compareBtn, 20);
+			errorNode.innerText = '';
+
+			if (curr == null)
+			{
+				mxUtils.write(errorNode, mxResources.get('pageNotFound'));
+			}
+			else
+			{
+				prevFileInfo = fileInfo.innerHTML;
+				fileInfo.innerHTML = mxResources.get('current');
+				container.style.display = 'none';
+				cmpContainer.style.display = '';
+				cmpContainer.style.backgroundColor = container.style.backgroundColor;
+
+				var tempNode = Editor.parseDiagramNode(curr);
+				var codec = new mxCodec(tempNode.ownerDocument);
+				codec.decode(tempNode, cmpGraph.getModel());
+				cmpGraph.view.scaleAndTranslate(graph.view.scale,
+					graph.view.translate.x, graph.view.translate.y);
+			}
 		}
-		else
+		catch (e)
 		{
-			prevFileInfo = fileInfo.innerHTML;
-			fileInfo.innerHTML = mxResources.get('current');
-			container.style.display = 'none';
-			cmpContainer.style.display = '';
-			cmpContainer.style.backgroundColor = container.style.backgroundColor;
-
-			var tempNode = Editor.parseDiagramNode(curr);
-			var codec = new mxCodec(tempNode.ownerDocument);
-			codec.decode(tempNode, cmpGraph.getModel());
-			cmpGraph.view.scaleAndTranslate(graph.view.scale,
-				graph.view.translate.x, graph.view.translate.y);
+			errorNode.innerText = '';
+			mxUtils.write(errorNode, mxResources.get('pageNotFound') + ': ' + e.message);
 		}
 	}, null, function()
 	{
@@ -8927,7 +8951,7 @@ var ChatWindow = function(editorUi, x, y, w, h)
 	typeSelect.appendChild(selectionOption);
 	selects.appendChild(typeSelect);
 
-	if (typeof mxMermaidToDrawio !== 'undefined')
+	if (typeof mxMermaidToDrawio !== 'undefined' && window.isMermaidEnabled)
 	{
 		var createOption = document.createElement('option');
 		createOption.setAttribute('value', 'create');
@@ -10039,7 +10063,8 @@ var MoreShapesDialog = function(editorUi, expanded, entries)
 			}
 
 			// Redirects scratchpad and search entries
-			if ((Editor.currentTheme == 'sketch' ||
+			if ((Editor.currentTheme == 'simple' ||
+				Editor.currentTheme == 'sketch' ||
 				Editor.currentTheme == 'min') &&
 				Editor.isSettingsEnabled())
 			{
@@ -12616,16 +12641,19 @@ var FontDialog = function(editorUi, curFontname, curUrl, curType, fn)
 	function validateFn(fontName, fontUrl, type)
 	{
 		var urlPattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+		var elt = table.querySelector('.dlg_fontName_' + type);
 		
-		if (fontName == null || fontName.length == 0)
+		if (elt != null && (fontName == null || fontName.length == 0))
 		{
-			table.querySelector('.dlg_fontName_' + type).style.border = '1px solid red';
+			elt.style.border = '1px solid red';
 			return false;
 		}
+
+		elt = table.querySelector('.dlg_fontUrl');
 		
-		if (type == 'w' && !urlPattern.test(fontUrl))
+		if (elt != null && type == 'w' && !urlPattern.test(fontUrl))
 		{
-			table.querySelector('.dlg_fontUrl').style.border = '1px solid red';
+			elt.style.border = '1px solid red';
 			return false;
 		}
 		
@@ -12978,6 +13006,63 @@ var FilePropertiesDialog = function(editorUi, publicLink)
 		};
 	};
 
+	if (urlParams['test'] == '1')
+	{
+		var initialLocked = (file != null) ? file.isLocked() : false;
+
+		row = document.createElement('tr');
+		td = document.createElement('td');
+		td.style.whiteSpace = 'nowrap';
+		td.style.overflow = 'hidden';
+		td.style.textOverflow = 'ellipsis';
+		td.style.fontSize = '10pt';
+
+		// TODO: Use mxResources.get('locked')
+		mxUtils.write(td, 'Locked' + ':');
+		
+		row.appendChild(td);
+
+		var lockedInput = document.createElement('input');
+		lockedInput.setAttribute('type', 'checkbox');
+		
+		if (initialLocked)
+		{
+			lockedInput.setAttribute('checked', 'checked');
+			lockedInput.defaultChecked = true;
+		}
+		
+		td = document.createElement('td');
+		td.style.whiteSpace = 'nowrap';
+		td.appendChild(lockedInput);
+		row.appendChild(td);
+		tbody.appendChild(row);
+
+		this.init = function()
+		{
+			lockedInput.focus();
+		};
+
+		addApply(function(success, error)
+		{
+			if (editorUi.fileNode != null && initialLocked != lockedInput.checked)
+			{
+				window.setTimeout(function()
+				{
+					if (file != null)
+					{
+						file.setLocked(lockedInput.checked);
+					}
+
+					success();
+				}, 0);
+			}
+			else
+			{
+				success();
+			}
+		});
+	}
+
 	if (isPng || isSvg)
 	{
 		var scale = 1;
@@ -13035,7 +13120,7 @@ var FilePropertiesDialog = function(editorUi, publicLink)
 		row.appendChild(td);
 		tbody.appendChild(row);
 		
-		this.init = function()
+		this.init = this.init || function()
 		{
 			zoomInput.focus();
 			
@@ -13095,7 +13180,7 @@ var FilePropertiesDialog = function(editorUi, publicLink)
 		row.appendChild(td);
 		tbody.appendChild(row);
 		
-		this.init = function()
+		this.init = this.init || function()
 		{
 			compressedInput.focus();
 		};
@@ -13358,7 +13443,7 @@ var ConnectionPointsDialog = function(editorUi, cell)
 		// Add cell and current connection points on it
 		var geo = cell.geometry;
 		var mainCell = new mxCell(cell.value, new mxGeometry(0, 0, geo.width, geo.height),
-							cell.style + ';rotatable=0;resizable=0;connectable=0;editable=0;movable=0;fillColor=none;');
+			cell.style + ';rotatable=0;resizable=0;connectable=0;editable=0;movable=0;fillColor=none;');
 		mainCell.vertex = true;
 		editingGraph.addCell(mainCell);
 

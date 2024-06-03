@@ -484,6 +484,7 @@ linewidth=Lijnbreedte
 link=Link
 links=Links
 loading=Laden
+locked=Vergrendeld
 lockUnlock=Vergrendelen/ontgrendelen
 loggedOut=Uitgelogd
 logIn=Inloggen

@@ -618,7 +618,6 @@ BaseFormatPanel.prototype.addAction = function(div, name)
 		btn.style.marginBottom = '2px';
 		btn.style.width = '210px';
 		div.appendChild(btn);
-		result = true;
 	}
 
 	return btn;
@@ -2134,6 +2133,9 @@ ArrangePanel.prototype.addAngle = function(div)
 	return div;
 };
 
+/**
+ * 
+ */
 BaseFormatPanel.prototype.getUnit = function()
 {
 	var unit = this.editorUi.editor.graph.view.unit;
@@ -2151,11 +2153,17 @@ BaseFormatPanel.prototype.getUnit = function()
 	}
 };
 
+/**
+ * 
+ */
 BaseFormatPanel.prototype.inUnit = function(pixels)
 {
 	return this.editorUi.editor.graph.view.formatUnitText(pixels);
 };
 
+/**
+ * 
+ */
 BaseFormatPanel.prototype.fromUnit = function(value)
 {
 	var unit = this.editorUi.editor.graph.view.unit;
@@ -2178,6 +2186,9 @@ BaseFormatPanel.prototype.isFloatUnit = function()
 	return this.editorUi.editor.graph.view.unit != mxConstants.POINTS;
 };
 
+/**
+ * 
+ */
 BaseFormatPanel.prototype.getUnitStep = function()
 {
 	var unit = this.editorUi.editor.graph.view.unit;
@@ -2292,6 +2303,8 @@ ArrangePanel.prototype.addGeometry = function(container)
 	
 	widthUpdate = this.addGeometryHandler(width, function(geo, value, cell)
 	{
+		value = Math.max(1, panel.fromUnit(value));
+		
 		if (graph.isTableCell(cell))
 		{
 			graph.setTableColumnWidth(cell, value - geo.width, true);
@@ -2301,8 +2314,6 @@ ArrangePanel.prototype.addGeometry = function(container)
 		}
 		else if (geo.width > 0)
 		{
-			var value = Math.max(1, panel.fromUnit(value));
-			
 			if (constrainCheckbox.checked)
 			{
 				geo.height = Math.round((geo.height * value * 100) / geo.width) / 100;
@@ -2313,6 +2324,8 @@ ArrangePanel.prototype.addGeometry = function(container)
 	});
 	heightUpdate = this.addGeometryHandler(height, function(geo, value, cell)
 	{
+		value = Math.max(1, panel.fromUnit(value));
+		
 		if (graph.isTableCell(cell))
 		{
 			cell = model.getParent(cell);
@@ -2327,8 +2340,6 @@ ArrangePanel.prototype.addGeometry = function(container)
 		}
 		else if (geo.height > 0)
 		{
-			var value = Math.max(1, panel.fromUnit(value));
-			
 			if (constrainCheckbox.checked)
 			{
 				geo.width = Math.round((geo.width  * value * 100) / geo.height) / 100;
@@ -4850,7 +4861,7 @@ StyleFormatPanel.prototype.addEditOps = function(div)
 			{
 				if (editSelect.value == 'openLibrary')
 				{
-					if (libs.length == 0)
+					if (libs != null && libs.length == 0)
 					{
 						// Updates search index and tries again
 						this.editorUi.sidebar.updateSearchIndex();

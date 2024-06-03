@@ -1,3 +1,78 @@
+31-MAY-2024: 24.2.13
+
+- Moves polyfill scope
+
+31-MAY-2024: 24.4.12
+
+- Adds empty polyfill for structuredClone to avoid mermaid.js syntax error
+
+31-MAY-2024: 24.4.11
+
+- Updates Mermaid to v10.9.1
+- Fixes cropped PDF output [drawio-desktop-1747]
+- Fixes inconsistent handling of empty diagram nodes
+
+29-MAY-2024: 24.4.10
+
+- Improves edge label positions in Explorer Plugin [drawio-4424]
+- Fixes shift+drag for new lines with anchor points [drawio-4197]
+- Adds new teams domain to frame ancestor CSP
+
+27-MAY-2024: 24.4.9
+
+- Uses 4 digits after the decimal point for inches [drawio-desktop-1739]
+- Fixes inconcistent handling of Ctrl and Cmd key for edges
+
+24-MAY-2024: 24.4.8
+
+- Fixes default shadow opacity [drawio-desktop-1750]
+
+23-MAY-2024: 24.4.7
+
+- Fixes possible NPE for inserted pages
+- Forces XML update for inserted default root and layer
+- [vsdx] Another trial to fix edge as a group [drawio-1722]
+- [conf cloud] Potential fix for copy/paste in draft pages [DID-11494]
+- Fixes possible empty diagram node in mxfile [DID-11645]
+
+22-MAY-2024: 24.4.6
+
+- Fixes possible NPE in Graph.initTouch
+
+22-MAY-2024: 24.4.5
+
+- Updates Teams app to use SDK v2.22.0 [CSP-3150]
+- Fixes in-place editing on iOS [drawio-4411]
+- Updates DOMPurify from 3.1.3 to 3.1.4
+- Fixes possible overwritten library files in browser storage
+- Blocks popup menu and shape picker in freehand mode
+- Fixes units for table cell size change [drawio-4360]
+- Fixes handling of parallel edges in explore plugin [drawio-4422]
+- Adds units for custom page size [DID-11607]
+
+17-MAY-2024: 24.4.4
+
+- Improves diff sync for removed default layer
+
+16-MAY-2024: 24.4.3
+
+- [conf cloud] Updates CSP based on the deprecation notice https://developer.atlassian.com/cloud/confluence/changelog/#CHANGE-1601
+- Improves diff sync and handles special cases
+
+15-MAY-2024: 24.4.2
+
+- Fixes possible NPE in StorageFile.getEtag
+
+15-MAY-2024: 24.4.1
+
+- Improves page switching performance
+- Updates DOMPurify from 3.1.2 to 3.1.3
+- Restores view and selection state after merge of local files
+- Adds conflict handling for browser files for testing
+- Fixes inactive escape listeners in sidebar [drawio-4379]
+- Moves locking to file [drawio-desktop-1380]
+- Adds automatic merge for browser files
+
 10-MAY-2024: 24.4.0
 
 - [vsdx] Fixes attribute labels [drawio-4299]
