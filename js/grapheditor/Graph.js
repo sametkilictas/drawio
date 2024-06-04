@@ -154,19 +154,7 @@ if (!Uint8Array.from) {
   }());
 }
 
-/**
- * Measurements Units
- */
-mxConstants.POINTS = 1;
-mxConstants.MILLIMETERS = 2;
-mxConstants.INCHES = 3;
-mxConstants.METERS = 4;
-
-/**
- * This ratio is with page scale 1
- */
-mxConstants.PIXELS_PER_MM = 3.937;
-mxConstants.PIXELS_PER_INCH = 100;
+// Overrides global constants
 mxConstants.SHADOW_OPACITY = 0.25;
 mxConstants.SHADOWCOLOR = '#000000';
 mxConstants.VML_SHADOWCOLOR = '#d0d0d0';
@@ -511,8 +499,7 @@ Graph = function(container, model, renderHint, stylesheet, themes, standalone)
 			    		{
 			    			var handler = null;
 
-							if (!mxEvent.isControlDown(me.getEvent()) &&
-								!mxEvent.isShiftDown(me.getEvent()))
+							if (!mxEvent.isShiftDown(me.getEvent()))
 							{
 								handler = this.selectionCellsHandler.getHandler(state.cell);
 							}
@@ -647,8 +634,7 @@ Graph = function(container, model, renderHint, stylesheet, themes, standalone)
 				    		// Checks if state was removed in call to stopEditing above
 				    		if (this.model.isEdge(state.cell) &&
 								!this.isCellSelected(state.cell) &&
-								!mxEvent.isAltDown(me.getEvent()) &&								
-								!mxEvent.isControlDown(me.getEvent()) &&
+								!mxEvent.isAltDown(me.getEvent()) &&
 								!mxEvent.isShiftDown(me.getEvent()) &&
 
 								// Immediate edge handling unavailable
@@ -2041,19 +2027,42 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 				graph.model.endUpdate();
 
 				// Animates the changes in the graph model
+				var ignored = false;
+
 				graph.getModel().addListener(mxEvent.CHANGE, function(sender, evt)
 				{
-					var changes = evt.getProperty('edit').changes;
-					mxText.prototype.enableBoundingBox = false;
-					graph.labelsVisible = false;
-					
-					mxEffects.animateChanges(graph, changes, function()
+					if (!ignored)
 					{
-						mxText.prototype.enableBoundingBox = true;
-						graph.labelsVisible = true;
-						graph.tooltipHandler.hide();
-						graph.refresh();
-					});
+						var changes = evt.getProperty('edit').changes;
+						mxText.prototype.enableBoundingBox = false;
+						graph.labelsVisible = false;
+						ignored = true;
+						
+						mxEffects.animateChanges(graph, changes, function()
+						{
+							// Keeps parallel edges apart
+							var layout = new mxParallelEdgeLayout(graph);
+							layout.spacing = 60;
+
+							var prevLayout = layout.layout;
+
+							// Dynamic spacing based on number of parallels
+							layout.layout = function(parallels)
+							{
+								layout.spacing = Math.min(60, Math.max(30, 60 - parallels.length * 5));
+								prevLayout.apply(this, arguments);
+							};
+							
+							layout.execute(graph.getDefaultParent());
+
+							mxText.prototype.enableBoundingBox = true;
+							graph.labelsVisible = true;
+							graph.tooltipHandler.hide();
+							graph.refresh();
+
+							ignored = false;
+						});
+					}
 				});
 
 				load(graph, cell);
@@ -2140,8 +2149,8 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 					// Arranges the response in a circle
 					var cellCount = vertices.length;
 					var phi = 2 * Math.PI / cellCount;
-					var r = Math.max(minSize, Math.min(graph.container.scrollWidth / 3 - 80,
-							graph.container.scrollHeight / 3 - 80));
+					var r = Math.max(minSize, Math.min(graph.container.scrollWidth / 2.5 - 80,
+							graph.container.scrollHeight / 2.5 - 80));
 					
 					for (var i = 0; i < cellCount; i++)
 					{
@@ -2156,11 +2165,6 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 							graph.getModel().setGeometry(vertices[i], geo);
 						}
 					}
-					
-					// Keeps parallel edges apart
-					var layout = new mxParallelEdgeLayout(graph);
-					layout.spacing = 60;
-					layout.execute(graph.getDefaultParent());
 				}
 				finally
 				{
@@ -2206,10 +2210,10 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 				cells = edges.slice(Math.max(0, start), Math.min(edges.length, start + pageSize));
 			}
 			
-			cells = cells.concat(sourceGraph.getOpposites(cells, sourceCell));
+			cells = sourceGraph.getOpposites(cells, sourceCell).concat(cells);
 			var clones = graph.cloneCells(cells);
 			
-			var edgeStyle = ';curved=1;noEdgeStyle=1;entryX=none;entryY=none;exitX=none;exitY=none;';
+			var edgeStyle = ';curved=1;noEdgeStyle=1;entryX=none;entryY=none;exitX=none;exitY=none;labelBackgroundColor=#ffffffc0;textOpacity=100;';
 			var btnStyle = 'fillColor=green;fontColor=white;strokeColor=green;rounded=1;';
 			
 			for (var i = 0; i < cells.length; i++)
@@ -2218,12 +2222,42 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 				
 				if (graph.model.isEdge(clones[i]))
 				{
-					// Removes waypoints, edge styles, constraints and centers the label
+					// Removes waypoints, edge styles, constraints
+					// and centers the main label
 					clones[i].geometry.x = 0;
 					clones[i].geometry.y = 0;
 					clones[i].geometry.points = null;
 					clones[i].setStyle(clones[i].getStyle() + edgeStyle);
 					clones[i].setTerminal(realCell, clones[i].getTerminal(true) == null);
+		
+					// Puts child labels at start/end/center of edge
+					for (var j = 0; j < clones[i].getChildCount(); j++)
+					{
+						var child = clones[i].getChildAt(j);
+
+						if (child.geometry != null)
+						{
+							if (child.geometry.relative)
+							{
+								child.setStyle(child.getStyle() + ';labelBackgroundColor=#ffffffc0;textOpacity=100;');
+								child.geometry.offset = new mxPoint(0, 0);
+								child.geometry.y = 0;
+								
+								if (child.geometry.x < 0.5)
+								{
+									child.geometry.x = -0.8;
+								}
+								else if (child.geometry.x > 0.5)
+								{
+									child.geometry.x = 0.8;
+								}
+								else
+								{
+									child.geometry.x = 0;
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -13284,28 +13318,31 @@ if (typeof mxVertexHandler !== 'undefined')
 			// selecting parent for selected children in groups before this check can be made.
 			this.popupMenuHandler.mouseUp = mxUtils.bind(this, function(sender, me)
 			{
-				var isMouseEvent = mxEvent.isMouseEvent(me.getEvent());
-				this.popupMenuHandler.popupTrigger = !this.isEditing() && this.isEnabled() &&
-					(me.getState() == null || !me.isSource(me.getState().control)) &&
-					(this.popupMenuHandler.popupTrigger || (!menuShowing && !isMouseEvent &&
-					((selectionEmpty && me.getCell() == null && this.isSelectionEmpty()) ||
-					(cellSelected && this.isCellSelected(me.getCell())))));
-
-				// Delays popup menu to allow for double tap to start editing
-				var popup = (!cellSelected || isMouseEvent) ? null : mxUtils.bind(this, function(cell)
+				if (this.freehand != null && (!this.freehand.isDrawing()))
 				{
-					window.setTimeout(mxUtils.bind(this, function()
-					{
-						if (!this.isEditing())
-						{
-							var origin = mxUtils.getScrollOrigin();
-							this.popupMenuHandler.popup(me.getX() + origin.x + 1,
-								me.getY() + origin.y + 1, cell, me.getEvent());
-						}
-					}), 300);
-				});
+					var isMouseEvent = mxEvent.isMouseEvent(me.getEvent());
+					this.popupMenuHandler.popupTrigger = !this.isEditing() && this.isEnabled() &&
+						(me.getState() == null || !me.isSource(me.getState().control)) &&
+						(this.popupMenuHandler.popupTrigger || (!menuShowing && !isMouseEvent &&
+						((selectionEmpty && me.getCell() == null && this.isSelectionEmpty()) ||
+						(cellSelected && this.isCellSelected(me.getCell())))));
 
-				mxPopupMenuHandler.prototype.mouseUp.apply(this.popupMenuHandler, [sender, me, popup]);
+					// Delays popup menu to allow for double tap to start editing
+					var popup = (!cellSelected || isMouseEvent) ? null : mxUtils.bind(this, function(cell)
+					{
+						window.setTimeout(mxUtils.bind(this, function()
+						{
+							if (!this.isEditing())
+							{
+								var origin = mxUtils.getScrollOrigin();
+								this.popupMenuHandler.popup(me.getX() + origin.x + 1,
+									me.getY() + origin.y + 1, cell, me.getEvent());
+							}
+						}), 300);
+					});
+
+					mxPopupMenuHandler.prototype.mouseUp.apply(this.popupMenuHandler, [sender, me, popup]);
+				}
 			});
 		};
 		
@@ -13924,7 +13961,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				case mxConstants.METERS:
             		return (pixels / (mxConstants.PIXELS_PER_MM * 1000)).toFixed(4);
 		        case mxConstants.INCHES:
-		            return (pixels / mxConstants.PIXELS_PER_INCH).toFixed(2);
+		            return (pixels / mxConstants.PIXELS_PER_INCH).toFixed(3);
 		    }
 		};
 		

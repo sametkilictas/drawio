@@ -1689,18 +1689,21 @@ EditorUi.prototype.installShapePicker = function()
 					}
 				}), dir, true);
 
-				this.centerShapePicker(div, rect, x, y, dir);
-				mxUtils.setOpacity(div, 30);
-
-				mxEvent.addListener(div, 'mouseenter', function()
+				if (div != null)
 				{
-					mxUtils.setOpacity(div, 100);
-				});
+					this.centerShapePicker(div, rect, x, y, dir);
+					mxUtils.setOpacity(div, 30);
 
-				mxEvent.addListener(div, 'mouseleave', function()
-				{
-					ui.hideShapePicker();
-				});
+					mxEvent.addListener(div, 'mouseenter', function()
+					{
+						mxUtils.setOpacity(div, 100);
+					});
+
+					mxEvent.addListener(div, 'mouseleave', function()
+					{
+						ui.hideShapePicker();
+					});
+				}
 			}), Editor.shapePickerHoverDelay);
 		}));
 
@@ -1757,29 +1760,34 @@ EditorUi.prototype.centerShapePicker = function(div, rect, x, y, dir)
 EditorUi.prototype.showShapePicker = function(x, y, source, callback, direction, hovering,
 	getInsertLocationFn, showEdges, startEditing)
 {
-	showEdges = showEdges || source == null;
+	var div = null;
 
-	var div = this.createShapePicker(x, y, source, callback, direction, mxUtils.bind(this, function()
-	{	
-		this.hideShapePicker();
-	}), this.getCellsForShapePicker(source, hovering, showEdges), hovering,
-		getInsertLocationFn, showEdges, startEditing);
-	
-	if (div != null)
+	if (!this.editor.graph.freehand.isDrawing())
 	{
-		if (this.hoverIcons != null && !hovering)
+		showEdges = showEdges || source == null;
+
+		div = this.createShapePicker(x, y, source, callback, direction, mxUtils.bind(this, function()
+		{	
+			this.hideShapePicker();
+		}), this.getCellsForShapePicker(source, hovering, showEdges), hovering,
+			getInsertLocationFn, showEdges, startEditing);
+		
+		if (div != null)
 		{
-			this.hoverIcons.reset();
+			if (this.hoverIcons != null && !hovering)
+			{
+				this.hoverIcons.reset();
+			}
+			
+			var graph = this.editor.graph;
+			graph.popupMenuHandler.hideMenu();
+			graph.tooltipHandler.hideTooltip();
+			this.hideCurrentMenu();
+			this.hideShapePicker();
+			
+			this.shapePickerCallback = callback;
+			this.shapePicker = div;
 		}
-		
-		var graph = this.editor.graph;
-		graph.popupMenuHandler.hideMenu();
-		graph.tooltipHandler.hideTooltip();
-		this.hideCurrentMenu();
-		this.hideShapePicker();
-		
-		this.shapePickerCallback = callback;
-		this.shapePicker = div;
 	}
 
 	return div;
@@ -6570,11 +6578,10 @@ EditorUi.prototype.destroy = function()
 
 	if (graph != null && this.selectionStateListener != null)
 	{
-		graph.getSelectionModel().removeListener(mxEvent.CHANGE, this.selectionStateListener);
-		graph.getModel().removeListener(mxEvent.CHANGE, this.selectionStateListener);
-		graph.removeListener(mxEvent.EDITING_STARTED, this.selectionStateListener);
-		graph.removeListener(mxEvent.EDITING_STOPPED, this.selectionStateListener);
-		graph.getView().removeListener('unitChanged', this.selectionStateListener);
+		graph.getSelectionModel().removeListener(this.selectionStateListener);
+		graph.getModel().removeListener(this.selectionStateListener);
+		graph.getView().removeListener(this.selectionStateListener);
+		graph.removeListener(this.selectionStateListener);
 		this.selectionStateListener = null;
 	}
 	

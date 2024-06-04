@@ -538,11 +538,6 @@
 	 * Restores app defaults for UI
 	 */
 	EditorUi.prototype.showRemoteCursors = true;
-
-	/**
-	 * Specifies if the diagram is locked. Default is false.
-	 */
-	EditorUi.prototype.locked = false;
 	
 	/**
 	 * Capability check for canvas export
@@ -665,16 +660,9 @@
 	 */
 	EditorUi.prototype.isLocked = function()
 	{
-		return this.locked;
-	};
-	
-	/**
-	 * Abstraction for local storage access.
-	 */
-	EditorUi.prototype.setLocked = function(value)
-	{
-		this.locked = value;
-		this.fireEvent(new mxEventObject('lockedChanged'));
+		var file = this.getCurrentFile();
+
+		return file != null && file.isLocked()
 	};
 	
 	/**
@@ -1231,8 +1219,11 @@
 	/**
 	 * 
 	 */
-	EditorUi.prototype.replaceFileData = function(data)
+	EditorUi.prototype.replaceFileData = function(data, patches)
 	{
+		EditorUi.debug('EditorUi.replaceFileData', [this],
+			'data', [data], 'patches', patches);
+		
 		data = this.validateFileData(data);
 		var node = (data != null && data.length > 0) ? mxUtils.parseXml(data).documentElement : null;
 
@@ -1303,6 +1294,14 @@
 					{
 						graph.model.execute(new ChangePage(this, oldPages[i], null));
 					}
+				}
+				
+				// Updates internal sync state for current file
+				var file = this.getCurrentFile();
+
+				if (file != null)
+				{
+					file.fileReplaced(patches);
 				}
 			}
 			finally
@@ -1838,9 +1837,11 @@
 				{
 					currentFile.reloadFile(mxUtils.bind(this, function()
 					{
+						this.spinner.stop();
 						currentFile.handleFileSuccess(DrawioFile.SYNC == 'manual');
 					}), mxUtils.bind(this, function(err)
 					{
+						this.spinner.stop();
 						currentFile.handleFileError(err, true);
 					}));
 				}
@@ -2104,6 +2105,9 @@
 			{
 				var nodes = node.getElementsByTagName('diagram');
 
+				// Checks for duplicate page IDs
+				var pages = {};
+
 				if (nodes.length > 0)
 				{
 					var hashObj = this.getHashObject();
@@ -2137,6 +2141,15 @@
 						{
 							selectedPage = page;
 						}
+
+						if (pages[page.getId()] == null)
+						{
+							pages[page.getId()] = page;
+						}
+						else
+						{
+							throw new Error(page.getId() + ': Duplicate page ID');
+						}
 					}
 					
 					this.currentPage = (selectedPage != null) ? selectedPage :
@@ -2161,6 +2174,9 @@
 			if (this.currentPage != null)
 			{
 				this.currentPage.root = this.editor.graph.model.root;
+
+				// Resets initial modified state
+				this.currentPage.setDiagramModified(false);
 				
 				// Scrolls to current page
 				this.scrollToPage();
@@ -3182,12 +3198,6 @@
 				else if (file.isModified())
 				{
 					file.addUnsavedStatus();
-					
-					// Restores unsaved data
-					if (file.backupPatch != null)
-					{
-						file.patch([file.backupPatch]);
-					}
 				}
 				else
 				{
@@ -3806,12 +3816,7 @@
 	    }
 	    
 	    var buttons = document.createElement('div');
-	    buttons.style.position = 'absolute';
-	    buttons.style.right = '0px';
-	    buttons.style.top = '0px';
-	    buttons.style.padding = '8px'	    
 	    buttons.style.backgroundColor = 'inherit';
-	    
 	    title.style.position = 'relative';
 	    
 	    var btnWidth = 18;
@@ -3892,14 +3897,12 @@
 					spinBtn.style.marginRight = '2px';
 					spinBtn.style.marginTop = '-2px';
 					buttons.insertBefore(spinBtn, buttons.firstChild);
-					title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
 					
 					this.saveLibrary(file.getTitle(), images, file, file.getMode(), true, true, function()
 					{
 						if (spinBtn != null && spinBtn.parentNode != null)
 						{
 							spinBtn.parentNode.removeChild(spinBtn);
-							title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
 						}
 					});
 				}
@@ -3917,7 +3920,6 @@
 							{
 								if (saveBtn != null && !file.isModified())
 								{
-									title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
 									saveBtn.parentNode.removeChild(saveBtn);
 									saveBtn = null;
 								}
@@ -3925,8 +3927,6 @@
 						
 						mxEvent.consume(evt);
 					}));
-					
-					title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
 				}
 			});
 			
@@ -4270,7 +4270,6 @@
 		}
 		
 		title.appendChild(buttons);
-		title.style.paddingRight = (buttons.childNodes.length * btnWidth) + 'px';
 		this.editor.fireEvent(new mxEventObject('libraryLoaded'));
 	};
 
@@ -10815,7 +10814,7 @@
 				{
 					data = this.graph.getAttributeForCell(cell, 'mermaidData');
 				
-					if (data != null)
+					if (data != null && window.isMermaidEnabled)
 					{
 						this.editMermaidData(cell, trigger, data);
 					}
@@ -11451,12 +11450,22 @@
 		if (Editor.isSettingsEnabled())
 		{
 			var view = this.editor.graph.view;
-			view.setUnit(mxSettings.getUnit());
+			var unit = mxSettings.getUnit();
+			view.setUnit(unit);
+
+			// Updates page size unit (using mm instead of m)
+			Editor.pageSizeUnit = (unit == mxConstants.METERS) ?
+				mxConstants.MILLIMETERS : unit;
 			
 			view.addListener('unitChanged', function(sender, evt)
 			{
-				mxSettings.setUnit(evt.getProperty('unit'));
-				mxSettings.save();		
+				var unit = evt.getProperty('unit');
+				mxSettings.setUnit(unit);
+				mxSettings.save();
+				
+				// Updates page size unit (using mm instead of m)
+				Editor.pageSizeUnit = (unit == mxConstants.METERS) ?
+					mxConstants.MILLIMETERS : unit;
 			});
 
 			var showRuler = this.canvasSupported && document.documentMode != 9 &&
@@ -14741,10 +14750,31 @@
 			{
 				// KNOWN: Paste from IE11 to other browsers on Windows
 				// seems to paste the contents of index.html
-				var xml = (asHtml) ? elt.innerHTML :
-					mxUtils.trim((elt.innerText == null) ?
-					mxUtils.getTextContent(elt) : elt.innerText);
 				var compat = false;
+				var xml = '';
+
+				if (asHtml)
+				{
+					// Extracts compatible XML data
+					if (elt.textContent != null &&
+						(elt.textContent.substring(0, 7) == '<mxfile' &&
+						elt.textContent.substring(elt.textContent.length - 9) == '</mxfile>') ||
+						(elt.textContent.substring(0, 13) == '<mxGraphModel' &&
+						elt.textContent.substring(elt.textContent.length - 15) == '</mxGraphModel>'))
+					{
+						// Replaces &nbsp; in text content with normal spaces
+						xml = elt.textContent.replace(/\u00a0/g, ' ');
+					}
+					else
+					{
+						xml = elt.innerHTML;
+					}
+				}
+				else
+				{
+					xml = mxUtils.trim((elt.innerText == null) ?
+						mxUtils.getTextContent(elt) : elt.innerText);
+				}
 
 				// Workaround for junk after XML in VM
 				try
@@ -14973,8 +15003,8 @@
 					gb = graph.getBoundingBox(graph.getSelectionCells());
 				}
 				
-				pf.width = gb.width * scale / thisGraph.view.scale;
-				pf.height = gb.height * scale / thisGraph.view.scale;
+				pf.width = (gb.width + 1) * scale / thisGraph.view.scale;
+				pf.height = (gb.height + 1) * scale / thisGraph.view.scale;
 			}
 
 			pf.width = Math.ceil(pf.width * printScale);
