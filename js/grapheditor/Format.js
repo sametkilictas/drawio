@@ -438,7 +438,7 @@ BaseFormatPanel.prototype.buttonBackgroundColor = 'transparent';
 /**
  * Install input handler.
  */
-BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValue, min, max, unit, textEditFallback, isFloat)
+BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValue, min, max, unit, textEditFallback, isFloat, useUnits)
 {
 	unit = (unit != null) ? unit : '';
 	isFloat = (isFloat != null) ? isFloat : false;
@@ -456,6 +456,11 @@ BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValu
 	var update = mxUtils.bind(this, function(evt)
 	{
 		var value = (isFloat) ? parseFloat(input.value) : parseInt(input.value);
+
+		if (useUnits)
+		{
+			value = this.fromUnit(value);
+		}
 
 		if (value != lastValue)
 		{
@@ -484,7 +489,7 @@ BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValu
 					}
 					
 					textEditFallback(value);
-					input.value = value + unit;
+					input.value = (useUnits? this.inUnit(value) : value) + unit;
 		
 					// Restore focus and selection in input
 					updating = false;
@@ -530,7 +535,7 @@ BaseFormatPanel.prototype.installInputHandler = function(input, key, defaultValu
 				}
 			}
 			
-			input.value = value + unit;
+			input.value = (useUnits? this.inUnit(value) : value) + unit;
 		}
 
 		mxEvent.consume(evt);
@@ -1831,6 +1836,7 @@ ArrangePanel.prototype.addLayerOps = function(div)
 ArrangePanel.prototype.addGroupOps = function(div)
 {
 	var ui = this.editorUi;
+	var graph = ui.editor.graph;
 	var ss = ui.getSelectionState();
 	
 	div.style.paddingTop = '8px';
@@ -1889,6 +1895,15 @@ ArrangePanel.prototype.addGroupOps = function(div)
 	}
 
 	count += this.addActions(div, ['lockUnlock']);
+
+	if (ss.vertices.length == 1 && ss.edges.length == 0)
+	{
+		if (graph.getOpposites(graph.getEdges(ss.vertices[0]),
+			ss.vertices[0]).length > 0)
+		{
+			count += this.addActions(div, ['explore']);
+		}
+	}
 
 	if (count == 0)
 	{
@@ -2136,21 +2151,27 @@ ArrangePanel.prototype.addAngle = function(div)
 /**
  * 
  */
-BaseFormatPanel.prototype.getUnit = function()
+BaseFormatPanel.prototype.getUnit = function(prefix)
 {
 	var unit = this.editorUi.editor.graph.view.unit;
+	var retUnit = '';
 	
 	switch(unit)
 	{
 		case mxConstants.POINTS:
-			return 'pt';
+			retUnit = 'pt';
+			break;
 		case mxConstants.INCHES:
-			return '"';
+			retUnit = '"';
+			break;
 		case mxConstants.MILLIMETERS:
-			return 'mm';
+			retUnit = 'mm';
+			break;
 		case mxConstants.METERS:
-			return 'm';
+			retUnit = 'm';
 	}
+
+	return (prefix? prefix : '') + retUnit;
 };
 
 /**
@@ -2754,6 +2775,7 @@ ArrangePanel.prototype.addEdgeGeometryHandler = function(input, fn)
  */
 ArrangePanel.prototype.addEdgeGeometry = function(container)
 {
+	var panel = this;
 	var ui = this.editorUi;
 	var graph = ui.editor.graph;
 	var rect = ui.getSelectionState();
@@ -2809,14 +2831,14 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 	mxUtils.write(span, mxResources.get('linestart'));
 	divs.appendChild(span);
 
-	var xs = this.addUnitInput(divs, 'pt', 87, 52, function()
+	var xs = this.addUnitInput(divs, this.getUnit(), 87, 52, function()
 	{
 		xsUpdate.apply(this, arguments);
-	});
-	var ys = this.addUnitInput(divs, 'pt', 16, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var ys = this.addUnitInput(divs, this.getUnit(), 16, 52, function()
 	{
 		ysUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(divs);
 	this.addLabel(divs, mxResources.get('left'), 87, 64);
@@ -2835,14 +2857,14 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 	mxUtils.write(span, mxResources.get('lineend'));
 	divt.appendChild(span);
 
-	var xt = this.addUnitInput(divt, 'pt', 87, 52, function()
+	var xt = this.addUnitInput(divt, this.getUnit(), 87, 52, function()
 	{
 		xtUpdate.apply(this, arguments);
-	});
-	var yt = this.addUnitInput(divt, 'pt', 16, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var yt = this.addUnitInput(divt, this.getUnit(), 16, 52, function()
 	{
 		ytUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(divt);
 	this.addLabel(divt, mxResources.get('left'), 87, 64);
@@ -2879,8 +2901,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 			if (geo != null && geo.sourcePoint != null &&
 				graph.model.getTerminal(cell, true) == null)
 			{
-				xs.value = geo.sourcePoint.x;
-				ys.value = geo.sourcePoint.y;
+				xs.value = this.inUnit(geo.sourcePoint.x) + ' ' + this.getUnit();
+				ys.value = this.inUnit(geo.sourcePoint.y) + ' ' + this.getUnit();
 			}
 			else
 			{
@@ -2890,8 +2912,8 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 			if (geo != null && geo.targetPoint != null &&
 				graph.model.getTerminal(cell, false) == null)
 			{
-				xt.value = geo.targetPoint.x;
-				yt.value = geo.targetPoint.y;
+				xt.value = this.inUnit(geo.targetPoint.x) + ' ' + this.getUnit();
+				yt.value = this.inUnit(geo.targetPoint.y) + ' ' + this.getUnit();
 			}
 			else
 			{
@@ -2907,22 +2929,22 @@ ArrangePanel.prototype.addEdgeGeometry = function(container)
 
 	xsUpdate = this.addEdgeGeometryHandler(xs, function(geo, value)
 	{
-		geo.sourcePoint.x = value;
+		geo.sourcePoint.x = panel.fromUnit(value);
 	});
 
 	ysUpdate = this.addEdgeGeometryHandler(ys, function(geo, value)
 	{
-		geo.sourcePoint.y = value;
+		geo.sourcePoint.y = panel.fromUnit(value);
 	});
 
 	xtUpdate = this.addEdgeGeometryHandler(xt, function(geo, value)
 	{
-		geo.targetPoint.x = value;
+		geo.targetPoint.x = panel.fromUnit(value);
 	});
 
 	ytUpdate = this.addEdgeGeometryHandler(yt, function(geo, value)
 	{
-		geo.targetPoint.y = value;
+		geo.targetPoint.y = panel.fromUnit(value);
 	});
 
 	graph.getModel().addListener(mxEvent.CHANGE, listener);
@@ -3740,14 +3762,14 @@ TextFormatPanel.prototype.addFont = function(container)
 	spacingPanel.appendChild(span);
 
 	var topUpdate, globalUpdate, leftUpdate, bottomUpdate, rightUpdate;
-	var topSpacing = this.addUnitInput(spacingPanel, 'pt', 87, 52, function()
+	var topSpacing = this.addUnitInput(spacingPanel, this.getUnit(), 87, 52, function()
 	{
 		topUpdate.apply(this, arguments);
-	});
-	var globalSpacing = this.addUnitInput(spacingPanel, 'pt', 16, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var globalSpacing = this.addUnitInput(spacingPanel, this.getUnit(), 16, 52, function()
 	{
 		globalUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(spacingPanel);
 	this.addLabel(spacingPanel, mxResources.get('top'), 87, 64);
@@ -3755,18 +3777,18 @@ TextFormatPanel.prototype.addFont = function(container)
 	mxUtils.br(spacingPanel);
 	mxUtils.br(spacingPanel);
 
-	var leftSpacing = this.addUnitInput(spacingPanel, 'pt', 158, 52, function()
+	var leftSpacing = this.addUnitInput(spacingPanel, this.getUnit(), 158, 52, function()
 	{
 		leftUpdate.apply(this, arguments);
-	});
-	var bottomSpacing = this.addUnitInput(spacingPanel, 'pt', 87, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var bottomSpacing = this.addUnitInput(spacingPanel, this.getUnit(), 87, 52, function()
 	{
 		bottomUpdate.apply(this, arguments);
-	});
-	var rightSpacing = this.addUnitInput(spacingPanel, 'pt', 16, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var rightSpacing = this.addUnitInput(spacingPanel, this.getUnit(), 16, 52, function()
 	{
 		rightUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(spacingPanel);
 	this.addLabel(spacingPanel, mxResources.get('left'), 158, 64);
@@ -4206,39 +4228,44 @@ TextFormatPanel.prototype.addFont = function(container)
 		if (force || document.activeElement != globalSpacing)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_SPACING, 2));
-			globalSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			globalSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 
 		if (force || document.activeElement != topSpacing)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_SPACING_TOP, 0));
-			topSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			topSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != rightSpacing)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_SPACING_RIGHT, 0));
-			rightSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			rightSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != bottomSpacing)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_SPACING_BOTTOM, 0));
-			bottomSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			bottomSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != leftSpacing)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_SPACING_LEFT, 0));
-			leftSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			leftSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 	});
 
-	globalUpdate = this.installInputHandler(globalSpacing, mxConstants.STYLE_SPACING, 2, -999, 999, ' pt');
-	topUpdate = this.installInputHandler(topSpacing, mxConstants.STYLE_SPACING_TOP, 0, -999, 999, ' pt');
-	rightUpdate = this.installInputHandler(rightSpacing, mxConstants.STYLE_SPACING_RIGHT, 0, -999, 999, ' pt');
-	bottomUpdate = this.installInputHandler(bottomSpacing, mxConstants.STYLE_SPACING_BOTTOM, 0, -999, 999, ' pt');
-	leftUpdate = this.installInputHandler(leftSpacing, mxConstants.STYLE_SPACING_LEFT, 0, -999, 999, ' pt');
+	globalUpdate = this.installInputHandler(globalSpacing, mxConstants.STYLE_SPACING, 2, -999, 999, 
+			this.getUnit(' '), null, this.isFloatUnit(), true);
+	topUpdate = this.installInputHandler(topSpacing, mxConstants.STYLE_SPACING_TOP, 0, -999, 999, 
+			this.getUnit(' '), null, this.isFloatUnit(), true);
+	rightUpdate = this.installInputHandler(rightSpacing, mxConstants.STYLE_SPACING_RIGHT, 0, -999, 999, 
+			this.getUnit(' '), null, this.isFloatUnit(), true);
+	bottomUpdate = this.installInputHandler(bottomSpacing, mxConstants.STYLE_SPACING_BOTTOM, 0, -999, 999, 
+			this.getUnit(' '), null, this.isFloatUnit(), true);
+	leftUpdate = this.installInputHandler(leftSpacing, mxConstants.STYLE_SPACING_LEFT, 0, -999, 999, 
+			this.getUnit(' '), null, this.isFloatUnit(), true);
 
 	this.addKeyHandler(input, listener);
 	this.addKeyHandler(globalSpacing, listener);
@@ -4559,7 +4586,7 @@ TextFormatPanel.prototype.addFont = function(container)
 							// in the log which seems to be IE8- only / 29.01.15
 							if (fontMenu.firstChild != null)
 							{
-								fontMenu.firstChild.nodeValue = Graph.stripQuotes(css.fontFamily);
+								fontMenu.firstChild.nodeValue = mxUtils.getCssFontFamily(css.fontFamily);
 							}
 						}
 					}
@@ -5156,6 +5183,7 @@ StyleFormatPanel.prototype.getCustomColors = function()
  */
 StyleFormatPanel.prototype.addStroke = function(container)
 {
+	var panel = this;
 	var ui = this.editorUi;
 	var graph = ui.editor.graph;
 	var ss = ui.getSelectionState();
@@ -5370,7 +5398,7 @@ StyleFormatPanel.prototype.addStroke = function(container)
 	function update(evt)
 	{
 		// Maximum stroke width is 999
-		var value = parseFloat(input.value);
+		var value = panel.fromUnit(parseFloat(input.value));
 		value = Math.min(999, Math.max(0, (isNaN(value)) ? 1 : value));
 		
 		if (value != mxUtils.getValue(ss.style, mxConstants.STYLE_STROKEWIDTH, 1))
@@ -5380,14 +5408,14 @@ StyleFormatPanel.prototype.addStroke = function(container)
 					'values', [value], 'cells', ss.cells));
 		}
 
-		input.value = value + ' pt';
+		input.value = panel.inUnit(value) + ' ' + panel.getUnit();
 		mxEvent.consume(evt);
 	};
 
 	function altUpdate(evt)
 	{
 		// Maximum stroke width is 999
-		var value = parseFloat(altInput.value);
+		var value = panel.fromUnit(parseFloat(altInput.value));
 		value = Math.min(999, Math.max(0, (isNaN(value)) ? 1 : value));
 		
 		if (value != mxUtils.getValue(ss.style, mxConstants.STYLE_STROKEWIDTH, 1))
@@ -5397,17 +5425,17 @@ StyleFormatPanel.prototype.addStroke = function(container)
 					'values', [value], 'cells', ss.cells));
 		}
 
-		altInput.value = value + ' pt';
+		altInput.value = panel.inUnit(value) + ' ' + panel.getUnit();
 		mxEvent.consume(evt);
 	};
 
-	var stepper = this.createStepper(input, update, 1, 9);
+	var stepper = this.createStepper(input, update, this.getUnitStep(), 9, null, null, this.isFloatUnit());
 	stepper.style.display = input.style.display;
 	stepper.style.top = '2px';
 	stepper.style.left = '198px';
 	stylePanel.appendChild(stepper);
 
-	var altStepper = this.createStepper(altInput, altUpdate, 1, 9);
+	var altStepper = this.createStepper(altInput, altUpdate, this.getUnitStep(), 9, null, null, this.isFloatUnit());
 	altStepper.style.display = altInput.style.display;
 	altInput.style.position = 'absolute';
 	altStepper.style.top = '2px';
@@ -5632,14 +5660,14 @@ StyleFormatPanel.prototype.addStroke = function(container)
 	arrowPanel.appendChild(span);
 	
 	var endSpacingUpdate, endSizeUpdate;
-	var endSpacing = this.addUnitInput(arrowPanel, 'pt', 98, 52, function()
+	var endSpacing = this.addUnitInput(arrowPanel, this.getUnit(), 98, 52, function()
 	{
 		endSpacingUpdate.apply(this, arguments);
-	});
-	var endSize = this.addUnitInput(arrowPanel, 'pt', 30, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var endSize = this.addUnitInput(arrowPanel, this.getUnit(), 30, 52, function()
 	{
 		endSizeUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(arrowPanel);
 	
@@ -5652,14 +5680,14 @@ StyleFormatPanel.prototype.addStroke = function(container)
 	arrowPanel.appendChild(span);
 	
 	var startSpacingUpdate, startSizeUpdate;
-	var startSpacing = this.addUnitInput(arrowPanel, 'pt', 98, 52, function()
+	var startSpacing = this.addUnitInput(arrowPanel, this.getUnit(), 98, 52, function()
 	{
 		startSpacingUpdate.apply(this, arguments);
-	});
-	var startSize = this.addUnitInput(arrowPanel, 'pt', 30, 52, function()
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
+	var startSize = this.addUnitInput(arrowPanel, this.getUnit(), 30, 52, function()
 	{
 		startSizeUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	mxUtils.br(arrowPanel);
 	this.addLabel(arrowPanel, mxResources.get('spacing'),
@@ -5688,10 +5716,10 @@ StyleFormatPanel.prototype.addStroke = function(container)
 	perimeterPanel.appendChild(span);
 	
 	var perimeterUpdate;
-	var perimeterSpacing = this.addUnitInput(perimeterPanel, 'pt', 30, 52, function()
+	var perimeterSpacing = this.addUnitInput(perimeterPanel, this.getUnit(), 30, 52, function()
 	{
 		perimeterUpdate.apply(this, arguments);
-	});
+	}, this.getUnitStep(), null, null, this.isFloatUnit());
 
 	if (ss.edges.length == ss.cells.length)
 	{
@@ -5710,13 +5738,13 @@ StyleFormatPanel.prototype.addStroke = function(container)
 		if (force || document.activeElement != input)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_STROKEWIDTH, 1));
-			input.value = (isNaN(tmp)) ? '' : tmp + ' pt';
+			input.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != altInput)
 		{
 			var tmp = parseFloat(mxUtils.getValue(ss.style, mxConstants.STYLE_STROKEWIDTH, 1));
-			altInput.value = (isNaN(tmp)) ? '' : tmp + ' pt';
+			altInput.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		styleSelect.style.visibility = (ss.style.shape == 'connector' || ss.style.shape == 'filledEdge' || ss.style.shape == 'wire' || ss.style.shape == mxMondrianConnector.prototype.cst.MONDRIAN_CONNECTOR) ? '' : 'hidden';
@@ -5883,39 +5911,44 @@ StyleFormatPanel.prototype.addStroke = function(container)
 		if (force || document.activeElement != startSize)
 		{
 			var tmp = parseInt(mxUtils.getValue(ss.style, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_MARKERSIZE));
-			startSize.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			startSize.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != startSpacing)
 		{
 			var tmp = parseInt(mxUtils.getValue(ss.style, mxConstants.STYLE_SOURCE_PERIMETER_SPACING, 0));
-			startSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			startSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 
 		if (force || document.activeElement != endSize)
 		{
 			var tmp = parseInt(mxUtils.getValue(ss.style, mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE));
-			endSize.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			endSize.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != startSpacing)
 		{
 			var tmp = parseInt(mxUtils.getValue(ss.style, mxConstants.STYLE_TARGET_PERIMETER_SPACING, 0));
-			endSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			endSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 		
 		if (force || document.activeElement != perimeterSpacing)
 		{
 			var tmp = parseInt(mxUtils.getValue(ss.style, mxConstants.STYLE_PERIMETER_SPACING, 0));
-			perimeterSpacing.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+			perimeterSpacing.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 		}
 	});
 	
-	startSizeUpdate = this.installInputHandler(startSize, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_MARKERSIZE, 0, 999, ' pt');
-	startSpacingUpdate = this.installInputHandler(startSpacing, mxConstants.STYLE_SOURCE_PERIMETER_SPACING, 0, -999, 999, ' pt');
-	endSizeUpdate = this.installInputHandler(endSize, mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE, 0, 999, ' pt');
-	endSpacingUpdate = this.installInputHandler(endSpacing, mxConstants.STYLE_TARGET_PERIMETER_SPACING, 0, -999, 999, ' pt');
-	perimeterUpdate = this.installInputHandler(perimeterSpacing, mxConstants.STYLE_PERIMETER_SPACING, 0, 0, 999, ' pt');
+	startSizeUpdate = this.installInputHandler(startSize, mxConstants.STYLE_STARTSIZE, mxConstants.DEFAULT_MARKERSIZE, 0, 999, 
+		this.getUnit(' '), null, this.isFloatUnit(), true);
+	startSpacingUpdate = this.installInputHandler(startSpacing, mxConstants.STYLE_SOURCE_PERIMETER_SPACING, 0, -999, 999, 
+		this.getUnit(' '), null, this.isFloatUnit(), true);
+	endSizeUpdate = this.installInputHandler(endSize, mxConstants.STYLE_ENDSIZE, mxConstants.DEFAULT_MARKERSIZE, 0, 999, 
+		this.getUnit(' '), null, this.isFloatUnit(), true);
+	endSpacingUpdate = this.installInputHandler(endSpacing, mxConstants.STYLE_TARGET_PERIMETER_SPACING, 0, -999, 999, 
+		this.getUnit(' '), null, this.isFloatUnit(), true);
+	perimeterUpdate = this.installInputHandler(perimeterSpacing, mxConstants.STYLE_PERIMETER_SPACING, 0, 0, 999, 
+		this.getUnit(' '), null, this.isFloatUnit(), true);
 
 	this.addKeyHandler(input, listener);
 	this.addKeyHandler(startSize, listener);
@@ -6004,13 +6037,13 @@ StyleFormatPanel.prototype.addLineJumps = function(container)
 		
 		var jumpSizeUpdate;
 		
-		var jumpSize = this.addUnitInput(container, 'pt', 16, 52, function()
+		var jumpSize = this.addUnitInput(container, this.getUnit(), 16, 52, function()
 		{
 			jumpSizeUpdate.apply(this, arguments);
-		});
+		}, this.getUnitStep(), null, null, this.isFloatUnit());
 		
-		jumpSizeUpdate = this.installInputHandler(jumpSize, 'jumpSize',
-			Graph.defaultJumpSize, 0, 999, ' pt');
+		jumpSizeUpdate = this.installInputHandler(jumpSize, 'jumpSize', Graph.defaultJumpSize, 
+				0, 999, this.getUnit(' '), null, this.isFloatUnit(), true);
 		
 		var listener = mxUtils.bind(this, function(sender, evt, force)
 		{
@@ -6020,7 +6053,7 @@ StyleFormatPanel.prototype.addLineJumps = function(container)
 			if (force || document.activeElement != jumpSize)
 			{
 				var tmp = parseInt(mxUtils.getValue(ss.style, 'jumpSize', Graph.defaultJumpSize));
-				jumpSize.value = (isNaN(tmp)) ? '' : tmp  + ' pt';
+				jumpSize.value = (isNaN(tmp)) ? '' : this.inUnit(tmp) + ' ' + this.getUnit();
 			}
 		});
 

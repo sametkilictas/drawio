@@ -970,8 +970,8 @@ mxStencilRegistry.allowEval = false;
 							'inConflictState', file.inConflictState,
 							'unwatchedSaves', file.unwatchedSaves);
 						
-						//File is changed (not just accessed) && File is not already in a conflict state
-						if (curr.mtimeMs != prev.mtimeMs && !file.inConflictState)
+						// File not deleted, changed (not just accessed) and not already in conflict state
+						if (curr.mtimeMs != 0 && curr.mtimeMs != prev.mtimeMs && !file.inConflictState)
 						{
 							//Ignore our own changes
 							if (file.unwatchedSaves || (file.stat != null && file.stat.mtimeMs == curr.mtimeMs))
@@ -1262,7 +1262,9 @@ mxStencilRegistry.allowEval = false;
 						if (file != null && file.fileObject != null && file.fileObject.path == path)
 						{
 							file.setEditable(false);
-							this.editor.setStatus('<div class="geStatusAlert">' + mxResources.get('readOnly') + '</div>');
+							this.editor.setStatus('<div class="geStatusBox" title="' +
+								mxUtils.htmlEntities(mxResources.get('readOnly')) + '">' +
+								mxUtils.htmlEntities(mxResources.get('readOnly')) + '</div>');
 						}
 					}
 				}));
@@ -1387,17 +1389,6 @@ mxStencilRegistry.allowEval = false;
 	LocalFile.prototype.isConflict = function(stat)
 	{
 		return stat != null && this.stat != null && stat.mtimeMs != this.stat.mtimeMs;
-	};
-	
-	LocalFile.prototype.isEditable = function()
-	{
-		return this.editable != null? this.editable : this.ui.editor.editable;
-	};
-
-	LocalFile.prototype.setEditable = function(editable)
-	{
-		this.editable = editable;
-		this.descriptorChanged();
 	};
 	
 	LocalFile.prototype.saveFile = async function(revision, success, error, unloading, overwrite)
@@ -1820,28 +1811,43 @@ mxStencilRegistry.allowEval = false;
 	App.prototype.checkForUpdates = function()
 	{
 		electron.sendMessage('checkForUpdates');
-	}
+	};
 	
 	App.prototype.toggleSpellCheck = function()
 	{
 		electron.sendMessage('toggleSpellCheck');
-	}
+	};
 
 	App.prototype.toggleStoreBkp = function()
 	{
 		electron.sendMessage('toggleStoreBkp');
-	}
+	};
 	
 	App.prototype.toggleGoogleFonts = function()
 	{
 		electron.sendMessage('toggleGoogleFonts');
-	}
+	};
 
 	App.prototype.openDevTools = function()
 	{
 		electron.sendMessage('openDevTools');
-	}
-	
+	};
+		
+	App.prototype.desktopZoomIn = function()
+	{
+		electron.sendMessage('zoomIn');
+	};
+
+	App.prototype.desktopZoomOut = function()
+	{
+		electron.sendMessage('zoomOut');
+	};
+
+	App.prototype.desktopResetZoom = function()
+	{
+		electron.sendMessage('resetZoom');
+	};
+
 	/**
 	 * Copies the given cells and XML to the clipboard as an embedded image.
 	 */

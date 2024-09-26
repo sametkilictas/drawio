@@ -84,11 +84,11 @@
 		];
 			
 		this.addPalette('archimate3Generic', 'Archimate 3.2 / Generic', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 
@@ -146,11 +146,11 @@
 		];
 			
 		this.addPalette('archimate3Application', 'Archimate 3.2 / Application', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 
@@ -225,11 +225,11 @@
 		];
 			
 		this.addPalette('archimate3Business', 'Archimate 3.2 / Business', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 
@@ -252,7 +252,7 @@
 					w * 150, h * 75, 'Work Package', 'Work Package', null, null, this.getTagsForStencil(gn, '', dt + 'work package').join(' ')),
 			this.createVertexTemplateEntry(am2 + 'workPackage;strokeWidth=5;', 
 					w * 60, h * 50, '', 'Work Package', null, null, this.getTagsForStencil(gn, '', dt + 'work package').join(' ')),
-			this.createVertexTemplateEntry(am2 + 'application;appType=deliverable;archiType=rounded;', 
+			this.createVertexTemplateEntry(am2 + 'application;appType=deliverable;', 
 					w * 150, h * 75, 'Deliverable', 'Deliverable', null, null, this.getTagsForStencil(gn, '', dt + 'deliverable').join(' ')),
 			this.createVertexTemplateEntry(am2 + 'deliverable;', 
 					w * 60, h * 35, '', 'Deliverable', null, null, this.getTagsForStencil(gn, '', dt + 'deliverable').join(' ')),
@@ -271,11 +271,11 @@
 		];
 			
 		this.addPalette('archimate3Implementation and Migration', 'Archimate 3.2 / Implementation and Migration', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 	
@@ -336,11 +336,11 @@
 		];
 			
 		this.addPalette('archimate3Motivation', 'Archimate 3.2 / Motivation', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 	
@@ -403,11 +403,11 @@
 		];
 			
 		this.addPalette('archimate3Relationships', 'Archimate 3.2 / Relationships', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 	
@@ -444,11 +444,11 @@
 		];
 			
 		this.addPalette('archimate3Strategy', 'Archimate 3.2 / Strategy', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 	
@@ -477,7 +477,7 @@
 			this.createVertexTemplateEntry(am + 'application;appType=sysSw;archiType=square;', 
 					w * 150, h * 75, 'System Software', 'System Software', null, null, this.getTagsForStencil(gn, '', dt + 'system software').join(' ')),
 			this.createVertexTemplateEntry(am + 'sysSw;', 
-					w * 40, h * 40, '', 'Device', null, null, this.getTagsForStencil(gn, '', dt + 'device').join(' ')),
+					w * 40, h * 40, '', 'System Software', null, null, this.getTagsForStencil(gn, '', dt + 'device').join(' ')),
 			this.createVertexTemplateEntry(am + 'application;appType=collab;archiType=square;', 
 					w * 150, h * 75, 'Technology Collaboration', 'Technology Collaboration', null, null, this.getTagsForStencil(gn, '', dt + 'collaboration').join(' ')),
 			this.createVertexTemplateEntry(am + 'collaboration;', 
@@ -533,11 +533,11 @@
 		];
 			
 		this.addPalette('archimate3Technology', 'Archimate 3.2 / Technology', false, mxUtils.bind(this, function(content)
-				{
-					for (var i = 0; i < fns.length; i++)
-					{
-						content.appendChild(fns[i](content));
-					}
+		{
+			for (var i = 0; i < fns.length; i++)
+			{
+				content.appendChild(fns[i](content));
+			}
 		}));
 	};
 })();
