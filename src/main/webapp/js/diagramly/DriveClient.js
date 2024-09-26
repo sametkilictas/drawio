@@ -38,17 +38,10 @@ window.DriveClient = function(editorUi, isExtAuth)
 		// Uses separate name for the viewer auth tokens
 		this.cookieName = 'gDriveViewerAuthInfo';
 		this.token = this.getPersistentToken();
-		
-		this.appId = window.DRAWIO_GOOGLE_VIEWER_APP_ID || '850530949725';
-		this.clientId = window.DRAWIO_GOOGLE_VIEWER_CLIENT_ID || '850530949725.apps.googleusercontent.com';
-		this.scopes = ['https://www.googleapis.com/auth/drive.readonly',
-			'https://www.googleapis.com/auth/userinfo.profile'];
 	}
-	else
-	{
-		this.appId = window.DRAWIO_GOOGLE_APP_ID || '671128082532';
-		this.clientId = window.DRAWIO_GOOGLE_CLIENT_ID || '671128082532-jhphbq6d0e1gnsus9mn7vf8a6fjn10mp.apps.googleusercontent.com';
-	}
+
+	this.appId = window.DRAWIO_GOOGLE_APP_ID || '671128082532';
+	this.clientId = window.DRAWIO_GOOGLE_CLIENT_ID || '671128082532-jhphbq6d0e1gnsus9mn7vf8a6fjn10mp.apps.googleusercontent.com';
 	
 	this.mimeTypes = this.xmlMimeType + ',application/mxe,application/mxr,' +
 		'application/vnd.jgraph.mxfile.realtime,application/vnd.jgraph.mxfile.rtlegacy';
@@ -153,7 +146,7 @@ DriveClient.prototype.maxRetries = 5;
 /**
  * Executes the first step for connecting to Google Drive.
  */
-DriveClient.prototype.staleEtagMaxRetries = 3;
+DriveClient.prototype.staleEtagMaxRetries = 4;
 
 /**
  * Executes the first step for connecting to Google Drive.
@@ -1649,13 +1642,18 @@ DriveClient.prototype.saveFile = function(file, revision, success, errFn, noChec
 													etag = resp.etag;
 												}
 
+												if (reasons.length == 0)
+												{
+													reasons.push(mxResources.get('unknownError'));
+												}
+
 												var temp = reasons.join(', ');
 
 												if (retryCount < this.staleEtagMaxRetries)
 												{
 													retryCount++;
 													var jitter = 1 + 0.1 * (Math.random() - 0.5);
-													var delay = Math.round(retryCount * 2 * this.coolOff * jitter);
+													var delay = Math.round(Math.pow(2, retryCount) * this.coolOff * jitter);
 													window.setTimeout(doExecuteSave, delay);
 
 													if (urlParams['test'] == '1')
@@ -2003,7 +2001,7 @@ DriveClient.prototype.saveFile = function(file, revision, success, errFn, noChec
 						{
 							criticalError(e);
 						}
-					})))
+					}), 20))
 				{
 					// If-branch
 					doSave(null, null, file.constructor != DriveLibrary);

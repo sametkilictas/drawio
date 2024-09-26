@@ -52,8 +52,6 @@ function Sidebar(editorUi, container)
 		}
 	});
 
-	mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerup' : 'mouseup', this.pointerUpHandler);
-
 	this.pointerDownHandler = mxUtils.bind(this, function()
 	{
 		if (this.tooltipCloseImage == null || this.tooltipCloseImage.style.display == 'none')
@@ -62,9 +60,7 @@ function Sidebar(editorUi, container)
 			this.hideTooltip();
 		}
 	});
-	
-	mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerdown' : 'mousedown', this.pointerDownHandler);
-	
+
 	this.pointerMoveHandler = mxUtils.bind(this, function(evt)
 	{
 		if (Date.now() - this.lastCreated > 300 && (this.tooltipCloseImage == null ||
@@ -86,8 +82,6 @@ function Sidebar(editorUi, container)
 		}
 	});
 
-	mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointermove' : 'mousemove', this.pointerMoveHandler);
-
 	// Handles mouse leaving the window
 	this.pointerOutHandler = mxUtils.bind(this, function(evt)
 	{
@@ -97,7 +91,21 @@ function Sidebar(editorUi, container)
 		}
 	});
 	
-	mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerout' : 'mouseout', this.pointerOutHandler);
+	// Adds listeners in capture phase to bypass blocking in other listeners
+	if (window.addEventListener)
+	{
+		document.addEventListener((mxClient.IS_POINTER) ? 'pointerup' : 'mouseup', this.pointerUpHandler, true)
+		document.addEventListener((mxClient.IS_POINTER) ? 'pointerdown' : 'mousedown', this.pointerDownHandler, true)
+		document.addEventListener((mxClient.IS_POINTER) ? 'pointermove' : 'mousemove', this.pointerMoveHandler, true)
+		document.addEventListener((mxClient.IS_POINTER) ? 'pointerout' : 'mouseout', this.pointerOutHandler, true)
+	}
+	else
+	{
+		mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerup' : 'mouseup', this.pointerUpHandler);
+		mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerdown' : 'mousedown', this.pointerDownHandler);
+		mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointermove' : 'mousemove', this.pointerMoveHandler);
+		mxEvent.addListener(document, (mxClient.IS_POINTER) ? 'pointerout' : 'mouseout', this.pointerOutHandler);
+	}
 
 	// Enables tooltips after scroll
 	mxEvent.addListener(container, 'scroll', mxUtils.bind(this, function()
@@ -174,7 +182,7 @@ Sidebar.prototype.expandedImage = (!mxClient.IS_SVG) ? IMAGE_PATH + '/expanded.g
 Sidebar.prototype.enableTooltips = true;
 
 /**
- * Specifies the delay for the tooltip. Default is 16 px.
+ * Specifies the border for the tooltip. Default is 16 px.
  */
 Sidebar.prototype.tooltipBorder = 16;
 
@@ -482,6 +490,21 @@ Sidebar.prototype.createTooltip = function(elt, cells, w, h, title, showLabel, o
 		this.graph2.setConnectable(false);
 		this.graph2.setPanning(false);
 		this.graph2.setEnabled(false);
+
+		// Renders oveflow on SVG
+		if (this.graph2.dialect == mxConstants.DIALECT_SVG)
+		{
+			var root = this.graph2.view.getDrawPane().ownerSVGElement;
+			
+			if (root != null)
+			{
+				root.style.overflow = 'visible';
+			}
+		}
+		else
+		{
+			this.graph2.view.canvas.style.overflow = 'visible';
+		}
 		
 		// Blocks all links
 		this.graph2.openLink = mxUtils.bind(this, function()
@@ -622,6 +645,7 @@ Sidebar.prototype.createTooltip = function(elt, cells, w, h, title, showLabel, o
 		
 		this.tooltipTitle.style.display = '';
 		mxUtils.write(this.tooltipTitle, title);
+		this.tooltipTitle.setAttribute('title', title);
 		
 		// Allows for wider labels
 		w2 = Math.min(this.maxTooltipWidth, Math.max(width, this.tooltipTitle.scrollWidth + 4));
@@ -680,7 +704,7 @@ Sidebar.prototype.createTooltip = function(elt, cells, w, h, title, showLabel, o
 	this.tooltip.style.left = left + 'px';
 	this.tooltip.style.top = top + 'px';
 	
-	mxUtils.fit(this.tooltip);
+	mxUtils.fit(this.tooltip, this.tooltipBorder);
 	this.lastCreated = Date.now();
 };
 
@@ -879,14 +903,19 @@ Sidebar.prototype.addEntry = function(tags, fn)
 	{
 		var self = this;
 		var createVertexTemplateFromCells = this.createVertexTemplateFromCells;
+		
 		this.createVertexTemplateFromCells = function(cells, width, height, title, allowCellsInserted)
 		{
-			for (var i = 0; i < cells.length; i++)
+			if (cells != null)
 			{
-				self.addLibForStyle(self.getKeyStyle(cells[i].style),
-					this.currentSearchEntryLibrary);
+				for (var i = 0; i < cells.length; i++)
+				{
+					self.addLibForStyle(self.getKeyStyle(cells[i].style),
+						this.currentSearchEntryLibrary);
+				}
 			}
 		};
+
 		fn();
 		this.createVertexTemplateFromCells = createVertexTemplateFromCells;
 	}
@@ -1671,6 +1700,21 @@ Sidebar.prototype.addMiscPalette = function(expand)
  			'<ul><li>Value 1</li><li>Value 2</li><li>Value 3</li></ul>', 'Unordered List'),
 	 	this.createVertexTemplateEntry('text;strokeColor=none;fillColor=none;html=1;whiteSpace=wrap;verticalAlign=middle;overflow=hidden;', 100, 80,
  			'<ol><li>Value 1</li><li>Value 2</li><li>Value 3</li></ol>', 'Ordered List'),
+
+	 	this.createVertexTemplateEntry('shape=table;startSize=0;container=1;collapsible=0;childLayout=tableLayout;fontSize=11;fillColor=none;strokeColor=none;', 60, 60,
+ 			'', 'Vertical List'),
+		this.addDataEntry('vertical list', 60, 60, 'Vertical List',
+			'7VjbbqMwEP0aXldcQrp9hfSyUvel3R9wwwRba2xkJiX063eMnaRNgxR2V1EUIYHkGWYGzznjI0SQ5NXmwbCa/9QFyCC5C5LcaI1uVW1ykDKIQ1EEySKI45DuIL4feBr1T8OaGVB4SkLsEt6YXIPzOEeDnfSOhrPaLpG9WlfWIDP4It6tLyR7qRUyocCQHfW2lKxuRB/tIriQxRPr9Bq3dbZWtqJsXyyy2SshZa6lttWUVu6FRv+GA6ffNxiEzWDvvcs3/gC6AjQdhbSiQO4i5g6ekIMoOX72scbZ5S5zDyQtPJbHcU1G4vqsW2qKayPeLZzSI3eIddOKSjIFj8CKA1emi26X9REwoTgYYbFGXfsICSv0y1eNqCtvGI9CeJTHwuj6FzMlbEOOkFVrobAHLs3oIijz8FsapNRxTna0t+my4QZzrWjHNEK2LLAGW2gOR2N+KuXxX1Eepf9O+ewL5T8QKvJEg9TTxlEw+QxLZKrsTxfHSvqD1HKB8FKzpQ1tSSLcYVM2ek/KENmagFpJO1YLLooC1HG+xs1Ezy6YuzdwJEcHNBH0GZOipJctXL2soQaEKp9c9fRUHpP/zqMvtgd7dDUmqXfFkM7aWhXNl+HY7fOkeUknibgoieg+k34GxZgPKcbwJEyKMUhrevWKcTMpxiUqRhKeTTG+DylGMinGeMW4uXrFuJ0E4gIEYna+T4ooHFKI2aQQ4xXi9toUgsz9zyUX/vHf0x8='),
+	 	this.addEntry('vertical list', mxUtils.bind(this, function()
+	 	{
+	 		var cell = new mxCell('Link', new mxGeometry(0, 0, 60, 40), 'text;html=1;strokeColor=none;fillColor=none;whiteSpace=wrap;align=center;verticalAlign=middle;fontColor=#0000EE;fontStyle=4;');
+	 		cell.vertex = true;
+	 		this.graph.setLinkForCell(cell, 'https://www.draw.io');
+
+	 		return this.createVertexTemplateFromCells([cell], cell.geometry.width, cell.geometry.height, 'Vertical List');
+	 	})),
+
+
  		this.addDataEntry('table', 180, 120, 'Table 1', '7VnbcpswEP0aXjtcYsd9NUnTh/Yl6Q8o1trSVEiMWAeTr+8KhGlSe2xwJpMSZvCMdtmVteccwY4IkjTb3VmWi5+GgwqS2yBJrTHYjLJdCkoFcSh5kNwEcRzSL4i/Hbkb1XfDnFnQeE5C3CQ8MbWFxtM4CqyUdxSC5W6I7NG5lgUyiw/y2flCsldGI5MaLNlRbSvF8kLW0U2EkIr/YJXZYjtPay3XlO0ni+Zk+/WARdgdral2+YLuwGSAtqKQUnIUPmLR1B0KkBvRpnkwQlY0js0+t4OIBh6lw4glPRG7NyWVJYyVzw4o5TF5jWJRykwxDd+B8VeupeHVPsua35AaZRzaUguw0qGIJvcRCtboh48G0WTesB6G8CBD3Jr8F7MbaEPWUqn2b7TRjvfcSI01cLMlXQRlGn6ZBTOqOCU76my6XLjF1GhaMYnDTQuswBKKwaTHw0i/egPOr87nnFaMkql7WCHTm3rDCMyU3xulkAgPOVu50JJ2fbN/tIvu2DjGsiGE1srp6UZIzkEfJqqfGGpawd4+QcNuNJSf5CQ/8570+Mk6LHvPxhSVphnSHtpqXvzD+X6dZ8lgNslgsAx2L0kbkSrmkyouVcX+xTwiWVxPfcKH6hOql6S/R9uwmJ4Mp+m6Hn3b8HWSwWAZjLdtiMJJFpfKYox9QxRNjcNHbBwW79g4RD2O5T7vsyE6fQz43z8Mepw2TkL4RM3DdCJ5uS5G0D2Q2X0rasL//pT0Bw=='),
  		this.addDataEntry('table', 180, 120, 'Table 2', '7ZlLc9owEMc/ja8dP3jlimnSQ3pJOr0reMGayFqPvNSQT9+VLUMCOEDbyaTYM2ZGWq9e/99K7MheFGfrOyPy9DsmoLzoqxfFBpHqUraOQSkv9GXiRTMvDH3+eeFty9ugeuvnwoCmcxqEdYNfQq2gttSGgjbKGYpU5LZI4smapillPM1ZwMUylQSPuZjb9yUvgm0FCUOP8sWafK7PUZOQGoxrM0elRF7IqrPaI5UquRcbXFEzTFOz3qtM33P7wnkbLF9XF9y9Gy0YVcMbfIYYFdoBE1iIlbIduXWCIVi3alWZnFB3gBmQ2bBLKRNKncek1tNPQS7TppkT2RdFbVhu2+6k54JT/ziJ6EISD1haGGjki1VYOT325S9KmSmh4RuIZM80xWTjTIS5KylYkCs+IRFmjexuuf5RhInB/IcwS2hcFlKpBoJGbeMmR6mpEmg45Ycli/0vQ2/IK4u5Huzq/Fh3QzFq5snRY7sFUVAJBZ2ELnUKRp4NPfwz6IN/wHxwwPxnVQz9oBU+T52kUA8wJ6GX5+xI3oHaeu9wHaFzWQQga7pQNgJnqUwS0HtQwr+FEp2EMrqQietsp9vFvQlFYLQg3jgrnRQHoLfzPIv9sJV9+8bvNPv1W1JXFAqj1lCI+lB4JxS2/7tXFAvjPg34VGnA5i30j8gKJq3HwaDjx8H46rOCm1b2w559t7KCwG+NhVEfCx1LC4Kgzws+Y14w+cC8IDi8rGsOhHHHD4Tg9M3df38CHF4QNvQnPf2u5QbtN4c3fTBceXLA1d0Hotr99fej3w=='),
 		this.addDataEntry('table title', 180, 150, 'Table with Title 1', '7VnbbtswDP0avw6WXSfda5yue9he2v6AGjGRMFkyZKZO+vWjbOWyJVluQ9G6BmxApChaOudIIOQozYvFveOl/GkF6Ci9i9LcWYttq1jkoHWUxEpE6ThKkpjeKPl2oJc1vXHJHRg8ZUDSDnjheg6t54k/a2i9FS518FaSl76JTW86qpA7fFSv3pfG5JhYg1wZcORgja01LyvVhI+bCKm0+MGXdo6rRCuL0jn7C3KrrR8vYMrn2vunlDV8hQ3IDrMFh7A4uOLGFZZ7D7YAdEsKqZVAGSJuW1RiCWomV8Oy4ORV65itx24ApEbAcD+e6Q6e/4bywda0LGmdevUA6oDVNryNXatCcwPfgYu/XCMrlutR2ygqI8EpjyLaMkRomGJoPltEWwTDBRjivcwJZ8sn7mawCpkqrVefMdZ4QZRWGWyAy0b0EJR5/CWLMlpxTjbb2PT4cIe5NTRjEo1PC7zCGqqLSU/2k74MtARqj2ng5j9I4OZ0CdACUHH9ABPkZtZsLImFDluolgrhseQTH1rTEdFuM+OjN+QcIt0SYFPt5TWWSggw+3k7TxsNy+DuXqAlm11KV3p0jw7OpCck22B5djauaWmGI22puRHVDufreZ4kg6yXwcUyWPxJWodUMehVca0qWNI9WQz7suE9lg3DNywbbvuT4Thdw86XDV97GVwsg+6WDSzuZXGtLLpYNzDWFw7vsXBg7A0rB7Z7idcfDru3gsevBT/8aXDG7WMvhE9UPfRXktfrogPlA5mbP0tt+PaPp98='),
@@ -2497,7 +2541,7 @@ Sidebar.prototype.createItem = function(cells, title, showLabel, showTitle, widt
 		cells = this.graph.cloneCells(cells);
 		this.graph.pasteCellStyles(this.graph.includeDescendants(originalCells),
 			this.initialDefaultVertexStyle, this.initialDefaultEdgeStyle);
-		
+
 		if (icon != null)
 		{
 			elt.style.backgroundImage = 'url(' + icon + ')';
@@ -2531,18 +2575,23 @@ Sidebar.prototype.createItem = function(cells, title, showLabel, showTitle, widt
 				cells, bounds, startEditing);
 			this.addClickHandler(elt, ds, cells, clickFn);
 		}
-	}
 	
-	// Shows a tooltip with the rendered cell
-	if (!mxClient.IS_IOS && showTooltip)
-	{
-		mxEvent.addGestureListeners(elt, null, mxUtils.bind(this, function(evt)
+		// Shows a tooltip with the rendered cell
+		if (!mxClient.IS_IOS && showTooltip)
 		{
-			if (mxEvent.isMouseEvent(evt))
+			mxEvent.addGestureListeners(elt, null, mxUtils.bind(this, function(evt)
 			{
-				this.showTooltip(elt, cells, bounds.width, bounds.height, title, showLabel);
-			}
-		}));
+				if (mxEvent.isMouseEvent(evt))
+				{
+					this.showTooltip(elt, cells, bounds.width, bounds.height, title, showLabel);
+				}
+			}));
+		}
+	}
+	else
+	{
+		elt.style.backgroundImage = 'url(' + Editor.svgBrokenImage.src + ')';
+		elt.setAttribute('title', title);
 	}
 	
 	return elt;
@@ -4019,14 +4068,23 @@ Sidebar.prototype.createVertexTemplate = function(style, width, height, value, t
 Sidebar.prototype.createVertexTemplateFromData = function(data, width, height, title, showLabel,
 	showTitle, allowCellsInserted, showTooltip)
 {
-	var doc = mxUtils.parseXml(Graph.decompress(data));
-	var codec = new mxCodec(doc);
+	var cells = null;
 
-	var model = new mxGraphModel();
-	codec.decode(doc.documentElement, model);
+	try
+	{
+		var doc = mxUtils.parseXml(Graph.decompress(data));
+		var codec = new mxCodec(doc);
+
+		var model = new mxGraphModel();
+		codec.decode(doc.documentElement, model);
+		
+		cells = this.graph.cloneCells(model.root.getChildAt(0).children);
+	}
+	catch (e)
+	{
+		title = mxResources.get('error') + ': ' + e.message;
+	}
 	
-	var cells = this.graph.cloneCells(model.root.getChildAt(0).children);
-
 	return this.createVertexTemplateFromCells(cells, width, height, title, showLabel, showTitle,
 		allowCellsInserted, showTooltip);
 };
@@ -4158,7 +4216,7 @@ Sidebar.prototype.addFoldingHandler = function(title, content, funct)
 
 	mxEvent.addListener(title, 'click', mxUtils.bind(this, function(evt)
 	{
-		if (mxEvent.getSource(evt) == title)
+		if (title.contains(mxEvent.getSource(evt)))
 		{
 			if (content.style.display == 'none')
 			{
@@ -4173,21 +4231,19 @@ Sidebar.prototype.addFoldingHandler = function(title, content, funct)
 
 						// Captures child nodes
 						var children = [];
-
+						
 						for (var i = 0; i < title.children.length; i++)
 						{
 							children.push(title.children[i]);
-							title.removeChild(title.children[i]);
-						}			
+						}
 
-						var prev = title.innerHTML;
 						title.innerHTML = mxResources.get('loading') + '...';
 						
 						window.setTimeout(mxUtils.bind(this, function()
 						{
 							this.setContentVisible(content, true);
 							title.style.cursor = '';
-							title.innerHTML = prev;
+							title.innerHTML = '';
 
 							// Restores child nodes
 							for (var i = 0; i < children.length; i++)
@@ -4301,7 +4357,7 @@ Sidebar.prototype.addImagePalette = function(id, title, prefix, postfix, items, 
 	{
 		(mxUtils.bind(this, function(item, title, tmpTags)
 		{
-			if (tmpTags == null)
+			if (tmpTags == null && (prefix == null || prefix.substring(0, 17) != 'img/lib/clip_art/'))
 			{
 				var slash = item.lastIndexOf('/');
 				var dot = item.lastIndexOf('.');

@@ -56,6 +56,8 @@
 
 	Sidebar.prototype.cisco_safe = ['Architecture', 'Business Icons', 'Capability', 'Design', 'IoT Things Icons', 'People Places Things Icons', 'Security Icons', 'Technology Icons', 'Threat'];
 	
+	Sidebar.prototype.sap = ['Annotations', 'Colored Connectors', 'Foundations', 'Integration Suite', 'App Dev Automation', 'Data Analytics', 'AI', 'Generic Icons', 'Component Groups', 'Components', 'Default Connectors', 'Default Shapes', 'Numbers', 'Products', 'Build Workzone', 'Semantic Accent', 'Texts'];
+	
 	Sidebar.prototype.sysml = ['Model Elements', 'Blocks', 'Ports and Flows', 'Constraint Blocks', 'Activities', 'Interactions', 'State Machines', 
 	                           'Use Cases', 'Allocations', 'Requirements', 'Profiles', 'Stereotypes'];
 
@@ -119,7 +121,7 @@
 	 */
 	Sidebar.prototype.configuration = [{id: 'general', libs: ['general', 'misc', 'advanced']},
 									   {id: 'uml'}, {id: 'uml25'}, {id: 'search'}, {id: 'er'},
-									   {id: 'azure2', prefix: 'azure2', libs: ['AI Machine Learning', 'Analytics', 'App Services', 'Azure Ecosystem', 'Azure Stack', 'Azure VMware Solution', 'Blockchain', 'Compute', 'Containers', 'CXP', 'Databases', 'DevOps', 'General', 'Identity', 'Integration', 'Internet of Things', 'Intune', 'IoT', 'Management Governance', 'Menu', 'Migrate', 'Mixed Reality', 'Mobile', 'Monitor', 'Networking', 'Other', 'Preview', 'Security', 'Storage', 'Web']},
+									   {id: 'azure2', prefix: 'azure2', libs: ['AI Machine Learning', 'Analytics', 'App Services', 'Azure Ecosystem', 'Azure Stack', 'Azure VMware Solution', 'Blockchain', 'Compute', 'Containers', 'CXP', 'Databases', 'DevOps', 'General', 'Hybrid and Multicloud', 'Identity', 'Integration', 'Internet of Things', 'Intune', 'IoT', 'Management Governance', 'Menu', 'Migrate', 'Mixed Reality', 'Mobile', 'Monitor', 'Networking', 'Other', 'Preview', 'Security', 'Storage', 'Web']},
 	                                   {id: 'ios', prefix: 'ios', libs: [''/*prefix is library*/, '7icons', '7ui']}, 
 	                                   {id: 'android', prefix: 'android', libs: [''/*prefix is library*/]}, {id: 'aws3d'},
 	                                   {id: 'flowchart'}, {id: 'basic'}, {id: 'infographic'}, {id: 'arrows'}, {id: 'arrows2'}, {id: 'lean_mapping'}, {id: 'citrix'}, {id: 'azure'}, {id: 'network'}, {id: 'vvd'}, 
@@ -146,6 +148,7 @@
            	                           {id: 'aws2', prefix: 'aws2', libs: Sidebar.prototype.aws2},
            	                           {id: 'aws3', prefix: 'aws3', libs: Sidebar.prototype.aws3},
            	                           {id: 'aws4b', prefix: 'aws4b', libs: Sidebar.prototype.aws4b},
+           	                           {id: 'sap', prefix: 'sap', libs: Sidebar.prototype.sap},
            	                           {id: 'aws4', prefix: 'aws4', libs: Sidebar.prototype.aws4},
            	                           {id: 'pid', prefix: 'pid', libs: Sidebar.prototype.pids},
            	                           {id: 'cisco', prefix: 'cisco', libs: Sidebar.prototype.cisco},
@@ -511,6 +514,7 @@
 								{title: 'Network', id: 'network', image: IMAGE_PATH + '/sidebar-network.png'},
 								{title: 'Office', id: 'office', image: IMAGE_PATH + '/sidebar-office.png'},
 								{title: mxResources.get('rack'), id: 'rack', image: IMAGE_PATH + '/sidebar-rack.png'},
+								{title: 'SAP', id: 'sap', image: IMAGE_PATH + '/sidebar-sap.png'},
 								{title: 'Veeam', id: 'veeam2', image: IMAGE_PATH + '/sidebar-veeam.png'},
 								{title: 'VMware', id: 'vvd', image: IMAGE_PATH + '/sidebar-vvd.png'}]},
             			{title: mxResources.get('business'),
@@ -574,16 +578,11 @@
 					canvas.setFontSize(14);
 
 					// Extracts title text
-					var children = title.childNodes;
+					var spans = title.getElementsByTagName('span');
 
-					for (var i = 0; i < children.length; i++)
+					if (spans.length > 0)
 					{
-						if (children[i].nodeType == mxConstants.NODETYPE_TEXT)
-						{
-							canvas.plainText(6, 0, 0, 0, mxUtils.getTextContent(children[i]));
-
-							break;
-						}
+						canvas.text(6, 0, 0, 0, mxUtils.getTextContent(spans[0]));
 					}
 
 					for (var i = 0; i < svgs.length; i++)
@@ -1065,6 +1064,7 @@
 		this.addGCPIconsPalette();
 		this.addIBMPalette();
 		this.addNetworkPalette();
+		this.addSAPPalette();
 		this.addOfficePalette();
 		this.addRackPalette(rack, dir);
 		this.addVeeamPalette();

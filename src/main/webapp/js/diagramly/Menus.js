@@ -356,17 +356,12 @@
 		
 		editorUi.actions.addAction('properties...', function()
 		{
-			if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
 			{
-				editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
-				{
-					editorUi.spinner.stop();
-
-					var dlg = new FilePropertiesDialog(editorUi, url);
-					editorUi.showDialog(dlg.container, 340, 200, true, true);
-					dlg.init();
-				});
-			}
+				var dlg = new FilePropertiesDialog(editorUi, url);
+				editorUi.showDialog(dlg.container, 340, 200, true, true);
+				dlg.init();
+			});
 		}).isEnabled = isGraphEnabled;
 	
 		if (window.mxFreehand)
@@ -442,48 +437,43 @@
 		{
 			editorUi.actions.put('exportUrl', new Action(mxResources.get('url') + '...', function()
 			{
-				editorUi.showPublishLinkDialog(mxResources.get('url'), true, null, null,
-					function(linkTarget, linkColor, allPages, lightbox, editLink, layers, width, height, tags)
-				{
-					var params = [];
-
-					if (tags)
+				editorUi.showPublishLinkDialog(mxResources.get('url'), null, null, null, null, null, null, null,
+					function(linkTarget, linkColor, currentPage, lightbox, editLink, layers, width, height, tags)
 					{
-						params.push('tags=%7B%7D');
-					}
+						var params = [];
 
-					var dlg = new EmbedDialog(editorUi, editorUi.createLink(linkTarget, linkColor,
-						allPages, lightbox, editLink, layers, null, true, params));
-					editorUi.showDialog(dlg.container, 450, 240, true, true);
-					dlg.init();
-				});
+						if (lightbox && tags)
+						{
+							params.push('tags=%7B%7D');
+						}
+
+						var dlg = new EmbedDialog(editorUi, editorUi.createLink(linkTarget, linkColor,
+							true, lightbox, editLink, layers, null, true, params, null, currentPage));
+						editorUi.showDialog(dlg.container, 450, 240, true, true);
+						dlg.init();
+					});
 			}));
 		}
 		
 		editorUi.actions.put('exportHtml', new Action(mxResources.get('formatHtmlEmbedded') + '...', function()
 		{
-			if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
 			{
-				editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				editorUi.showHtmlDialog(mxResources.get('export'), null, url, function(publicUrl, zoomEnabled,
+					initialZoom, linkTarget, linkColor, fit, allPages, layers, tags, lightbox, editLink)
 				{
-					editorUi.spinner.stop();
-					
-					editorUi.showHtmlDialog(mxResources.get('export'), null, url, function(publicUrl, zoomEnabled,
-						initialZoom, linkTarget, linkColor, fit, allPages, layers, tags, lightbox, editLink)
-					{
-						editorUi.createHtml(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages,
-							layers, tags, lightbox, editLink, mxUtils.bind(this, function(html, scriptTag)
-							{
-								var basename = editorUi.getBaseFilename(allPages);
-								var result = '<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->\n' +
-									'<!DOCTYPE html>\n<html>\n<head>\n<title>' + mxUtils.htmlEntities(basename) + '</title>\n' +
-									'<meta charset="utf-8"/>\n</head>\n<body>' + html + '\n' + scriptTag + '\n</body>\n</html>';
-								editorUi.saveData(basename + ((basename.substring(basename.lenth - 7) ==
-									'.drawio') ? '' : '.drawio') + '.html', 'html', result, 'text/html');
-							}));
-					});
+					editorUi.createHtml(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages,
+						layers, tags, lightbox, editLink, mxUtils.bind(this, function(html, scriptTag)
+						{
+							var basename = editorUi.getBaseFilename(allPages);
+							var result = '<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5,IE=9" ><![endif]-->\n' +
+								'<!DOCTYPE html>\n<html>\n<head>\n<title>' + mxUtils.htmlEntities(basename) + '</title>\n' +
+								'<meta charset="utf-8"/>\n</head>\n<body>' + html + '\n' + scriptTag + '\n</body>\n</html>';
+							editorUi.saveData(basename + ((basename.substring(basename.lenth - 7) ==
+								'.drawio') ? '' : '.drawio') + '.html', 'html', result, 'text/html');
+						}));
 				});
-			}
+			});
 		}));
 		
 		editorUi.actions.put('exportPdf', new Action(mxResources.get('formatPdf') + '...', function()
@@ -722,7 +712,7 @@
 					if (!isNaN(val) && val > 0)
 					{
 						editorUi.exportSvg(val / 100, transparentBackground, ignoreSelection,
-							addShadow, editable, embedImages, border, !cropImage, false,
+							addShadow, editable, embedImages, border, !cropImage, currentPage,
 							linkTarget, theme, exportType, embedFonts);
 					}
 				}), true, editorUi.lastExportSvgEditable, 'svg', true);
@@ -743,12 +733,13 @@
 						{
 							editorUi.exportImage(val / 100, transparentBackground && format == 'png',
 								ignoreSelection, addShadow, editable && format == 'png', border,
-								!cropImage, false, format, grid, null, theme, exportType);
+								!cropImage, currentPage, format, grid, null, theme, exportType);
 
 							if (done != null)
 							{
-								done(scale, transparentBackground, ignoreSelection, addShadow, editable, embedImages,
-									border, cropImage, currentPage, dummy, grid, theme, exportType);
+								done(scale, transparentBackground, ignoreSelection, addShadow,
+									editable, embedImages, border, cropImage, currentPage,
+									dummy, grid, theme, exportType);
 							}
 						}
 					}), true, defaultEditable, format, true);
@@ -1528,16 +1519,32 @@
 					{
 						editorUi.checkForUpdates();
 					});
-					
+
+					editorUi.actions.put('desktopZoomIn', new Action(mxResources.get('zoomIn'), function()
+					{
+						editorUi.desktopZoomIn();
+					}));
+
+					editorUi.actions.put('desktopZoomOut', new Action(mxResources.get('zoomOut'), function()
+					{
+						editorUi.desktopZoomOut();
+					}));
+
+					editorUi.actions.put('desktopResetZoom', new Action(mxResources.get('actualSize'), function()
+					{
+						editorUi.desktopResetZoom();
+					}));
+
 					this.addMenuItems(menu, ['-', 'keyboardShortcuts', 'quickStart',
 						'website', 'support', '-'], parent);
 
 					if (urlParams['disableUpdate'] != '1')
 					{
-						this.addMenuItems(menu, ['check4Updates'], parent);
+						this.addMenuItems(menu, ['check4Updates', '-'], parent);
 					}
 
-					this.addMenuItems(menu, ['openDevTools', '-', 'about'], parent);
+					this.addMenuItems(menu, ['desktopResetZoom', 'desktopZoomIn',
+						'desktopZoomOut', '-', 'openDevTools', '-', 'about'], parent);
 				}
 				else
 				{
@@ -2389,99 +2396,92 @@
 		
 		editorUi.actions.put('embedHtml', new Action(mxResources.get('html') + '...', function()
 		{
-			if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
 			{
-				editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				editorUi.showHtmlDialog(mxResources.get('create'), 'https://www.drawio.com/doc/faq/embed-html-options',
+					url, function(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages, layers, tags, lightbox, editLink)
 				{
-					editorUi.spinner.stop();
-					
-					editorUi.showHtmlDialog(mxResources.get('create'), 'https://www.drawio.com/doc/faq/embed-html-options',
-						url, function(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages, layers, tags, lightbox, editLink)
-					{
-						editorUi.createHtml(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages,
-							layers, tags, lightbox, editLink, mxUtils.bind(this, function(html, scriptTag)
+					editorUi.createHtml(publicUrl, zoomEnabled, initialZoom, linkTarget, linkColor, fit, allPages,
+						layers, tags, lightbox, editLink, mxUtils.bind(this, function(html, scriptTag)
+						{
+							// Comment is workaround for file data check in checkFileContent for Electron
+							var dlg = new EmbedDialog(editorUi, '<!-- ' + editorUi.editor.appName + ' diagram -->\n' +
+								html + '\n' + scriptTag + '\n', null, null, function()
 							{
-								// Comment is workaround for file data check in checkFileContent for Electron
-								var dlg = new EmbedDialog(editorUi, '<!-- ' + editorUi.editor.appName + ' diagram -->\n' +
-									html + '\n' + scriptTag + '\n', null, null, function()
+								var wnd = window.open();
+								var doc = wnd.document;
+								
+								if (doc != null)
 								{
-									var wnd = window.open();
-									var doc = wnd.document;
+									if (document.compatMode === 'CSS1Compat')
+									{
+										doc.writeln('<!DOCTYPE html>');
+									}
 									
-									if (doc != null)
+									doc.writeln('<html>');
+									doc.writeln('<head><title>' + encodeURIComponent(mxResources.get('preview')) +
+										'</title><meta charset="utf-8"></head>');
+									doc.writeln('<body>');
+									doc.writeln(html);
+									
+									var direct = mxClient.IS_IE || mxClient.IS_EDGE || document.documentMode != null;
+									
+									if (direct)
 									{
-										if (document.compatMode === 'CSS1Compat')
-										{
-											doc.writeln('<!DOCTYPE html>');
-										}
-										
-										doc.writeln('<html>');
-										doc.writeln('<head><title>' + encodeURIComponent(mxResources.get('preview')) +
-											'</title><meta charset="utf-8"></head>');
-										doc.writeln('<body>');
-										doc.writeln(html);
-										
-										var direct = mxClient.IS_IE || mxClient.IS_EDGE || document.documentMode != null;
-										
-										if (direct)
-										{
-											doc.writeln(scriptTag);
-										}
-										
-										doc.writeln('</body>');
-										doc.writeln('</html>');
-										doc.close();
-										
-										// Adds script tag after closing page and delay to fix timing issues
-										if (!direct)
-										{
-											var info = wnd.document.createElement('div');
-											info.marginLeft = '26px';
-											info.marginTop = '26px';
-											mxUtils.write(info, mxResources.get('updatingDocument'));
-	
-											var img = wnd.document.createElement('img');
-											img.setAttribute('src', window.location.protocol + '//' + window.location.hostname +
-												'/' + IMAGE_PATH + '/spin.gif');
-											img.style.marginLeft = '6px';
-											info.appendChild(img);
-											
-											wnd.document.body.insertBefore(info, wnd.document.body.firstChild);
-											
-											window.setTimeout(function()
-											{
-												var script = document.createElement('script');
-												script.type = 'text/javascript';
-												script.src = /<script.*?src="(.*?)"/.exec(scriptTag)[1];
-												doc.body.appendChild(script);
-												
-												info.parentNode.removeChild(info);
-											}, 20);
-										}
+										doc.writeln(scriptTag);
 									}
-									else
+									
+									doc.writeln('</body>');
+									doc.writeln('</html>');
+									doc.close();
+									
+									// Adds script tag after closing page and delay to fix timing issues
+									if (!direct)
 									{
-										editorUi.handleError({message: mxResources.get('errorUpdatingPreview')});
+										var info = wnd.document.createElement('div');
+										info.marginLeft = '26px';
+										info.marginTop = '26px';
+										mxUtils.write(info, mxResources.get('updatingDocument'));
+
+										var img = wnd.document.createElement('img');
+										img.setAttribute('src', window.location.protocol + '//' + window.location.hostname +
+											'/' + IMAGE_PATH + '/spin.gif');
+										img.style.marginLeft = '6px';
+										info.appendChild(img);
+										
+										wnd.document.body.insertBefore(info, wnd.document.body.firstChild);
+										
+										window.setTimeout(function()
+										{
+											var script = document.createElement('script');
+											script.type = 'text/javascript';
+											script.src = /<script.*?src="(.*?)"/.exec(scriptTag)[1];
+											doc.body.appendChild(script);
+											
+											info.parentNode.removeChild(info);
+										}, 20);
 									}
-								});
-								editorUi.showDialog(dlg.container, 450, 240, true, true);
-								dlg.init();
-							}));
-					});
+								}
+								else
+								{
+									editorUi.handleError({message: mxResources.get('errorUpdatingPreview')});
+								}
+							});
+							editorUi.showDialog(dlg.container, 450, 240, true, true);
+							dlg.init();
+						}));
 				});
-			}
+			});
 		}));
 		
 		editorUi.actions.put('liveImage', new Action('Live image...', function()
 		{
 			var current = editorUi.getCurrentFile();
 			
-			if (current != null && editorUi.spinner.spin(document.body, mxResources.get('loading')))
+			if (current != null)
 			{
-				editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				editorUi.getPublicUrl(current, function(url)
 				{
-					editorUi.spinner.stop();
-					
 					if (url != null)
 					{
 						var dlg = new EmbedDialog(editorUi, '<img src="' + ((current.constructor != DriveFile) ?
@@ -2543,17 +2543,15 @@
 		
 		editorUi.actions.put('embedIframe', new Action(mxResources.get('iframe') + '...', function()
 		{
-			var bounds = graph.getGraphBounds();
-			
-			editorUi.showPublishLinkDialog(mxResources.get('iframe'), null, '100%',
-				Math.ceil(bounds.height / graph.view.scale) + 2,
-				function(linkTarget, linkColor, allPages, lightbox, editLink, layers, width, height, tags)
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(publicUrl)
 			{
-				if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
-				{
-					editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				var bounds = graph.getGraphBounds();
+				
+				editorUi.showPublishLinkDialog(mxResources.get('iframe'), '100%',
+					Math.ceil(Math.max(100, bounds.height / graph.view.scale)) + 2, null, null, null,
+					publicUrl, editorUi.getCurrentFile(), function(linkTarget, linkColor,
+						currentPage, lightbox, editLink, layers, width, height, tags, link)
 					{
-						editorUi.spinner.stop();
 						var params = [];
 
 						if (tags)
@@ -2563,12 +2561,12 @@
 						
 						var dlg = new EmbedDialog(editorUi, '<iframe frameborder="0" style="width:' + width +
 							';height:' + height + ';" src="' + editorUi.createLink(linkTarget, linkColor,
-							allPages, lightbox, editLink, layers, url, null, params) + '"></iframe>');
+							true, lightbox, editLink, layers, (link == 'public') ? publicUrl : null,
+							null, params, null, currentPage) + '"></iframe>');
 						editorUi.showDialog(dlg.container, 450, 240, true, true);
 						dlg.init();
-					});
-				}
-			}, true);
+					}, true);
+			});
 		}));
 
 		editorUi.actions.put('embedNotion', new Action(mxResources.get('notion') + '...', function()
@@ -2600,14 +2598,12 @@
 				mxEvent.consume(evt);
 			});
 			
-			editorUi.showPublishLinkDialog(mxResources.get('notion'), null, null, null,
-				function(linkTarget, linkColor, allPages, lightbox, editLink, layers, width, height, tags)
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(publicUrl)
 			{
-				if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
-				{
-					editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				editorUi.showPublishLinkDialog(mxResources.get('notion'), null, null, true,
+					'https://www.drawio.com/blog/drawio-notion', footer, publicUrl, editorUi.getCurrentFile(),
+					function(linkTarget, linkColor, currentPage, lightbox, editLink, layers, width, height, tags, link)
 					{
-						editorUi.spinner.stop();
 						var params = ['border=0'];
 
 						if (tags)
@@ -2616,38 +2612,34 @@
 						}
 
 						var dlg = new EmbedDialog(editorUi, editorUi.createLink(linkTarget, linkColor,
-							allPages, lightbox, editLink, layers, url, null, params));
+							true, lightbox, editLink, layers, (link == 'public') ? publicUrl : null,
+							null, params, null, currentPage));
 						editorUi.showDialog(dlg.container, 450, 240, true, true);
 						dlg.init();
 					});
-				}
-			}, true, 'https://www.drawio.com/blog/drawio-notion', footer);
+			});
 		}));
 		
 		editorUi.actions.put('publishLink', new Action(mxResources.get('link') + '...', function()
 		{
-			editorUi.showPublishLinkDialog(null, null, null, null,
-				function(linkTarget, linkColor, allPages, lightbox, editLink, layers, width, height, tags)
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(publicUrl)
 			{
-				if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
-				{
-					editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
+				editorUi.showPublishLinkDialog(null, null, null, null, null, null, publicUrl, editorUi.getCurrentFile(),
+					function(linkTarget, linkColor, currentPage, lightbox, editLink, layers, width, height, tags, link)
 					{
-						editorUi.spinner.stop();
-						
 						var params = [];
 
-						if (tags)
+						if (lightbox && tags)
 						{
 							params.push('tags=%7B%7D');
 						}
 
 						var dlg = new EmbedDialog(editorUi, editorUi.createLink(linkTarget, linkColor,
-							allPages, lightbox, editLink, layers, url, null, params));
+							true, lightbox, editLink, layers, (link == 'public') ? publicUrl : null,
+							null, params, null, currentPage));
 						editorUi.showDialog(dlg.container, 450, 240, true, true);
 						dlg.init();
 					});
-				}
 			});
 		}));
 
@@ -2673,16 +2665,12 @@
 
 		editorUi.actions.addAction('googleSites...', function()
 		{
-			if (editorUi.spinner.spin(document.body, mxResources.get('loading')))
+			editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
 			{
-				editorUi.getPublicUrl(editorUi.getCurrentFile(), function(url)
-				{
-					editorUi.spinner.stop();
-					var dlg = new GoogleSitesDialog(editorUi, url);
-					editorUi.showDialog(dlg.container, 420, 256, true, true);
-					dlg.init();
-				});
-			}
+				var dlg = new GoogleSitesDialog(editorUi, url);
+				editorUi.showDialog(dlg.container, 420, 256, true, true);
+				dlg.init();
+			});
 		});
 
 		// Adds plugins menu item only if localStorage is available for storing the plugins
@@ -3528,7 +3516,7 @@
 			{
 				editorUi.handleError(e);
 			}
-		}));
+		})).isEnabled = isGraphEnabled;
 
 		this.put('embed', new Menu(mxUtils.bind(this, function(menu, parent)
 		{
@@ -4425,8 +4413,8 @@
 					editorUi.menus.addMenuItems(menu, ['pageTabs'], parent);
 				}
 
-				this.addMenuItems(menu, ['tooltips', 'ruler', '-', 'grid', 'guides',
-					'-', 'connectionArrows', 'connectionPoints', '-',
+				this.addMenuItems(menu, ['ruler', '-', 'tooltips', 'animations',
+					'-', 'grid', 'guides', '-', 'connectionArrows', 'connectionPoints', '-',
 					'resetView', 'zoomIn', 'zoomOut'], parent);
 
 				if (urlParams['sketch'] != '1')
@@ -4477,23 +4465,11 @@
 				
 				if (urlParams['embed'] != 1)
 				{
-					menu.addSeparator(parent);
-
 					if (!mxClient.IS_CHROMEAPP && !EditorUi.isElectronApp && editorUi.getServiceName() == 'draw.io')
 					{
 						menu.addItem(mxResources.get('openInNewWindow'), null, mxUtils.bind(this, function()
 						{
 							editorUi.editor.editAsNew(editorUi.getFileData(true, null, null, null, true, true));
-						}), parent);
-					}
-					
-					var url = editorUi.getLinkForPage(page);
-
-					if (url != null)
-					{
-						menu.addItem(mxResources.get('link') + '...', null, mxUtils.bind(this, function()
-						{
-							editorUi.showPageLinkDialog(page);
 						}), parent);
 					}
 				}
@@ -4653,7 +4629,7 @@
 				
 				editorUi.menus.addSubmenu('units', menu, parent);
 				editorUi.menus.addMenuItems(menu, ['-', 'copyConnect',
-					'collapseExpand', 'tooltips', 'toggleReadOnly', '-'], parent);
+					'collapseExpand', '-', 'tooltips', 'animations', '-'], parent);
 
 				var file = editorUi.getCurrentFile();
 
@@ -5476,7 +5452,7 @@
 
 						if (css != null)
 						{
-							curFontName = Graph.stripQuotes(css.fontFamily);
+							curFontName = mxUtils.getCssFontFamily(css.fontFamily);
 
 							// Finds the URL for the current font by finding the nearest parent element
 							// with a data-font-src attribute or the fontSource attribute from the cell

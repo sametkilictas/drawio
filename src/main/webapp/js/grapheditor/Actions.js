@@ -58,16 +58,13 @@ Actions.prototype.init = function()
 	}, null, null, 'Enter'));
 	this.addAction('keyPressEnter', function()
 	{
-		if (graph.isEnabled())
+		if (graph.isSelectionEmpty())
 		{
-			if (graph.isSelectionEmpty())
-			{
-				ui.actions.get('smartFit').funct();
-			}
-			else
-			{
-				graph.startEditingAtCell();
-			}
+			ui.actions.get('smartFit').funct();
+		}
+		else if (graph.isEnabled())
+		{
+			graph.startEditingAtCell();
 		}
 	});
 	this.addAction('import...', function()
@@ -101,7 +98,7 @@ Actions.prototype.init = function()
 		});
 	}).isEnabled = isGraphEnabled;
 	this.addAction('save', function() { ui.saveFile(false); }, null, null, Editor.ctrlKey + '+S').isEnabled = isGraphEnabled;
-	this.addAction('saveAs...', function() { ui.saveFile(true); }, null, null, Editor.ctrlKey + '+Shift+S').isEnabled = isGraphEnabled;
+	this.addAction('saveAs...', function() { ui.saveFile(true); }, null, null, Editor.ctrlKey + '+Shift+S');
 	this.addAction('export...', function() { ui.showDialog(new ExportDialog(ui).container, 300, 340, true, true); });
 	this.addAction('editDiagram...', function()
 	{
@@ -613,6 +610,14 @@ Actions.prototype.init = function()
 			}
 		}
 	}, null, null, Editor.ctrlKey + '+L');
+	
+	this.addAction('explore', function()
+	{
+		if (graph.model.isVertex(graph.getSelectionCell()))
+		{
+			Graph.exploreFromCell(ui.editor.graph, ui.editor.graph.getSelectionCell());
+		}
+	});
 
 	// Navigation actions
 	this.addAction('home', function() { graph.home(); }, null, null, 'Shift+Home');
@@ -1071,7 +1076,7 @@ Actions.prototype.init = function()
 		{
 			graph.zoomIn();
 		}
-	}, null, null, Editor.ctrlKey + ' + (Numpad) / Alt+Mousewheel');
+	}, null, null, Editor.ctrlKey + ' + / Alt+Mousewheel');
 	this.addAction('zoomOut', function(evt)
 	{
 		if (graph.isFastZoomEnabled())
@@ -1082,7 +1087,7 @@ Actions.prototype.init = function()
 		{
 			graph.zoomOut();
 		}
-	}, null, null, Editor.ctrlKey + ' - (Numpad) / Alt+Mousewheel');
+	}, null, null, Editor.ctrlKey + ' - / Alt+Mousewheel');
 	this.addAction('fitWindow', function()
 	{
 		if (graph.pageVisible && graph.isSelectionEmpty())
@@ -1182,6 +1187,14 @@ Actions.prototype.init = function()
 	action.setToggleAction(true);
 	action.setSelectedCallback(function() { return graph.graphHandler.guidesEnabled; });
 	action.setEnabled(false);
+	
+	action = this.addAction('animations', function()
+	{
+		Editor.enableAnimations = !Editor.enableAnimations;
+		ui.fireEvent(new mxEventObject('enableAnimationsChanged'));
+	});
+	action.setToggleAction(true);
+	action.setSelectedCallback(function() { return Editor.enableAnimations; });
 	
 	action = this.addAction('tooltips', function()
 	{

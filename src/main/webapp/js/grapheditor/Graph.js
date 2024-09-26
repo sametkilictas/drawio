@@ -1681,28 +1681,7 @@ Graph.htmlToPng = function(html, w, h, fn, css, scale)
  */
 Graph.zapGremlins = function(text)
 {
-	var lastIndex = 0;
-	var checked = [];
-	
-	for (var i = 0; i < text.length; i++)
-	{
-		var code = text.charCodeAt(i);
-		
-		// Removes all control chars except TAB, LF and CR
-		if (!((code >= 32 || code == 9 || code == 10 || code == 13) &&
-			code != 0xFFFF && code != 0xFFFE))
-		{
-			checked.push(text.substring(lastIndex, i));
-			lastIndex = i + 1;
-		}
-	}
-	
-	if (lastIndex > 0 && lastIndex < text.length)
-	{
-		checked.push(text.substring(lastIndex));
-	}
-	
-	return (checked.length == 0) ? text : checked.join('');
+	return mxUtils.zapGremlins(text);
 };
 
 /**
@@ -2263,9 +2242,10 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 
 			if (cell.startIndex > 0)
 			{
-				var backCell = graph.createVertex(null, null,
-					mxResources.get('previousPage') + '...',
-					0, 0, 100, 30, btnStyle);
+				var backCell = graph.createVertex(null, null, mxResources.get('previousPage') + ' (' +
+					Math.ceil((cell.startIndex || 0) / pageSize) + '/' +
+					Math.ceil(edges.length / pageSize) + ')',
+					0, 0, 120, 30, btnStyle);
 				backCell.referenceCell = realCell;
 				backCell.startIndex = Math.max(0, (cell.startIndex || 0) - pageSize);
 				clones.splice(0, 0, backCell);
@@ -2273,9 +2253,9 @@ Graph.exploreFromCell = function(sourceGraph, selectionCell, config)
 			
 			if (edges.length > (cell.startIndex || 0) + pageSize)
 			{
-				var moreCell = graph.createVertex(null, null,
-					mxResources.get('nextPage') + '...',
-					0, 0, 100, 30, btnStyle);
+				var moreCell = graph.createVertex(null, null, mxResources.get('nextPage') + ' (' +
+					(Math.ceil((cell.startIndex || 0) / pageSize) + 2) + '/' +
+					Math.ceil(edges.length / pageSize) + ')', 0, 0, 120, 30, btnStyle);
 				moreCell.referenceCell = realCell;
 				moreCell.startIndex = (cell.startIndex || 0) + pageSize;
 				clones.splice(0, 0, moreCell);
@@ -2460,17 +2440,6 @@ DOMPurify.addHook('afterSanitizeAttributes', function(node)
 	}
 });
 
-// Workaround for removed content with empty nodes
-DOMPurify.addHook('uponSanitizeAttribute', function (node, evt)
-{
-	if (node.nodeName == 'svg' && evt.attrName == 'content')
-	{
-		evt.forceKeepAttr = true;
-	}
-	
-	return node;
-});
-
 /**
  * Sanitizes the given value.
  */
@@ -2595,37 +2564,6 @@ Graph.clipSvgDataUri = function(dataUri, ignorePreserveAspect)
 	}
 	
 	return dataUri;
-};
-
-/**
- * Returns the CSS font family from the given computed style.
- */
-Graph.stripQuotes = function(text)
-{
-	if (text != null)
-	{
-		if (text.charAt(0) == '\'')
-		{
-			text = text.substring(1);
-		}
-		
-		if (text.charAt(text.length - 1) == '\'')
-		{
-			text = text.substring(0, text.length - 1);
-		}
-	
-		if (text.charAt(0) == '"')
-		{
-			text = text.substring(1);
-		}
-		
-		if (text.charAt(text.length - 1) == '"')
-		{
-			text = text.substring(0, text.length - 1);
-		}
-	}
-	
-	return text;
 };
 
 /**
@@ -3324,9 +3262,9 @@ Graph.prototype.init = function(container)
 			// Ignores transparent stroke colors
 			if (keys[i] != 'strokeColor' || (values[i] != null && values[i] != 'none'))
 			{
-				if (mxUtils.indexOf(Graph.cellStyles, keys[i]) >= 0)
+				if (mxUtils.indexOf(Graph.cellStyles, keys[i]) >= 0 || keys[i] == 'shape')
 				{
-					if (vertex || common)
+					if (keys[i] != 'shape' && (vertex || common))
 					{
 						if (values[i] == null)
 						{
@@ -4615,7 +4553,8 @@ Graph.prototype.createVertexWipeAnimation = function(state, wipeIn)
  */
 Graph.prototype.getPageSize = function()
 {
-	return (this.pageVisible) ? new mxRectangle(0, 0, this.pageFormat.width * this.pageScale,
+	return (this.pageVisible && this.pageFormat != null) ?
+		new mxRectangle(0, 0, this.pageFormat.width * this.pageScale,
 			this.pageFormat.height * this.pageScale) : this.scrollTileSize;
 };
 
@@ -10385,8 +10324,9 @@ if (typeof mxVertexHandler !== 'undefined')
 		/**
 		 * Overrides autosize to add a border.
 		 */
-		Graph.prototype.getPreferredSizeForCell = function(cell)
+		Graph.prototype.getPreferredSizeForCell = function(cell, w, gridEnabled)
 		{
+			gridEnabled = (gridEnabled != null) ? gridEnabled : this.gridEnabled;
 			var result = mxGraph.prototype.getPreferredSizeForCell.apply(this, arguments);
 			
 			// Adds buffer
@@ -10395,7 +10335,7 @@ if (typeof mxVertexHandler !== 'undefined')
 				result.width += 10;
 				result.height += 4;
 				
-				if (this.gridEnabled)
+				if (gridEnabled)
 				{
 					result.width = this.snap(result.width);
 					result.height = this.snap(result.height);
@@ -11749,6 +11689,55 @@ if (typeof mxVertexHandler !== 'undefined')
 		{
 			var exp = new mxImageExport();
 			
+			// Adds cell ID to SVG group
+			exp.addCellData = function(cell, group, includeValue)
+			{
+				group.setAttribute('data-cell-id', cell.id);
+
+				if (includeValue)
+				{
+					if (mxUtils.isNode(cell.value))
+					{
+						for (var i = 0; i < cell.value.attributes.length; i++)
+						{
+							var attrib = cell.value.attributes[i];
+							group.setAttribute('data-cell-' + attrib.name, attrib.value);
+						}
+					}
+					else if (typeof cell.value === 'object')
+					{
+						for (var key in cell.value)
+						{
+							group.setAttribute('data-cell-' + key, cell.value[key]);
+						}
+					}
+					else if (cell.value != null)
+					{
+						group.setAttribute('data-cell-value', cell.value);
+					}
+				}
+
+				return group;
+			};
+
+			// Maps cell hierarchy to SVG group structure
+			var visitStatesRecursive = exp.visitStatesRecursive;
+			exp.visitStatesRecursive = function(state, canvas, visitor)
+			{
+				if (state != null)
+				{
+					var root = canvas.root;
+					var svgDoc = canvas.root.ownerDocument;
+					canvas.root = this.addCellData(state.cell,
+						(svgDoc.createElementNS != null) ?
+							svgDoc.createElementNS(mxConstants.NS_SVG, 'g') :
+							svgDoc.createElement('g'), Editor.addSvgMetadata);
+					root.appendChild(canvas.root);
+					visitStatesRecursive.apply(this, arguments);
+					canvas.root = root;
+				}
+			};
+
 			// Adds hyperlinks (experimental)
 			exp.getLinkForCellState = mxUtils.bind(this, function(state, canvas)
 			{
@@ -14895,7 +14884,8 @@ if (typeof mxVertexHandler !== 'undefined')
 		{
 			edgeHandlerMouseUp.apply(this, arguments);
 			
-			if (this.linkHint != null && this.linkHint.style.display == 'none')
+			if (this.linkHint != null && this.linkHint.style.display == 'none' &&
+				this.graph.getSelectionCount() == 1)
 			{
 				this.linkHint.style.display = '';
 			}
@@ -15546,7 +15536,8 @@ if (typeof mxVertexHandler !== 'undefined')
 				this.rotationShape.node.style.display = (this.graph.getSelectionCount() == 1) ? '' : 'none';
 			}
 			
-			if (this.linkHint != null && this.linkHint.style.display == 'none')
+			if (this.linkHint != null && this.linkHint.style.display == 'none' &&
+				this.graph.getSelectionCount() == 1)
 			{
 				this.linkHint.style.display = '';
 			}
@@ -15590,6 +15581,8 @@ if (typeof mxVertexHandler !== 'undefined')
 					if (this.linkHint == null)
 					{
 						this.linkHint = createHint();
+
+						mxUtils.setPrefixedStyle(this.linkHint.style, 'transform', 'translate(-50%,0)');
 						this.linkHint.style.padding = '6px 8px 6px 8px';
 						this.linkHint.style.opacity = '1';
 						this.linkHint.style.filter = '';
@@ -15823,7 +15816,7 @@ if (typeof mxVertexHandler !== 'undefined')
 					b = Math.max(b, tb.y + tb.height);
 				}
 				
-				this.linkHint.style.left = Math.max(0, Math.round(rs.x + (rs.width - this.linkHint.clientWidth) / 2)) + 'px';
+				this.linkHint.style.left = (rs.x + rs.width / 2) + 'px';
 				this.linkHint.style.top = Math.round(b + this.verticalOffset / 2 + Editor.hintOffset) + 'px';
 				this.linkHint.style.display = (this.graph.getSelectionCount() > 1) ? 'none' : '';
 			}
@@ -15881,7 +15874,7 @@ if (typeof mxVertexHandler !== 'undefined')
 						b.add(this.state.text.bounds);
 					}
 					
-					this.linkHint.style.left = Math.max(0, Math.round(b.x + (b.width - this.linkHint.clientWidth) / 2)) + 'px';
+					this.linkHint.style.left = (b.x + b.width / 2) + 'px';
 					this.linkHint.style.top = Math.round(b.y + b.height + Editor.hintOffset) + 'px';
 					this.linkHint.style.display = (this.graph.getSelectionCount() > 1) ? 'none' : '';
 				}

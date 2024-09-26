@@ -269,6 +269,24 @@
 	Editor.defaultBorder = 5;
 
 	/**
+	 * Specifies if cell metadata should be added to SVG output. Default is false.
+	 */
+	Editor.addSvgMetadata = false;
+
+	/**
+	 * Specifies animations should be enabled. Default is true.
+	 */
+	Editor.enableAnimations = true;
+
+	/**
+	 * Specifies if ChatGPT should be enabled. Default is true only
+	 * on app.diagrams.net (including test and preprod).
+	 */
+	Editor.enableChatGpt = (/test\.draw\.io$/.test(window.location.hostname)) ||
+		(/preprod\.diagrams\.net$/.test(window.location.hostname)) ||
+		(/app\.diagrams\.net$/.test(window.location.hostname));
+
+	/**
 	 * Specifies the ChatGPT API key. Default is null.
 	 */
 	Editor.gptApiKey = (urlParams['gpt-api-key'] != null) ?
@@ -468,7 +486,9 @@
         {name: 'fillOpacity', dispName: 'Fill Opacity', type: 'int', min: 0, max: 100, defVal: 100},
         {name: 'strokeOpacity', dispName: 'Stroke Opacity', type: 'int', min: 0, max: 100, defVal: 100},
         {name: 'startFill', dispName: 'Start Fill', type: 'bool', defVal: true},
+		{name: 'startFillColor', dispName: 'Start Fill Color', type: 'color', defVal: null},
         {name: 'endFill', dispName: 'End Fill', type: 'bool', defVal: true},
+		{name: 'endFillColor', dispName: 'End Fill Color', type: 'color', defVal: null},
         {name: 'perimeterSpacing', dispName: 'Terminal Spacing', type: 'float', defVal: 0},
         {name: 'anchorPointDirection', dispName: 'Anchor Direction', type: 'bool', defVal: true},
         {name: 'snapToPoint', dispName: 'Snap to Point', type: 'bool', defVal: false},
@@ -644,6 +664,12 @@
     		return geo != null && !geo.relative;
         }},
         {name: 'autosize', dispName: 'Autosize', type: 'bool', defVal: false},
+		{name: 'autosizeGrid', dispName: 'Autosize Grid', type: 'enum', defVal: null,
+        	enumList: [{val: null, dispName: 'Default'}, {val: '1', dispName: 'Enabled'}, {val: '0', dispName: 'Disabled'}], isVisible: function(state, format)
+			{
+				return state.vertices.length > 0 && format.editorUi.editor.graph.isAutoSizeCell(state.vertices[0]);
+			}
+        },
         {name: 'fixedWidth', dispName: 'Fixed Width', type: 'bool', defVal: false},
         {name: 'resizable', dispName: 'Resizable', type: 'bool', defVal: true},
         {name: 'resizeWidth', dispName: 'Resize Width', type: 'bool', defVal: false},
@@ -2403,6 +2429,16 @@
 			if (config.shadowBlur != null)
 			{
 				mxConstants.SHADOW_BLUR = config.shadowBlur;
+			}
+
+			if (config.enableAnimations != null)
+			{
+				Editor.enableAnimations = config.enableAnimations;
+			}
+			
+			if (config.enableChatGpt != null)
+			{
+				Editor.enableChatGpt = config.enableChatGpt;
 			}
 
 			if (config.gptApiKey != null)
@@ -6190,7 +6226,14 @@
 				
 				if (name != null)
 				{
-					Graph.addFont(name, decodeURIComponent(url));
+					try
+					{
+						Graph.addFont(name, decodeURIComponent(url));
+					}
+					catch (e)
+					{
+						// ignore
+					}
 				}
 			}
 		}
@@ -8406,6 +8449,7 @@
 	mxStencilRegistry.libraries['pid2valves'] = [SHAPES_PATH + '/pid2/mxPidValves.js'];
 	mxStencilRegistry.libraries['pidFlowSensors'] = [STENCIL_PATH + '/pid/flow_sensors.xml'];
 	mxStencilRegistry.libraries['salesforce'] = [STENCIL_PATH + '/salesforce.xml'];
+	mxStencilRegistry.libraries['sap'] = [SHAPES_PATH + '/mxSAP.js', STENCIL_PATH + '/sap.xml'];
 	mxStencilRegistry.libraries['emoji'] = [SHAPES_PATH + '/emoji/mxEmoji.js'];
 
 	// Triggers dynamic loading for markers

@@ -102,6 +102,68 @@ var mxUtils =
 			};
 		}
 	}(),
+		
+	/**
+	 * Function: getCssFontFamily
+	 * 
+	 * Gets the CSS font family or families without quotes.
+	 */
+	getCssFontFamily: function(fontFamily)
+	{
+		if (typeof fontFamily === 'string')
+		{
+			var tokens = fontFamily.split(',');
+
+			for (var i = 0; i < tokens.length; i++)
+			{
+				tokens[i] = mxUtils.trim(tokens[i]);
+
+				if (tokens[i].charAt(0) == '"' && tokens[i].charAt(tokens[i].length - 1) == '"')
+				{
+					tokens[i] = tokens[i].substring(1, tokens[i].length - 1);
+				}
+			}
+
+			fontFamily = tokens.join(', ');
+		}
+
+		return fontFamily;
+	},
+
+	/**
+	 * Function: parseCssFontFamily
+	 * 
+	 * Parses the given CSS font family or families and returns a properly
+	 * quotes and escaped font family definition for use in CSS.
+	 */
+	parseCssFontFamily: function(fontFamily, htmlEntities)
+	{
+		if (typeof fontFamily === 'string')
+		{
+			var tokens = fontFamily.split(',');
+
+			for (var i = 0; i < tokens.length; i++)
+			{
+				tokens[i] = mxUtils.trim(tokens[i]);
+
+				if (tokens[i].charAt(0) == '"' && tokens[i].charAt(tokens[i].length - 1) == '"')
+				{
+					tokens[i] = tokens[i].substring(1, tokens[i].length - 1);
+				}
+
+				if (htmlEntities)
+				{
+					tokens[i] = mxUtils.htmlEntities(tokens[i]);
+				}
+
+				tokens[i] = '"' + tokens[i] + '"';
+			}
+
+			fontFamily = tokens.join(', ');
+		}
+
+		return fontFamily;
+	},
 	
 	/**
 	 * Function: parseCssNumber
@@ -1586,8 +1648,9 @@ var mxUtils =
 	 * Makes sure the given node is inside the visible area of the window. This
 	 * is done by setting the left and top in the style. 
 	 */
-	fit: function(node)
+	fit: function(node, margin)
 	{
+		margin = margin || 0;
 		var ds = mxUtils.getDocumentSize();
 		var left = parseInt(node.offsetLeft);
 		var width = parseInt(node.offsetWidth);
@@ -1595,24 +1658,20 @@ var mxUtils =
 		var offset = mxUtils.getDocumentScrollOrigin(node.ownerDocument);
 		var sl = offset.x;
 		var st = offset.y;
-
-		var b = document.body;
-		var d = document.documentElement;
-		var right = (sl) + ds.width;
+		var right = sl + ds.width - margin;
 		
 		if (left + width > right)
 		{
-			node.style.left = Math.max(sl, right - width) + 'px';
+			node.style.left = Math.max(sl + margin, right - width) + 'px';
 		}
 		
 		var top = parseInt(node.offsetTop);
 		var height = parseInt(node.offsetHeight);
-		
-		var bottom = st + ds.height;
+		var bottom = st + ds.height - margin;
 		
 		if (top + height > bottom)
 		{
-			node.style.top = Math.max(st, bottom - height) + 'px';
+			node.style.top = Math.max(st + margin, bottom - height) + 'px';
 		}
 	},
 
@@ -3064,12 +3123,50 @@ var mxUtils =
 	 */
 	removeJavascriptProtocol: function(link)
 	{
+		link = (link != null) ? mxUtils.zapGremlins(link) : null;
+
 		while (link != null && mxUtils.ltrim(link.toLowerCase()).substring(0, 11) === 'javascript:')
 		{
 			link = link.substring(link.toLowerCase().indexOf(':') + 1);
 		}
 
 		return link;
+	},
+	
+	/**
+	 * Function: zapGremlins
+	 * 
+	 * Removes all illegal control characters with ASCII code <32 except TAB, LF
+	 * and CR.
+	 * 
+	 * Parameters:
+	 * 
+	 * text - String that represents the text.
+	 */
+	zapGremlins: function(text)
+	{
+		var lastIndex = 0;
+		var checked = [];
+		
+		for (var i = 0; i < text.length; i++)
+		{
+			var code = text.charCodeAt(i);
+			
+			// Removes all control chars except TAB, LF and CR
+			if (!((code >= 32 || code == 9 || code == 10 || code == 13) &&
+				code != 0xFFFF && code != 0xFFFE))
+			{
+				checked.push(text.substring(lastIndex, i));
+				lastIndex = i + 1;
+			}
+		}
+		
+		if (lastIndex > 0 && lastIndex < text.length)
+		{
+			checked.push(text.substring(lastIndex));
+		}
+		
+		return (checked.length == 0) ? text : checked.join('');
 	},
 
 	/**

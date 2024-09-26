@@ -26,17 +26,7 @@ mxUtils.extend(StorageFile, DrawioFile);
 */
 StorageFile.prototype.getEtag = function(data)
 {
-	if (data == null)
-	{
-		return null;
-	}
-	else
-	{
-		var content = mxUtils.parseXml(data);
-
-		return content.documentElement.getAttribute('etag');
-	}
-};
+	return this.ui.hashValue((data != null) ? data : '');};
 
 /**
  * Sets the delay for autosave in milliseconds. Default is 1000.
@@ -90,7 +80,16 @@ StorageFile.prototype.isPolling = function()
  */
 StorageFile.prototype.getPollingInterval = function()
 {
-	return 2000;
+	return 10000;
+};
+
+/**
+ * Hook for subclassers to get the latest descriptor of this file
+ * and return it in the success handler.
+ */
+StorageFile.prototype.loadDescriptor = function(success, error)
+{
+	this.getLatestVersionId(success, error);
 };
 
 /**
@@ -222,8 +221,7 @@ StorageFile.doInsertFile = function(file, success, error)
 	{
 		var fn = function()
 		{
-			// Inserts data into local storage
-			file.saveFile(title, false, function()
+			file.writeFile(title, function()
 			{
 				success(file);
 			}, error);
@@ -329,6 +327,10 @@ StorageFile.prototype.saveFile = function(title, revision, success, error, retry
 		if (this.isRenamable() && title.charAt(0) == '.' && error != null)
 		{
 			error({message: mxResources.get('invalidName')});
+		}
+		else if (this instanceof StorageLibrary)
+		{
+			fn(); // No need to check for conflicts with libraries			
 		}
 		else
 		{
