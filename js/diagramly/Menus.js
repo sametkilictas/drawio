@@ -2759,6 +2759,8 @@
 		
 		if (urlParams['embed'] == '1')
 		{
+			editorUi.actions.get('saveAs').setEnabled(false);
+			
 			editorUi.actions.get('save').funct = function(exit)
 			{
 				if (graph.isEditing())
@@ -2774,7 +2776,8 @@
 					var msg = editorUi.createLoadMessage('save');
 					msg.xml = data;
 					
-					if (exit)
+					if (exit === true && (urlParams['saveAndExit'] == '1' ||
+						urlParams['publishClose'] == '1'))
 					{
 						msg.exit = true;
 					}
@@ -2811,8 +2814,7 @@
 				{
 					editorUi.actions.get('save').funct(true);
 				}
-
-			});
+			}, null, null, Editor.ctrlKey + '+S');
 			
 			saveAndExitAction.label = urlParams['publishClose'] == '1' ? mxResources.get('publish') : mxResources.get('saveAndExit');
 			
@@ -4110,6 +4112,14 @@
 						editorUi.showLibraryDialog(null, null, null, null, App.MODE_DEVICE);
 					}, parent);
 				}
+
+				if (urlParams['confLib'] == '1')
+				{
+					menu.addItem(mxResources.get('confluenceCloud') + '...', null, function()
+					{
+						editorUi.showLibraryDialog(null, null, null, null, 'CONF_LIB');
+					}, parent);
+				}
 			}));
 	
 			this.put('openLibraryFrom', new Menu(function(menu, parent)
@@ -4241,7 +4251,7 @@
 										try
 										{
 											editorUi.loadLibrary(new UrlLibrary(
-												this, req.getText(), fileUrl));
+												editorUi, req.getText(), fileUrl));
 											editorUi.showSidebar();
 										}
 										catch (e)
