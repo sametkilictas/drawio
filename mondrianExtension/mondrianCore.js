@@ -1,68 +1,66 @@
-// Singleton instance
-let mondrianCoreInstance = null;
+/**
+ * ES5-compatible MondrianCore singleton
+ */
+(function (global) {
+    var mondrianCoreInstance = null;
 
-class MondrianCore {
-  constructor() {
-        if (!mondrianCoreInstance) {
-            mondrianCoreInstance = this;
-        } else {
-        return mondrianCoreInstance;
+    function MondrianCore() {
+        if (mondrianCoreInstance) {
+            return mondrianCoreInstance;
         }
-    }  
 
-    async initialize() {
-    }
-
-    CONFIG = {
-        TAG_FONT : 'Roboto Mono',
-
-        // Material Design Definitions https://material.io/design/color/the-color-system.html#tools-for-picking-colors
-
-        COLOR: {
-            PALETTE: {
-                red: {light: '#FFEBEE', medium: '#E53935', dark: '#B71C1C'},        //50, 600, 900
-                magenta: {light: '#FCE4EC', medium: '#D81B60', dark: '#880E4F'},	//Pink
-                purple: {light: '#F3E5F5', medium: '#8E24AA', dark: '#4A148C'},
-                cyan: {light: '#E0F7FA', medium: '#00ACC1', dark: '#006064'},
-                blue: {light: '#E3F2FD', medium: '#1E88E5', dark: '#0D47A1'},
-                teal: {light: '#E0F2F1', medium: '#00897B', dark: '#004D40'},
-                green: {light: '#E8F5E9', medium: '#43A047', dark: '#1B5E20'},
-                limegreen: {light: '#CCFF90', medium: '#64DD17', dark: '#33691E'},      // added for Connector OM5 standard
-                yellow: {light: '#FFFDE7', medium: '#FDD835', dark: '#F57F17'},
-                orange: {light: '#FFF3E0', medium: '#FB8C00', dark: '#E65100'},
-                gray: {light: '#ECEFF1', medium: '#546E7A', dark: '#263238'},       //Blue Gray
-                black: {light: '#ECEFF1', medium: '#000000', dark: '#000000'},
-                black_label: {medium: '#666666', dark: '#000000'}                   // Special entry only used for fontColor of Labels
-            },
-
-            INTENSITY: {
-                NO_COLOR: 'noColor',
-                WHITE: 'white',
-                VERY_LIGHT: 'veryLight',
-                LIGHT: 'light',
-                MEDIUM: 'medium',
-                DARK: 'dark'
+        this.CONFIG = {
+            TAG_FONT: 'Roboto Mono',
+            COLOR: {
+                PALETTE: {
+                    red: { light: '#FFEBEE', medium: '#E53935', dark: '#B71C1C' },
+                    magenta: { light: '#FCE4EC', medium: '#D81B60', dark: '#880E4F' },
+                    purple: { light: '#F3E5F5', medium: '#8E24AA', dark: '#4A148C' },
+                    cyan: { light: '#E0F7FA', medium: '#00ACC1', dark: '#006064' },
+                    blue: { light: '#E3F2FD', medium: '#1E88E5', dark: '#0D47A1' },
+                    teal: { light: '#E0F2F1', medium: '#00897B', dark: '#004D40' },
+                    green: { light: '#E8F5E9', medium: '#43A047', dark: '#1B5E20' },
+                    limegreen: { light: '#CCFF90', medium: '#64DD17', dark: '#33691E' },
+                    yellow: { light: '#FFFDE7', medium: '#FDD835', dark: '#F57F17' },
+                    orange: { light: '#FFF3E0', medium: '#FB8C00', dark: '#E65100' },
+                    gray: { light: '#ECEFF1', medium: '#546E7A', dark: '#263238' },
+                    black: { light: '#ECEFF1', medium: '#000000', dark: '#000000' },
+                    black_label: { medium: '#666666', dark: '#000000' }
+                },
+                INTENSITY: {
+                    NO_COLOR: 'noColor',
+                    WHITE: 'white',
+                    VERY_LIGHT: 'veryLight',
+                    LIGHT: 'light',
+                    MEDIUM: 'medium',
+                    DARK: 'dark'
+                }
             }
-        }
+        };
+
+        mondrianCoreInstance = this;
     }
 
-    // COLOR FUNCTIONS
-    getColor = function(colorFamily, colorIntensity) {
-        switch(colorFamily)
-        {
-            case 'noColor':
-                return 'none';
-            case 'white':
-                return '#ffffff';
+    MondrianCore.prototype.initialize = function (callback) {
+        if (callback) callback();
+    };
+
+    MondrianCore.prototype.getSelectedColorSpecification = function (colorFamily) {
+        if (this.CONFIG.COLOR.PALETTE.hasOwnProperty(colorFamily)) {
+            return this.CONFIG.COLOR.PALETTE[colorFamily];
+        } else {
+            return { light: '#f2f4f8', medium: '#000000', dark: '#000000' };
         }
-    
-        let intensity = this.CONFIG.COLOR.INTENSITY;
-        switch(colorIntensity) 
-        {
-            case intensity.NO_COLOR:
-                return 'none';
-            case intensity.WHITE:
-                return '#ffffff';
+    };
+
+    MondrianCore.prototype.getColor = function (colorFamily, colorIntensity) {
+        var intensity = this.CONFIG.COLOR.INTENSITY;
+        if (colorFamily === intensity.NO_COLOR) return 'none';
+        if (colorFamily === intensity.WHITE) return '#ffffff';
+
+        switch (colorIntensity) {
+            case intensity.NO_COLOR: return 'none';
+            case intensity.WHITE: return '#ffffff';
             case intensity.VERY_LIGHT:
             case intensity.LIGHT:
                 return this.getSelectedColorSpecification(colorFamily)[intensity.LIGHT];
@@ -71,359 +69,284 @@ class MondrianCore {
             case intensity.DARK:
                 return this.getSelectedColorSpecification(colorFamily)[intensity.DARK];
         }
-    }
+    };
 
-    getSelectedColorSpecification = function(colorFamily) {
-        if(this.CONFIG.COLOR.PALETTE.hasOwnProperty(colorFamily))
-            return this.CONFIG.COLOR.PALETTE[colorFamily];
-        else
-            return {light: '#f2f4f8', medium: '#000000', dark: '#000000'}
-    }
+    MondrianCore.prototype.isDarkColor = function (color, colorIntensity) {
+        if (color === '#000000') return true;
+        if (color === '#ffffff') return false;
+        if (color === this.CONFIG.COLOR.PALETTE.yellow.medium) return false;
 
-    isDarkColor = function(color, colorIntensity)
-    {
-        if(color === '#000000') // black
-            return true;
-        else if(color === '#ffffff') // white
-            return false;
-        else if(color === this.CONFIG.COLOR.PALETTE.yellow.medium) // yellow medium is an exception. This will be light as well.
-            return false;
-        else
-            return (colorIntensity === this.CONFIG.COLOR.INTENSITY.MEDIUM || colorIntensity === this.CONFIG.COLOR.INTENSITY.DARK);
-    }
+        return colorIntensity === this.CONFIG.COLOR.INTENSITY.MEDIUM ||
+            colorIntensity === this.CONFIG.COLOR.INTENSITY.DARK;
+    };
 
-    getStrokeColor = function (currentStyle, colorFamilyOverride, colorIntensityOverride) {
-        const CORE = window.MONDRIAN_CORE;
-
-        let colorFamilyLine = (colorFamilyOverride) ?  
-            colorFamilyOverride : 
-            CORE.getStyleValue(currentStyle, 'colorFamilyLine', 'black');
-
-        let colorIntensityLine = (colorIntensityOverride) ? 
-            colorIntensityOverride : 
-            CORE.getStyleValue(currentStyle, 'colorIntensityLine', 'medium');
-        
-        return CORE.getColor(colorFamilyLine, colorIntensityLine);
-    }
-
-    // UTIL FUNCTIONS
-    getStyleValue = function(style, key, defaultValue)
-    {
+    MondrianCore.prototype.getStyleValue = function (style, key, defaultValue) {
         var value = 'undefined';
         var keyIndex = style.indexOf(key + '=');
-
-        if(keyIndex > 0)
-        {	
+        if (keyIndex > 0) {
             var valueSeparator = style.indexOf('=', keyIndex + 1);
             var keySeparator = style.indexOf(';', valueSeparator + 1);
-
-            if(keySeparator < 0)
-                keySeparator = style.length;
-            
+            if (keySeparator < 0) keySeparator = style.length;
             value = style.substring(valueSeparator + 1, keySeparator);
         }
+        return (value === 'undefined' && defaultValue !== undefined) ? defaultValue : value;
+    };
 
-        return (value === 'undefined' &&  defaultValue != undefined) ? defaultValue : value;
-    }
+    MondrianCore.prototype.getStrokeColor = function (currentStyle, colorFamilyOverride, colorIntensityOverride) {
+        var CORE = mondrianCoreInstance;
+        var colorFamilyLine = colorFamilyOverride || CORE.getStyleValue(currentStyle, 'colorFamilyLine', 'black');
+        var colorIntensityLine = colorIntensityOverride || CORE.getStyleValue(currentStyle, 'colorIntensityLine', 'medium');
+        return CORE.getColor(colorFamilyLine, colorIntensityLine);
+    };
 
-    updateStyle = function(thisState, mandatoryStyles, defaultStyles, doBeginUpdate = true)
-    {
-        if (thisState != null)
-        { 
-            const CORE = window.MONDRIAN_CORE;
-            const INTENSITY = CORE.CONFIG.COLOR.INTENSITY;
-            
-            let newStyles = (thisState != null) ? thisState.cell.style : undefined;
-            let currentStyles = (thisState != null) ? thisState.cell.style : undefined;
-    
-            // Apply template settings if defined
-            let template = window.MONDRIAN_REPO.getTemplate(CORE.getStyleValue(newStyles, 'template', undefined));
-            if(template != undefined)
-            {   
-                let initTemplate = (CORE.getStyleValue(newStyles, 'initTemplate', undefined) != 'undefined');
+    MondrianCore.prototype.updateStyle = function (thisState, mandatoryStyles, defaultStyles, doBeginUpdate) {
+        doBeginUpdate = (typeof doBeginUpdate === 'undefined') ? true : doBeginUpdate;
+        if (!thisState) return;
 
-                if(template.style != undefined)
-                {
-                    if(template.style.mandatorySettings != undefined) // always apply
-                    {
-                        for (const setting in template.style.mandatorySettings) {
-                            newStyles = mxUtils.setStyle(newStyles, setting, template.style.mandatorySettings[setting]);
-                        }
-                    }
+        var CORE = mondrianCoreInstance;
+        var INTENSITY = CORE.CONFIG.COLOR.INTENSITY;
 
-                    if(template.style.initialSettings != undefined && initTemplate) // only apply if value is not yet set
-                    {
-                        for (const setting in template.style.initialSettings) {
-                            newStyles = mxUtils.setStyle(newStyles, setting, template.style.initialSettings[setting]);
-                        }
+        var newStyles = thisState.cell.style;
+        var currentStyles = thisState.cell.style;
 
-                        newStyles = mxUtils.setStyle(newStyles, 'initTemplate', null);
-                    }
+        var template = global.MONDRIAN_REPO.getTemplate(CORE.getStyleValue(newStyles, 'template'));
+        if (template && template.style) {
+            var initTemplate = CORE.getStyleValue(newStyles, 'initTemplate') !== 'undefined';
+
+            if (template.style.mandatorySettings) {
+                for (var setting in template.style.mandatorySettings) {
+                    newStyles = mxUtils.setStyle(newStyles, setting, template.style.mandatorySettings[setting]);
                 }
             }
-    
-            // apply the MANDATORY styles that have been given to this function
-            let newStylePartials = (mandatoryStyles != undefined) ? mandatoryStyles.split(';') : [];
-            for (let j = 0; j< newStylePartials.length; j++)
-            {
-                let styleAttribute = newStylePartials[j].toString().split('=');
-                newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
-            }
-    
-            // apply the DEFAULT styles that have been given to this function
-            newStylePartials = (defaultStyles != undefined) ? defaultStyles.split(';') : [];
-            for (let j = 0; j< newStylePartials.length; j++)
-            {
-                let styleAttribute = newStylePartials[j].toString().split('=');
-                let propValue = CORE.getStyleValue(newStyles, styleAttribute[0]);
-    
-                if(propValue == 'undefined')
-                    newStyles = mxUtils.setStyle(newStyles, styleAttribute[0], styleAttribute[1]);
-            }
-    
-            // strokeColor is based on the colorFamily and intensity and the #HEX value must be re-established after the update
-            let colorFamilyOverride;
-            let colorIntensityOverride;
-    
-            if(thisState.view.graph != undefined && thisState.view.graph['mondrianHighlightPredefinedEnabled'])
-            {
-                let isPreDefined = ((thisState.cell.getAttribute('repoAttributes','')) != '');
-                colorFamilyOverride = (isPreDefined) ? 'green' : 'red';
-                colorIntensityOverride = (isPreDefined) ? INTENSITY.MEDIUM : INTENSITY.MEDIUM;
-            }
-    
-            newStyles = mxUtils.setStyle(newStyles, 'strokeColor', CORE.getStrokeColor(newStyles, colorFamilyOverride, colorIntensityOverride));
-    
-            if(newStyles != currentStyles)
-            {
-                if (doBeginUpdate)
-                    thisState.view.graph.model.beginUpdate();
-                try
-                {
-                    thisState.view.graph.model.setStyle(thisState.cell, newStyles);	
+            if (template.style.initialSettings && initTemplate) {
+                for (var setting in template.style.initialSettings) {
+                    newStyles = mxUtils.setStyle(newStyles, setting, template.style.initialSettings[setting]);
                 }
-                finally
-                {
-                    if(doBeginUpdate)
-                        thisState.view.graph.model.endUpdate();
+                newStyles = mxUtils.setStyle(newStyles, 'initTemplate', null);
+            }
+        }
+
+        var i, parts, propValue;
+        if (mandatoryStyles) {
+            parts = mandatoryStyles.split(';');
+            for (i = 0; i < parts.length; i++) {
+                var kv = parts[i].split('=');
+                newStyles = mxUtils.setStyle(newStyles, kv[0], kv[1]);
+            }
+        }
+
+        if (defaultStyles) {
+            parts = defaultStyles.split(';');
+            for (i = 0; i < parts.length; i++) {
+                var kv = parts[i].split('=');
+                propValue = CORE.getStyleValue(newStyles, kv[0]);
+                if (propValue === 'undefined') {
+                    newStyles = mxUtils.setStyle(newStyles, kv[0], kv[1]);
                 }
             }
         }
-    }
-        
-    addAttributes = function(element, elementType, labelColor, labelOnDarkBackground)
-    {
-        const mondrianStyleProperties = {ATTRIBUTES_TEXT: 'attributesText', FORMAT_TEXT: 'formatText'};
-        const mondrianBaseVersionAttribute = 'mondrianVersion';
-        const mondrianBaseVersion = '1.0.0';
 
-        const mondrianBaseElementID =           {mxMondrianConnector: 'Interface-ID', mxMondrianShape: 'Element-ID'};
-        const mondrianBaseAttributes =          {mxMondrianConnector: ['Interface-ID', 'Interface-Name'], mxMondrianShape: ['Element-ID', 'Element-Name', 'Icon-Name', 'Tag-Text']};
-        const mondrianBaseDefaultAttributes =   {mxMondrianConnector: ["Interface-Name", "Interface-ID", "noText"], mxMondrianShape: ["Element-Name", "Element-ID", "noText"]};
-        const mondrianBaseLabelSettings =       {mxMondrianConnector: 'defaultSettingsConnector', mxMondrianShape:'defaultSettings'};
-        if(element.state != null)
-        {
-            const CORE = window.MONDRIAN_CORE;
-            const REPO = window.MONDRIAN_REPO;
-            let cell = element.state.cell;
-    
-            // Set UserObject
+        var colorFamilyOverride, colorIntensityOverride;
+        if (thisState.view.graph && thisState.view.graph['mondrianHighlightPredefinedEnabled']) {
+            var isPreDefined = thisState.cell.getAttribute('repoAttributes', '') !== '';
+            colorFamilyOverride = isPreDefined ? 'green' : 'red';
+            colorIntensityOverride = INTENSITY.MEDIUM;
+        }
+
+        newStyles = mxUtils.setStyle(newStyles, 'strokeColor', CORE.getStrokeColor(newStyles, colorFamilyOverride, colorIntensityOverride));
+
+        if (newStyles !== currentStyles) {
+            if (doBeginUpdate) thisState.view.graph.model.beginUpdate();
+            try {
+                thisState.view.graph.model.setStyle(thisState.cell, newStyles);
+            } finally {
+                if (doBeginUpdate) thisState.view.graph.model.endUpdate();
+            }
+        }
+    };
+
+    MondrianCore.prototype.addAttributes = function (element, elementType, labelColor, labelOnDarkBackground) {
+        var CORE = mondrianCoreInstance;
+        var REPO = global.MONDRIAN_REPO;
+        var mondrianStyleProperties = { ATTRIBUTES_TEXT: 'attributesText', FORMAT_TEXT: 'formatText' };
+        var mondrianBaseVersionAttribute = 'mondrianVersion';
+        var mondrianBaseVersion = '1.0.0';
+        var mondrianBaseElementID = { mxMondrianConnector: 'Interface-ID', mxMondrianShape: 'Element-ID' };
+        var mondrianBaseAttributes = { mxMondrianConnector: ['Interface-ID', 'Interface-Name'], mxMondrianShape: ['Element-ID', 'Element-Name', 'Icon-Name', 'Tag-Text'] };
+        var mondrianBaseDefaultAttributes = { mxMondrianConnector: ["Interface-Name", "Interface-ID", "noText"], mxMondrianShape: ["Element-Name", "Element-ID", "noText"] };
+        var mondrianBaseLabelSettings = { mxMondrianConnector: 'defaultSettingsConnector', mxMondrianShape: 'defaultSettings' };
+
+        if (element.state != null) {
+            var cell = element.state.cell;
+
             if (!mxUtils.isNode(cell.value)) {
-                let obj = mxUtils.createXmlDocument().createElement('UserObject');
-                obj.setAttribute('label', cell.value);			
+                var obj = mxUtils.createXmlDocument().createElement('UserObject');
+                obj.setAttribute('label', cell.value);
                 cell.value = obj;
             }
-    
-            // Set Default Attributes
-            if(cell.value.getAttribute(mondrianBaseVersionAttribute) != mondrianBaseVersion)
-            {
+
+            if (cell.value.getAttribute(mondrianBaseVersionAttribute) != mondrianBaseVersion) {
                 cell.value.setAttribute(mondrianBaseVersionAttribute, mondrianBaseVersion);
                 cell.value.setAttribute('placeholders', '1');
-    
-                for (let attributeIndex = 0; attributeIndex < mondrianBaseAttributes[elementType].length; attributeIndex++ )
-                {
-                    if(!cell.value.hasAttribute(mondrianBaseAttributes[elementType][attributeIndex]))
-                        cell.value.setAttribute(mondrianBaseAttributes[elementType][attributeIndex], '');
+
+                for (var i = 0; i < mondrianBaseAttributes[elementType].length; i++) {
+                    var attr = mondrianBaseAttributes[elementType][i];
+                    if (!cell.value.hasAttribute(attr)) {
+                        cell.value.setAttribute(attr, '');
+                    }
                 }
             }
-    
-            // Set Template Attributes if defined
-            let template = window.MONDRIAN_REPO.getTemplate(CORE.getStyleValue(cell.style, 'template', undefined));
-            if(template != undefined)
-            {   
-                let templateAttributes = [];
-                let templateAttributesMandatory = [];
-                if(template.attributes != undefined)
-                {
-                    if(template.attributes.mandatorySettings != undefined) // always apply
-                    {
-                        for (const setting in template.attributes.mandatorySettings) {
+
+            var template = REPO.getTemplate(CORE.getStyleValue(cell.style, 'template'));
+            if (template != null) {
+                var templateAttributes = [];
+                var templateAttributesMandatory = [];
+                if (template.attributes != null) {
+                    if (template.attributes.mandatorySettings != null) {
+                        for (var setting in template.attributes.mandatorySettings) {
                             cell.value.setAttribute(setting, template.attributes.mandatorySettings[setting]);
-                            
                             templateAttributes.push(setting);
                             templateAttributesMandatory.push(setting);
                         }
                     }
-
-                    if(template.attributes.initialSettings != undefined) // only apply if value is not yet set
-                    {
-                        for (const setting in template.attributes.initialSettings) {
-                            let isSet = (cell.getAttribute(setting,'') != '');
-
-                            if(!isSet)
+                    if (template.attributes.initialSettings != null) {
+                        for (var setting in template.attributes.initialSettings) {
+                            if (cell.getAttribute(setting, '') === '') {
                                 cell.value.setAttribute(setting, template.attributes.initialSettings[setting]);
-
+                            }
                             templateAttributes.push(setting);
                         }
                     }
                 }
-
-                cell.value.setAttribute('templateAttributes',templateAttributes.join(','));
-                cell.value.setAttribute('templateAttributesMandatory',templateAttributesMandatory.join(','));
-            }
-            else
-            {
-                cell.value.setAttribute('templateAttributes',null);
-                cell.value.setAttribute('templateAttributesMandatory',null);
+                cell.value.setAttribute('templateAttributes', templateAttributes.join(','));
+                cell.value.setAttribute('templateAttributesMandatory', templateAttributesMandatory.join(','));
+            } else {
+                cell.value.setAttribute('templateAttributes', null);
+                cell.value.setAttribute('templateAttributesMandatory', null);
             }
 
-            // Set Repo Attributes
             REPO.setAttributesFromRepo(element.state, mondrianBaseElementID[elementType]);
-    
-            // Set Label Value
-            let attributesText = CORE.getStyleValue(cell.style, mondrianStyleProperties.ATTRIBUTES_TEXT, undefined);
-            let attributesChanged = false;
-            let attributes = [];
-    
-            if(attributesText === undefined || attributesText === 'undefined')
-            {
+
+            var attributesText = CORE.getStyleValue(cell.style, mondrianStyleProperties.ATTRIBUTES_TEXT);
+            var attributesChanged = false;
+            var attributes = [];
+            if (attributesText === undefined || attributesText === 'undefined') {
                 attributes = mondrianBaseDefaultAttributes[elementType];
                 attributesChanged = true;
-            }
-            else
-            {
-                let formatText = CORE.getStyleValue(cell.style, mondrianStyleProperties.FORMAT_TEXT, 'default:1');
-                let attributesCount = 0;
-    
-                // to support transition away from separate value to control textFormat
-                if(formatText === 'default:1')
-                    attributesCount = 1;
-                else if(formatText === 'default' || formatText === 'default:1,2')
-                    attributesCount = 2;
-                else if(formatText === 'default:1,2,3')
-                    attributesCount = 3;
-    
+            } else {
+                var formatText = CORE.getStyleValue(cell.style, mondrianStyleProperties.FORMAT_TEXT, 'default:1');
+                var attributesCount = 0;
+                if (formatText === 'default:1') attributesCount = 1;
+                else if (formatText === 'default' || formatText === 'default:1,2') attributesCount = 2;
+                else if (formatText === 'default:1,2,3') attributesCount = 3;
+
                 attributes = attributesText.split(',');
-                for (let i = 0; i < attributes.length; i++)
-                {
-                    if(attributes[i] === 'default')
-                    {
-                        if(i < attributesCount)
-                            attributes[i] = mondrianBaseDefaultAttributes[elementType][i];
-                        else
-                            attributes[i] = 'noText';
-    
+                for (var j = 0; j < attributes.length; j++) {
+                    if (attributes[j] === 'default') {
+                        attributes[j] = (j < attributesCount) ? mondrianBaseDefaultAttributes[elementType][j] : 'noText';
                         attributesChanged = true;
                     }
                 }
             }
-    
-            if(attributesChanged)
-            {
-                attributesText = attributes.join(",");
+
+            if (attributesChanged) {
+                attributesText = attributes.join(',');
                 cell.style = mxUtils.setStyle(cell.style, mondrianStyleProperties.ATTRIBUTES_TEXT, attributesText);
             }
-            
-            cell.value.setAttribute('label',
-                CORE.defineLabel(attributesText, cell, mondrianBaseLabelSettings[elementType], labelColor, labelOnDarkBackground));
+
+            cell.value.setAttribute('label', CORE.defineLabel(attributesText, cell, mondrianBaseLabelSettings[elementType], labelColor, labelOnDarkBackground));
         }
-    }    
+    };
 
-    getLabelFormat = function(labelAttributes, labelTemplate)
-    {
-        let attributes = labelAttributes.split(',');
+    MondrianCore.prototype.defineLabel = function (attributesText, currentCell, settings, labelColor, labelOnDarkBackGround, labelTemplate) {
+        if(window.IS_VIEWER)
+            return currentCell.getAttribute('label');
+        
+        labelColor = labelColor || 'black';
+        labelOnDarkBackGround = !!labelOnDarkBackGround;
+        labelTemplate = labelTemplate || 'default';
 
-        let highestKeyWithAttribute = -1;
+        var formatText = this.getLabelFormat(attributesText, labelTemplate);
+        var currentLabelValue = currentCell.getAttribute('label');
+        currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel') ? 1 : 0);
 
-        for (const [key, value] of attributes.entries()) {
-            if(value != 'noText')
-                highestKeyWithAttribute = key;
+        var elementDefaultSettings = global.MONDRIAN_REPO.getElement(['default'], settings || 'defaultSettings');
+        var labelFormats = elementDefaultSettings.labelFormats;
+        var labelDefaults = elementDefaultSettings.labelDefaultAttributes;
+
+        var attributes = (attributesText === 'undefined' || typeof attributesText === 'undefined') ? labelDefaults : attributesText.split(',');
+        var labelFormatFilter = (formatText === 'undefined' || typeof formatText === 'undefined') ? elementDefaultSettings.labelDefaultFormat : formatText;
+        var labelAttributes = [];
+
+        for (var i = 0; i < attributes.length; i++) {
+            if (attributes[i] === 'default') {
+                labelAttributes.push(labelDefaults[i]);
+            } else if (attributes[i] === 'noText') {
+                labelAttributes.push('');
+            } else {
+                labelAttributes.push(attributes[i]);
+            }
         }
 
-        let labelFormat = undefined;
+        var labelValue = labelFormats[labelFormatFilter] || labelFormats['default'];
 
-        switch(highestKeyWithAttribute) {
+        for (var i = 0; i < labelAttributes.length; i++) {
+            labelValue = labelValue.replace('@' + i, labelAttributes[i]);
+            labelValue = labelValue.replace('%%', '');
+        }
+
+        var colorFamily = (labelColor === 'black') ? 'black_label' : labelColor;
+        var labelColors = labelOnDarkBackGround ? ['#ffffff', '#ffffff'] : [
+            this.CONFIG.COLOR.PALETTE[colorFamily].dark,
+            this.CONFIG.COLOR.PALETTE[colorFamily].medium
+        ];
+
+        for (var i = 0; i < labelColors.length; i++) {
+            labelValue = labelValue.replace('HEX' + i, labelColors[i]);
+            labelValue = labelValue.replace('%%', '');
+        }
+
+        return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
+    };
+
+    MondrianCore.prototype.getLabelFormat = function (labelAttributes, labelTemplate) {
+        var attributes = labelAttributes.split(',');
+        var highestKeyWithAttribute = -1;
+
+        for (var i = 0; i < attributes.length; i++) {
+            if (attributes[i] !== 'noText') {
+                highestKeyWithAttribute = i;
+            }
+        }
+
+        var labelFormat;
+        switch (highestKeyWithAttribute) {
             case -1:
                 labelFormat = 'nolabel';
                 break;
             case 0:
-                labelFormat = `${labelTemplate}:1`;
+                labelFormat = labelTemplate + ':1';
                 break;
             case 1:
-                labelFormat = `${labelTemplate}:1,2`;
+                labelFormat = labelTemplate + ':1,2';
                 break;
             default:
-                labelFormat = `${labelTemplate}:1,2,3`;
+                labelFormat = labelTemplate + ':1,2,3';
+                break;
         }
 
         return labelFormat;
+    };
+
+    global.createMondrianCore = function (callback) {
+        var core = new MondrianCore();
+        core.initialize(callback);
+        return core;
+    };
+
+    if (typeof App === 'undefined') {
+        if (typeof global.MONDRIAN_CORE === 'undefined') {
+            global.MONDRIAN_CORE = global.createMondrianCore();
+        }
     }
-
-    defineLabel = function(attributesText, currentCell, settings, labelColor = 'black', labelOnDarkBackGround = false, labelTemplate = 'default')
-    {
-        let formatText = this.getLabelFormat(attributesText, labelTemplate);
-
-        let currentLabelValue = currentCell.getAttribute('label');
-        currentCell.style = mxUtils.setStyle(currentCell.style, 'noLabel', (formatText === 'nolabel' ) ? 1 : 0);
-
-        let elementDefaultSettings = window.MONDRIAN_REPO.getElement(['default'],(settings != undefined) ? settings : 'defaultSettings');
-        let labelFormats = elementDefaultSettings.labelFormats;
-        let labelDefaults = elementDefaultSettings.labelDefaultAttributes;
-
-        let attributes = (attributesText == 'undefined' || attributesText == undefined) ? labelDefaults : attributesText.split(',');
-                    
-        let labelFormatFilter = (formatText == 'undefined' || formatText == undefined) ? elementDefaultSettings.labelDefaultFormat : formatText;
-        let labelAttributes = [];
-        
-        for(let textAttributeIDX in attributes)
-        {
-            let textAttribute = attributes[textAttributeIDX];
-            
-            if(textAttribute == 'default')
-                labelAttributes.push(labelDefaults[textAttributeIDX]);
-            else if(textAttribute == 'noText')
-                labelAttributes.push('');
-            else
-                labelAttributes.push(textAttribute);
-        }
-
-        let labelValue = (labelFormats[labelFormatFilter] != undefined) ? labelFormats[labelFormatFilter] : labelFormats['default'];
-
-        // data values
-        for (let i = 0; i < labelAttributes.length; i++)
-        {
-            labelValue = labelValue.replace('@'+i,labelAttributes[i]);
-            labelValue = labelValue.replace('%%','');
-        }
-
-        // colors
-        let colorFamily = (labelColor === 'black') ? 'black_label' : labelColor;
-        let labelColors = (labelOnDarkBackGround) ? ['#ffffff','#ffffff'] : [this.CONFIG.COLOR.PALETTE[colorFamily].dark,this.CONFIG.COLOR.PALETTE[colorFamily].medium];
-
-        for (let i = 0; i < labelColors.length; i++)
-        {
-            labelValue = labelValue.replace('HEX'+i,labelColors[i]);
-            labelValue = labelValue.replace('%%','');
-        }
-
-        return (labelValue === 'CUSTOM') ? currentLabelValue : labelValue;
-    }
-}
-
-// asynchronous factory function
-async function createMondrianCore() {
-    const mondrianCore = new MondrianCore();
-    await mondrianCore.initialize();
-    
-    return mondrianCore;
-}
+})(typeof window !== 'undefined' ? window : this);

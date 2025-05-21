@@ -244,20 +244,12 @@
 		{
 			if (mxScriptsLoaded && mxWinLoaded)
 			{
-				mxscript('mondrianExtension/mondrianCore.js', 
-					async function()
-					{
-						window.MONDRIAN_CORE = await createMondrianCore();
-					}
-				);
-				
-				mxscript('mondrianExtension/mondrianRepo.js', 
-					async function()
-					{
-						window.MONDRIAN_REPO = await createMondrianRepo();
-						App.main();
-					}
-				);
+				window.MONDRIAN_CORE = window.createMondrianCore();
+
+				window.createMondrianRepo(function(repo) {
+					window.MONDRIAN_REPO = repo;
+					App.main();
+				});
 			}
 		};
 		

@@ -8,8 +8,6 @@ window.EXPORT_URL = 'REPLACE_WITH_YOUR_EXPORT_SERVER';
 window.PLANT_URL = 'REPLACE_WITH_YOUR_PLANTUML_SERVER';
 window.DRAW_MATH_URL = 'math/es5';
 
- //window.MONDRIAN_CONFIG_PATH = 'FAKE/';
-
 window.DRAWIO_SERVER_URL = this.getBaseURL(window.location.href) + '/';
 function getBaseURL(locationHREF)
 {

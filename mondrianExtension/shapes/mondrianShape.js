@@ -1409,12 +1409,12 @@ mxMondrianShape.prototype.paintIcon = function(c)
 	let svd = this.shapeVisualDefinition;
 	if(svd.icon.visible)
 	{
-		let iconStencilName = this.state.cell.getAttribute('Icon-Name',null) || 'undefined';
+		let iconStencilName = this.state.cell.getAttribute('Icon-Name',null) || 'icon-undefined';
 		let iconImageStyle = this.image || 'undefined';
 
 		// Determine what Icon to show
 		let showStencilIcon = true;
-		let stencilIconIsUndefined = (iconStencilName == 'undefined');
+		let stencilIconIsUndefined = (iconStencilName == 'icon-undefined');
 
 		let showImageIcon = (iconImageStyle != null && iconImageStyle != '' && iconImageStyle != 'undefined');
 		
@@ -1423,7 +1423,7 @@ mxMondrianShape.prototype.paintIcon = function(c)
 		if(showStencilIcon)
 		{
 			let iconName = window.MONDRIAN_REPO.MONDRIAN_ICONS_STENCIL_REGISTRY + iconStencilName;
-
+			
 			if(window.MONDRIAN_REPO.hasStencil(iconName))
 				iconStencil = mxStencilRegistry.getStencil(window.MONDRIAN_REPO.getStencil(iconName));
 			
@@ -1452,6 +1452,7 @@ mxMondrianShape.prototype.paintIcon = function(c)
 		else if(showStencilIcon && stencilIconIsUndefined && showImageIcon) // stencil is found, but it is the 'undefined stencil and there is an Image Style set -> use the Image Style
 			showStencilIcon = false;
 		
+		showStencilIcon = true; // TODO: remove the image selection. It is not used anymore.
 		if(showStencilIcon || showImageIcon)
 		{
 			let iconWidth = svd.icon.size;
